@@ -27,7 +27,7 @@ module.exports = function() {
                 var optionsBody = {
                     url: target,
                     method: 'PUT',
-                    body: JSON.stringify(options.data),
+                    json: options.data,
                     headers: options.action.http_headers
                 };
 
