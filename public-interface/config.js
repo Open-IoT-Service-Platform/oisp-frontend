@@ -196,8 +196,8 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     config.api.forceSSL = false;
     config.auth.captcha.enabled = false;
 
-    config.mail.smtp.requiresAuth = false;
-    config.mail.smtp.auth = undefined;
+    //config.mail.smtp.requiresAuth = false;
+    //config.mail.smtp.auth = undefined;
 
     config.redis = {};
 
