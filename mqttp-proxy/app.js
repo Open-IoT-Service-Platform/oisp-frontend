@@ -39,7 +39,7 @@ app.put('/', function(req, res) {
 	if(broker != null)
 	{
 		var body = req.body
-		console.log("value:", body.conditions[0].components[0].valuePoints[0].value);
+		// console.log("value:", body.conditions[0].components[0].valuePoints[0].value);
 		console.log(broker);
 		// console.log(body)
 
