@@ -182,6 +182,8 @@ iotApp.directive('iotMetricsChart', function(componentsService){
         };
 
         function computeRawDataForSeries(series){
+            if(series == null) return;
+
             scope[attributes.rawData].length = 0;
 
             series.forEach(function(deviceComponentPair){
