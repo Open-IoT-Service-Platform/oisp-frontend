@@ -353,23 +353,29 @@ iotController.controller('ChartCtrl', function( $scope,
     $scope.chartData = [];
     /*jshint newcap: false */
     $scope.tableChartData = new ngTableParams({
-        page: 1,            // show first page
-        count: 10           // count per page
+        page: 1,                // show first page
+        count: 10,              // count per page
+        sorting: {
+            timestamp: 'desc'   // set default sorting
+        }
     }, {
         counts: [],
         getData: function(deferred, params) {
-            //$scope.devices = data;
             var orderedData = !isEmpty(params.sorting()) ?
                 $filter('orderBy')($scope.chartData, params.orderBy()) :
                 $scope.chartData;
+
             orderedData = params.filter() ?
                 $filter('filter')(orderedData, params.filter()) :
                 orderedData;
 
-            deferred.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+            var dataForPage = orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count());
+
+            deferred.resolve(dataForPage);
             params.total(orderedData.length);
         }
     });
+
     /*jshint newcap: true */
     var dataCanceler;
 

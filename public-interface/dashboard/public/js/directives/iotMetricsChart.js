@@ -181,6 +181,26 @@ iotApp.directive('iotMetricsChart', function(componentsService){
             return n.toFixed(2);
         };
 
+        function computeRawDataForSeries(series){
+            scope[attributes.rawData].length = 0;
+
+            series.forEach(function(deviceComponentPair){
+                deviceComponentPair.points.forEach(function(value){
+                    var data = {
+                        deviceId: deviceComponentPair.deviceId,
+                        deviceName: deviceComponentPair.deviceName,
+                        metricId: deviceComponentPair.componentType,
+                        componentName: deviceComponentPair.componentName,
+                        componentId: deviceComponentPair.componentId,
+                        timestamp: scope.getLocalTimeFromUTC(parseInt(value.ts)),
+                        value: isNaN(value.value)? value.value: parseFloat(value.value)
+                    };
+
+                    scope[attributes.rawData].push(data);
+                });
+            })
+        }
+
         function renderChart(data){
             var series = [];
             chartSeries = [initialSeries];
@@ -200,6 +220,9 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                     return;
                 }
                 //generate chart data
+
+                computeRawDataForSeries(data.series)
+
                 var dataFrom = parseInt(data.from);
                 var dataTo = parseInt(data.to);
                 data.series.forEach(function(deviceComponentPair){
@@ -252,31 +275,19 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                             "y": parseFloat(0)
                         });
                     }
-                    deviceComponentPair.points.forEach(function(value){
-                        if (deviceComponentPair.format === 'integer') {
-                            formatter = intFormatter;
-                        } else {
-                            formatter = floatFormatter;
-                        }
 
+                    if (deviceComponentPair.format === 'integer') {
+                        formatter = intFormatter;
+                    } else {
+                        formatter = floatFormatter;
+                    }
+                    deviceComponentPair.points.forEach(function(value){
                         if(!isNaN(value.value)){
                             seriesData.push({
                                 "x": scope.getLocalTimeFromUTC(parseInt(value.ts)) / 1000,
                                 "y": parseFloat(value.value)
                             });
                         }
-
-                        var data = {
-                            deviceId: deviceComponentPair.deviceId,
-                            deviceName: deviceComponentPair.deviceName,
-                            metricId: deviceComponentPair.componentType,
-                            componentName: deviceComponentPair.componentName,
-                            componentId: deviceComponentPair.componentId,
-                            timestamp: scope.getLocalTimeFromUTC(parseInt(value.ts)),
-                            value: isNaN(value.value)? value.value: parseFloat(value.value)
-                        };
-
-                        scope[attributes.rawData].push(data);
                     });
 
                     var seriesScale = scope["scales"].filter(function(item){
@@ -525,6 +536,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
         });
 
         scope.$watch(attributes.series, function(value){
+            computeRawDataForSeries(value)
             if(mGraph.main){
                 value.forEach(function(newSerie) {
                     if(newSerie.points.length === 0) {

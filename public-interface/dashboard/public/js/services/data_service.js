@@ -47,9 +47,6 @@ iotServices.factory('dataService', ['$http','sessionService', function($http, se
                         return promise
                             .then(function (response) {
                                 return response.data;
-                            })
-                            .catch(function (response) {
-                                throw new Error(response.data.errors || response.data);
                             });
                     }
                 });
