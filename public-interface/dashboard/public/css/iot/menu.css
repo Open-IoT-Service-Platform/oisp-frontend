@@ -124,19 +124,26 @@ a.menu {
 }
 
 
-.logo {
+.logo, .intel-logo {
     display: inline-block;
-    width: 44px;
-    height: 30px;
-    background-image: url('../../img/common/intel-logo-320-dpi-hires.png');
+    width: 32px;
+    height: 32px;
+    background-image: url('../../img/common/1and1-logo-320-dpi-hires.png');
     margin: 9px;
     vertical-align: middle;
     text-indent: -9999em;
     background-repeat: no-repeat;
+    background-size: 32px 32px;
+}
+
+.intel-logo {
+    width: 43px;
+    height: 30px;
+    background-image: url('../../img/common/intel-logo-320-dpi-hires.png');
     background-size: 43px 30px;
 }
 
-.navbar-shadow .logo{
+.navbar-shadow .logo, .navbar-shadow .intel-logo{
     margin-top:0;
 }
 
@@ -318,4 +325,29 @@ a.menu {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-color: rgba(0, 122, 255, 0.65);
+}
+
+
+
+.intel-iot-platform-text {
+    line-height: 2;
+    padding-top: 60px;
+}
+.oneandone-cloud-server {
+    margin-top: 64px;
+}
+.oneandone-benefits {
+    margin-top: 0;
+    padding-left: 2em;
+    list-style-type: none;
+}
+.oneandone-benefits li {
+    margin-bottom: 10px;
+}
+.oneandone-benefits li:before {
+    position: absolute;
+    margin-left: -1.3em;
+    font-weight: bold;
+    content: "\2713";
+    color: darkgreen;
 }
