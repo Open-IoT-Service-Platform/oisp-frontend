@@ -109,17 +109,18 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
                                 type: commands.MESSAGE_TYPE_COMMAND,
                                 transport: protocol,
                                 content: {
+                                    transport: protocol,
                                     domainId: accountId,
                                     deviceId: device.deviceId,
                                     gatewayId: device.gatewayId,
                                     componentId: command.componentId,
-                                    command: device.components[0].command.commandString,
+                                    command: device.components[0].componentType.command.commandString,
                                     params: command.parameters
                                 }
                             };
                             commandsMessages.push(message);
                         })
-                        .catch(function () {
+                        .catch(function (err) {
                             logger.error('actuationAlerts - unable to get information about connection status for device - ' + device.deviceId +
                             '. Alert actuation command will not be send.');
                         });
