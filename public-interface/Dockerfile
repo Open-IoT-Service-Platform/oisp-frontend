@@ -1,0 +1,5 @@
+FROM node:4.8.3
+
+WORKDIR /app
+
+EXPOSE 4001

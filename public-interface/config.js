@@ -199,13 +199,13 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     //config.mail.smtp.requiresAuth = false;
     //config.mail.smtp.auth = undefined;
 
-    config.redis = {};
+    //config.redis = {};
 
-    config.logger.transport.console.json = false;
-    config.logger.transport.console.prettyPrint = false;
-    config.logger.transport.console.logstash = false;
-    config.logger.logLevel = 'debug';
-    config.logger.maxLines = 60000;
+    // config.logger.transport.console.json = false;
+    // config.logger.transport.console.prettyPrint = false;
+    // config.logger.transport.console.logstash = false;
+    // config.logger.logLevel = 'debug';
+    // config.logger.maxLines = 60000;
 
     config.controlChannel.ws.secure = false;
 }

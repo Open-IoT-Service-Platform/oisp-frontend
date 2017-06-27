@@ -25,6 +25,7 @@ var uuid = require('node-uuid'),
     userTokenExpire,
     iss,
     alg,
+    supportedAlg,
     routesConfig = [],
     rolesConfig = {},
     publicRoutes = [],
@@ -83,7 +84,7 @@ function findDeletedAccounts(tokenAccounts, accountIds){
 var getTokenInfo = function(token, req, callback){
     var jws = new jsjws.JWS();
     try {
-        jws.verifyJWSByKey(token, keyPem.pub_key());
+        jws.verifyJWSByKey(token, keyPem.pub_key(), supportedAlg);
 
         var header = jws.getParsedHeader();
         var payload = jws.getParsedPayload();
@@ -144,6 +145,7 @@ var getTokenInfo = function(token, req, callback){
 
         }
     }catch(e){
+        logger.error("Failed to verify JWS token");
         callback();
     }
 };
@@ -309,6 +311,7 @@ module.exports.middleware = function(secConfig, forceSSL){
     userTokenExpire = secConfig.user_token_expire * 60 * 1000;
     alg = secConfig.alg;
     iss = secConfig.iss;
+    supportedAlg = secConfig.supportedAlg;
 
     app.use(authorizeRoute);
 
