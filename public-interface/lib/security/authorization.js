@@ -145,6 +145,7 @@ var getTokenInfo = function(token, req, callback){
 
         }
     }catch(e){
+        console.log(e)
         logger.error("Failed to verify JWS token");
         callback();
     }
@@ -184,9 +185,11 @@ var getAccountId = function(path, body, tokenAccounts) {
 };
 
 var isAllowed = function(req, callback) {
+    var requestPath = req.path
+
     if(publicRoutes.some(function(i){
         return req.method === i.verb &&
-            i.path === req.path;
+            i.path === requestPath;
     })){
         callback(true);
     } else {
