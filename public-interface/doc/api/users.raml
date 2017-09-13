@@ -1,0 +1,131 @@
+displayName: <h2> User Management </h2>
+description: Handles user creation, updating, deleting and password changes and retrieval
+/{userId}:
+  uriParameters:
+    userId:
+      description: |
+        The ID of a user. This was returned when the user was created. If you don't have the userId but have user credentials, you can obtain an Authorization Token(cf. Authorization section)and then get the Authorization Token Info. The UserId will be the subject of the token payload. If the result body were converted to a JavaScript object, the userId would be at result["payload"]["sub"]
+      example: 53e95985c8406a147700b94d
+  get: 
+    description: |
+      **Get User information**
+    is: [ authorization-header, response-errors-users, response-errors-generic ]
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "id":"53e95985c8406a147700b94d",
+                "accounts":{
+                  "e5d969cd-e7fa-404e-a1e5-f4ce138f62c3":{
+                    "name":"Group1_Account",
+                    "role":"admin",
+                    "healthTimePeriod":86400
+                  }
+                },
+                "attributes":{
+                  "phone":"123456789",
+                  "another_attribute":"another_value"
+                },
+                "email":"test@example.com",
+                "termsAndConditions":true,
+                "verified":true
+              }
+  put:
+    description: |
+      **Update user attributes.**
+
+      As an user, you can add attributes to your user data. Attributes can be any key/value pair.
+    is: [ authorization-header, response-errors-users, response-errors-generic ]
+    body:
+      application/json:
+        type: !include build/user_PUT.json
+        example: |
+          {   
+            "attributes":{
+              "phone":"123456789",
+              "another_attribute":"another_value",
+              "new":"next_string_value"
+            }
+          }
+    responses:
+      200:
+  delete:
+    description: |
+      **Delete a User.**
+
+      This action will result in deleting your user data, and also accounts if they do not have any other administrators. You will also no longer be able to use your old token.
+    is: [ authorization-header, response-errors-users, response-errors-generic ]
+    responses:
+      204:
+/forgot_password:
+  description: |
+    **Change forgotten password.**
+
+    In order to change password (for cases in which user do not remember the old one) you have to do following steps:
+
+    * Invoke POST /users/forgot_password. After this step user will receive email with a url, which can be used to set a new password via IoT Dashboard. In email there will be user's token as a part of resetPassword url. Token is required for successful completion of next steps. Token is unique for user and action.
+    * Invoke PUT /users/forgot_password, with token from email received by user after completion of point 1. In a request body you have to put new password and token.
+  put:
+    description: |
+      **Request change password**
+
+      Methods generate and send email, which can be used to change password. User email has to be specified in request body.
+    body:
+      application/json:
+        type: !include build/user_FORGOT_PASSWORD.json
+        example: |
+          {
+            "email":"test@example.com"
+          }
+
+    is: [responses-successful, response-errors-users, response-errors-generic ]
+  post:
+    description: |
+      **Update password**
+
+      Method set new password for the user. In request body you have put token received in a email (send after invoking POST /users/forgot_password) and the new password.
+    body:
+      application/json:
+        type: !include build/user_CHANGE_PASSWORD_USING_TOKEN.json
+        example: |
+          {
+            "token":"ki2pc9RdnVVSKoN4",
+            "password":"Qwerty2"
+          }
+    is: [responses-successful, response-errors-users, response-errors-generic ]
+/{email}/change_password:
+  uriParameters:
+    email:
+      description: User email
+      example: test@example.com
+  put:
+    description: |
+      **Change password**
+
+      Methods set new password for a user (identified by email).
+    is: [ authorization-header, responses-successful, response-errors-users, response-errors-generic ]
+    body:
+      application/json:
+        type: !include build/user_CHANGE_PASSWORD_USING_OLD.json
+        example: |
+          {
+            "currentpwd": "Qwerty1",
+            "password": "Qwerty2"
+          }
+/request_user_verification:
+  post:
+    description: |
+      **Request user verification**
+
+      Methods generate and send email, which can be used to activate user. User email has to be specified in request body.
+    body:
+      application/json:
+        type: !include build/user_REACTIVATE.json
+        example: |
+          {
+            "email":"test@example.com"
+          }
+    is: [ responses-successful, response-errors-users, response-errors-generic ]
+    

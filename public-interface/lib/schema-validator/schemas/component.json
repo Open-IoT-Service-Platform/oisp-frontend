@@ -7,42 +7,60 @@
             "dimension": {
                 "type": "string",
                 "pattern":"^[a-zA-Z0-9]*$",
-                "required": true
+                "required": true,
+		"description": "Component Type Name",
+		"examples": ["temperature"]
             },
             "version": {
                 "type": "string",
                 "pattern": "^[0-9]+\\.[0-9]+$",
-                "required": true
+                "required": true,
+		"description": "API version",
+		"examples": ["1.0", "2.0"]
             },
             "type": {
                 "type": "string",
-                "enum": ["sensor"],
-                "required": true
+                "enum": ["sensor", "actuator"],
+                "required": true,
+		"description": "Component Type",
+		"examples": ["sensor", "actuator"]
             },
             "dataType": {
                 "type": "string",
                 "enum": ["Number", "String", "Boolean", "ByteArray"],
-                "required": true
+                "required": true,
+		"description": "Data Type",
+		"examples": ["Number", "String", "Boolean", "ByteArray"]
             },
             "format": {
                 "type": "string",
-                "required": true
+                "required": true,
+		"description": "Data Format",
+		"examples": ["float", "boolean", "string", "percentage", "integer"]
             },
             "min": {
                 "type": "number",
-                "required": false
+                "required": false,
+		"description": "Minimum Value",
+		"examples": ["-150"]
             },
             "max": {
                 "type": "number",
-                "required": false
+                "required": false,
+		"description": "Maximum Value",
+		"examples": ["150"]
             },
             "measureunit": {
                 "type": "string",
-                "required": true
+                "required": true,
+		"description": "Units Name",
+		"examples": ["Degrees Celsius"]
             },
             "display": {
                 "type": "string",
-                "required": true
+                "required": true,
+		"description": "Data Series Types: Time Series (Numbers), Raw Data (String), or Binary Data (ByteString) ",
+		"examples": ["timeSeries", "rawData", "binaryDataRenderer"]
             }
         }
     },

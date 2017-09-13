@@ -1,0 +1,275 @@
+displayName: <h2> Data API </h2>
+uriParameters:
+  accountId:
+    description: |
+      The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
+    example: 321ef007-8449-477f-9ea0-d702d77e64b9
+/{deviceId}:
+  uriParameters:
+    deviceId:
+      description: The ID of a Device
+      example: 24-a5-80-21-5b-29
+  post:
+    description: |
+      **Submit Data**
+
+      Submit data from specific device. You can use REST API capabilities to submit data for specific device and it's component. Device and component have to be registered in the cloud before sending observations.
+
+      * `Device location (loc)` should be sent as [_decimal latitude_, _decimal longitude_, _height in meters_] using WGS84 Datum
+
+      * `Attributes` should be sent as key:value pairs, where both key and value sent as string
+    is: [ authorization-header, response-errors-data, response-errors-generic ]
+    body:
+      type: !include build/data_POST.json
+      example: |
+        {
+          "on": 1354741967799,
+          "accountId": "550e8400-e29b-41d4-a716-446655440000",
+          "data": [            
+          {
+            "componentId": "436e7e74-6771-4898-9057-26932f5eb7e1_01",
+            "on": 1354741966688,
+            "loc": [ 45.5434085, -122.654422, 124.3 ],
+            "value": "26.7"
+          },
+          {
+            "componentId": "436e7e74-6771-4898-9057-26932f5eb7e1_01",
+            "on": 1354741966699,
+            "loc": [ 45.5434085, -122.654422 ],
+            "value": "26.8"
+          },
+          {
+            "componentId": "436e7e74-6771-4898-9057-26932f5eb7e1_02",
+            "on": 1354741966688,
+            "value": "35",
+            "attributes": {
+                "accuracy": "±2%RH",
+                "reading": "digital"
+            }
+
+          },
+          {
+            "componentId": "436e7e74-6771-4898-9057-26932f5eb7e1_03",
+            "on": 1354741966677,
+            "value": "TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlzIHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2YgdGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGludWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRoZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4="
+          }
+          ]   
+        }
+    responses:
+      201:
+        description: CREATED
+/data/search:
+  post:
+    description: |
+      **Retrieve Data**
+
+      Retrieve data sent to the Cloud. You can use REST API to request data that was submitted to the Cloud.
+
+      For all output types, if request would result in 500 000 samples or more, error 413 - Entity too large will be returned.
+
+      ** from and to **
+
+      * If the `to` key is omitted, data will be retrieved up to the current time.
+
+      * If the `from` key is omitted, from will default to zero. If `from` is positive it will represent the number of milliseconds since Jan-01-1970T00:00:00.000. However, if `from` is negative, it represents the number of seconds to add to `to` (because the number is negative, it will decrease `to`, moving backward in time.
+
+      * Due to a defect (2137), the `from` parameter must be included. Set it to 0 to represent the epoch.
+
+    is: [ authorization-header, response-errors-data, response-errors-generic ]
+    queryParameters:
+      output:
+        description: Format of data, `csv` or `email`
+        example: csv
+    body:
+      type: !include build/data_SEARCH.json
+      examples:
+        Example 1: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "targetFilter": {
+              "deviceList": [
+              "24-a5-80-21-5b-29"
+              ]
+            },
+            "metrics": [
+            {
+              "id": "436e7e74-6771-4898-9057-26932f5eb7e1",
+              "op": "none"
+            }
+            ]
+          }
+        Example using device selection: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "targetFilter": {
+              "criteria": {
+                "deviceId": {"operator" : "eq", "value":"AA-BB-CC"}
+              }
+            },
+            "metrics": [
+            {
+              "id": "component_id",
+              "op": "none"
+            }
+            ]
+          }
+        Example for sending by email: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "targetFilter": {
+              "criteria": {
+                "tags": {"operator" : "in", "value": ["floor, lab"]}
+              }
+            },
+            "metrics": [
+            {
+              "id": "component_id",
+              "op": "none"
+            }
+            ],
+            "recipients" : [
+            "<test1@example.com>",
+            "<test2@example.com>"
+            ]
+          }
+        Example for getting observations for two devices of last 24h: |
+          {
+            "from": -86400,
+            "targetFilter": {
+              "deviceList": ["D1", "D2" ]
+            },
+            "metrics": [
+            {
+              "id": "e3a48caa-e4c5-46bb-951e-8f9d0a4be516",
+              "op": "none"
+            },
+            {
+              "id": "76a95112-2159-4ee6-8e91-6a69b9c51edc",
+              "op": "none"
+            }
+            ]
+          }
+    responses:
+      201:
+/search/advanced:
+  post:
+    description: |
+      **Advanced Data Inquiry**
+
+      >Advanced Data Inquiry allows querying measurement data (values, location and attributes) for a single account using advanced filtering and sorting.
+
+      **Attribute and Value filters**
+      > All filter keys and values are sent as strings (including numeric values).
+
+      > `gatewayIds`, `deviceIds` and `componentIds` filter on the unique ID and can be used to pin-point a specific gateway/device/component.
+
+      > `valueFilter` work on the "value" field of each measurement.
+
+      > **Attribute filters** work on the device/component/measurement attributes. Each entry is an attribute name with a list of values to be matched.
+
+      > For device and component, in addition to user-defined attributes, special metadata attributes can be used for filtering: _groupPath, deviceName, Tags, componentName, componentType._
+
+      > Different filters and different attributes within filters are evaluated with AND relation. Values in the value list are evaluated with OR relation:
+
+        ```
+        {
+          "deviceIds" : ["ABC"],
+          "componentIds" : ["123", "456"],
+          "devCompAttributeFilter" : {"Tags" : ["Intel", "IOT"], "componentType" : ["temperature"]}
+        }
+
+        Means:
+
+          (deviceId = "ABC") AND (componentId = "123" OR "456") 
+          AND (Tags contains "Intel" OR "IOT") AND (componentType = "temperature")
+        ```
+
+        > The combination of `gatewayIds`, `deviceIds`, `componentIds` and `devCompAttributeFilter` determine the objects returned in the response. The other filters determine which records are returned for each object. Therefore, if a device satisfies the device filters but has no records that satisfy the value filter, it will return with an empty `samples` array.
+        > Conversely, if the filter combination is empty (e.g. `componentID` value that doesn't exist in the supplied `deviceID`), no objects will be returned. It is the client responsibility to ensure the filters sent are valid.
+
+        > The device/component/gateway filters do not support "slowly changing dimensions": e.g. if the device list is filtered by _deviceName_ and a device name changed from "My Device X" to "My Device Y" on April, his past measurements (January-March) will also be returned when requesting "My Device Y", although they were measured when the device name was different.
+    is: [ authorization-header, response-errors-data, response-errors-generic ]
+    body:
+      type: !include build/data_SEARCH_ADVANCED.json
+      examples:
+        example inquiry:
+          {
+            "gatewayIds" : ["<gid1>", "<gid2>"],
+            "deviceIds" : ["<did1>", "<did2>"],
+            "componentIds" : ["<cid1>", "<cid2>"],
+            "from" :  1407979291860,
+            "to" :  1407979292860,
+            "returnedMeasureAttributes" : ["att_1", "att_2"],
+            "showMeasureLocation" :  true,
+            "aggregations": "include",
+            "devCompAttributeFilter" : {
+              "filterName1" : ["filter_value1", "filter_value2"],
+              "filterName2" : ["filter_value1", "filter_value2"]
+            },
+            "measurementAttributeFilter" : {
+              "filterName1" : ["filter_value1", "filter_value2"],
+              "filterName2" : ["filter_value1", "filter_value2"]
+            },
+            "valueFilter" : {
+              "value" : ["filter_value1", "filter_value2"]
+            },
+            "componentRowLimit" :  10,
+            "countOnly" :  true,
+            "sort" : [{
+            "sortField1" : "Asc"
+            },
+            {
+              "sortField2" : "Desc"
+            }		
+            ]
+          }
+    responses:
+      200:
+        description: OK
+        body:
+          examples:
+            with countOnly = false: |
+              {
+                "msgType" : "advancedDataInquiryResponse",
+                "accountId" : "<account_id>",
+                "startTimestamp" :  <start_datetime>,
+                "endTimestamp" :  <end_datetime>,
+                "componentRowLimit" :  <limit>,
+                "data" : [
+                {
+                  "deviceId" : "<did1>",
+                  "deviceName" : "<name>",
+                  "components" : [{
+                  "componentId" : "<cid>",
+                  "componentType" : "<component_type>",
+                  "componentName" : "<component_label>",
+                  "max":"<max_value>",
+                  "min":"<min_value>",
+                  "sum":"<sum_value>",
+                  "count":"<count_value>",
+                  "sumSquares":"<sum_squares>",
+                  "samplesHeader" : ["Timestamp", "Value", "lat", "lon", "alt", "att1", "att2"]
+                  "samples" : [
+                    ["ts", "val", "", "", "", "", "<att2_value>"],
+                    ["ts", "val", "<lat>", "<lon>", "<alt>", "<att1_value>", ""],
+                    ["ts", "val", "", "", "", "", ""]
+                  ]
+                  }, 	
+                  {
+                    < component2 > 
+                  }
+                  ]
+                }, 
+                {
+                  < device2 > 
+                }
+                ]
+              }
+            with countOnly = true:
+              {
+                "msgType": "advancedDataInquiryResponse",
+                "rowCount" : <count>
+              }

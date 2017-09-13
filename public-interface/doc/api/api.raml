@@ -1,0 +1,92 @@
+#%RAML 1.0
+---
+title: Open IOT Connector (OIC) RESTful
+baseUri: https://streammyiot.com
+mediaType: [ application/json ]
+version: v1
+        
+traits:
+  authorization-header:
+    headers:
+      Authorization:
+        description: "This header is used to transmit a valid JWT as follows: Bearer JWT"
+        example: "Authorization: Bearer eyJ0eXAi.."
+  responses-successful:
+    responses:
+      200:
+        description: OK
+  responses-created:
+    responses:
+      201:
+        description: CREATED
+  response-errors-users:
+    !include build/errors_User.raml
+  response-errors-acounts:
+    !include build/errors_Account.raml
+  response-errors-rules:
+    !include build/errors_Rule.raml
+  response-errors-alerts:
+    !include build/errors_Alert.raml
+  response-errors-devices:
+    !include build/errors_Device.raml
+  response-errors-invitation:
+    !include build/errors_Invite.raml
+  response-errors-complex-command:
+    !include build/errors_ComplexCommand.raml
+  response-errors-actuation:
+    !include build/errors_Actuation.raml
+  response-errors-component:
+    !include build/errors_Component.raml
+  response-errors-data:
+    !include build/errors_Data.raml
+  response-errors-generic:
+    !include build/errors_Generic.raml
+
+#Auth API
+/v1/api/auth:
+  !include auth.raml
+  
+
+#Users API
+/v1/api/users:
+  !include users.raml
+
+
+#Accounts API
+/v1/api/accounts:
+  !include accounts.raml
+
+
+#Rules API
+/v1/api/accounts/{accountId}/rules:
+  !include rules.raml
+
+
+#Alert API
+/v1/api/account/{accountId}/alerts:
+  !include alerts.raml
+
+
+#Devices API
+/v1/api/account/{accountId}/devices:
+  !include devices.raml
+
+
+#Advanced Data API
+/v1/api/accounts/{accountId}/data:
+  !include data.raml
+
+
+#Component Types Catalog
+/v1/api/accounts/{accountId}/cmpcatalog:
+  !include component-types.raml
+
+
+#Control Device API
+/v1/api/accounts/{accountId}/control:
+  !include control-device.raml
+
+
+#Invitation Management
+/v1/api/accounts/{accountId}/invites:
+  !include invitation-management.raml

@@ -1,0 +1,71 @@
+  displayName: <h2> Authorization </h2>
+  description: This part of the API handles authorization. The authorization is done with JWT. The API can be used to get a JWT token and retrieve information about it.
+  /token:
+    post:
+      description: |
+        Get the JWS for a user. The token is unique for every request.
+
+        **Token expiration:**
+
+        User JWT token is valid for 24h and contains user access information. On access change, token should be refreshed, to use new privileges. Example situation that require token refresh:
+
+        <ul>
+        <li> User creates new account - to use new account, token must be refreshed </li>
+        <li> User has been invited to new account - to have access to this account, token should be refreshed </li>
+        <li> User account role has been updated, for instance admin privileges were granted - to use new level of access, token must be refreshed </li>
+        </ul>
+      body:
+        application/json:
+          type: !include build/authorization_AUTH.json
+          example: |
+            {
+              "username": "user@example.com",
+              "password": "mypassword"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                { "token": "eyJ0eXAi..." }
+
+  /tokenInfo:
+    get:
+      description: Get info about the JWT token
+      is: [  authorization-header ]
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "header": {
+                    "typ": "JWT",
+                    "alg": "RS256"
+                  },
+                  "payload": {
+                    "jti": "7b1430a2-dd61-4a47-919c-495cadb1ea7b",
+                    "iss": "http://streammyiot.com",
+                    "sub": "53fdff4418b547e4241b8358",
+                    "exp": "2014-10-02T07:53:25.361Z"
+                  }
+                }
+
+  /me:
+    get:
+      description: "Get user information about the owner of the JWT token"
+      is: [  authorization-header ]
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "id": "5524fb12b57077f3012323c2",
+                  "created": 1428487559131,
+                  "email": "user@example.com",
+                  "termsAndConditions": true,
+                  "updated": 1428487559131,
+                  "verified": true
+                }
+

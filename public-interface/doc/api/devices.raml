@@ -1,0 +1,408 @@
+displayName: <h2> Device Management </h2>
+uriParameters:
+  accountId:
+    description: |
+      The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
+    example: 321ef007-8449-477f-9ea0-d702d77e64b9
+get:
+  description: |
+    **List Devices**
+    
+    If no query paramters are given, then it will retrieve a list of all devices for the specified account, with minimal data for each device. Otherwise, the query parameters will filter the desired result.
+  is: [ authorization-header, response-errors-devices, response-errors-generic ]
+  queryParameters:
+    sort:
+      description: Result will be sorted by this field. Can be "deviceId","gatewayId", "name" or "status"
+      type: string
+      required: false
+      example: "deviceId"
+    order:
+      description: Sorting order. Can be "asc" for ascendning or "desc" for descrending
+      type: string
+      required: false
+      example: asc
+    limit:
+      description: Maximum number of returned devices
+      type: integer
+      minimum: 0
+      required: false
+      example: 5
+    skip: 
+      description: |
+        Returned list offset - if 10 provided, result won't contain first 10 list elements retrieved from database. Default is 0
+      type: integer
+      minimum: 0
+      required: false
+      example: 10
+    deviceId:
+      description: Filter the result by deviceId
+      type: string
+      required: false
+      example: 24-a5-80-21-5b-3a
+    gatewayId:
+      description: Filter the result by gatewayId
+      type: string
+      required: false
+      example: 24-a5-80-21-5b-3a
+    name:
+      description: Filter the result by device name
+      type:
+      required: false
+      example: "Device #3"
+    status:
+      description: Filter the result by statuse (example: status=created)
+      type:
+      required: false
+      example: created
+  responses:
+    200:
+      description: OK
+      body:
+        application/json:
+          example:
+            [
+            { 
+              "deviceId": "24-a5-80-21-5b-29",
+              "gatewayId": "24-a5-80-21-5b-29",
+              "name": "Device #1",  
+              "tags": ["Israel", "Tel Aviv"],
+              "status": "created",
+            },
+            { 
+              "deviceId": "24-a5-80-21-5b-30",
+              "gatewayId": "24-a5-80-21-5b-30",
+              "name": "Device #2",  
+              "tags": ["US", "Oregon", "Portland"],
+              "status": "active",
+            },
+            { 
+              "deviceId": "24-a5-80-21-5b-3a",
+              "gatewayId": "24-a5-80-21-5b-3a",
+              "name": "Device #3",  
+              "tags": ["US", "California", "Folsom"],
+              "status": "created",
+            }
+            ]
+post:
+  description: |
+    **Create a Device**
+
+    Used to create a device. The access token in the header will be used to authenticate the account on the URL for which this operation is being performed.
+
+    Device ID should consist only A-Z, a-z, 0-9 and - characters Location is optional and only makes sense for stationary devices. It should be sent as [decimal latitude, decimal longitude, (optional) height in meters] using WGS84 Datum.
+
+    Device attributes should be sent as key:value pairs, where both key and value are string
+
+    Device attributes collection can not contain keys: deviceId, deviceName, gatewayId, tags, location, components.
+  is: [ authorization-header, response-errors-devices, response-errors-generic]
+  body:
+    application/json:
+      type: !include build/device_POST.json
+      example: |
+        { 
+          "deviceId": "24-a5-80-21-5b-29",
+          "gatewayId": "24-a5-80-21-5b-29",
+          "name": "Device #1",            
+          "tags": ["US", "California", "Sacramento"],
+          "loc": [ 45.5434085, -122.654422, 124.3 ],
+          "attributes": {
+            "vendor": "intel",
+            "platform": "x86",
+            "os": "linux"
+          }
+        }
+
+  responses:
+    409:
+      description: Device already exists
+    400:
+      description: Invalid activation code (did code expire?)
+    201:
+      description: CREATED
+      body:
+        application/json:
+          example: |
+            { 
+              "deviceId": "24-a5-80-21-5b-29",
+              "gatewayId": "24-a5-80-21-5b-29",
+              "name": "Device #1",            
+              "tags": ["US", "California", "Sacramento"],
+              "loc": [ 45.5434085, -122.654422, 124.3 ],
+              "created": 1354741966688,
+              "status": "created",
+              "attributes": {
+                "vendor": "intel",
+                "platform": "x86",
+                "os": "linux"
+              }
+            }
+      
+/{deviceId}:
+  uriParameters:
+    deviceId:
+      description: The ID of a Device
+      example: 24-a5-80-21-5b-29
+  get:
+    description: |
+      **Get one Device**
+
+      Get full detail for specific device for the specified account.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "deviceId": "24-a5-80-21-5b-29",
+                "gatewayId": "24-a5-80-21-5b-29",
+                "name": "Device 1",
+                "status": "active",
+                "created": 1404250013693,
+                "components": [
+                {
+                  "cid": "73f9fe37-bd9e-4139-b678-afdd716e7dda",
+                  "name": "temp",
+                  "type": "temperature.v1.0"
+                }
+                ],
+                "attributes": {
+                  "vendor": "intel",
+                  "platform": "x86",
+                  "os": "linux"
+                }
+              }
+  put:
+    description: |
+      **Update One Device**
+
+      Update a single device. The device ID (deviceId) cannot be updated as it is the key. If the device id does not exist, an error will be returned. The list of components represents the entire list of components for the device.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    body:
+      application/json:
+        type: !include build/device_PUT.json
+        example: |
+          {
+            "gatewayId": "24-a5-80-21-5b-29",
+            "name": "Device #1",
+            "loc": [ 45.5434085, -122.654422, 124.3 ],  
+            "tags": ["Arizona", "Phoenix"],            
+            "attributes": {
+              "vendor": "intel",
+              "platform": "x86",
+              "os": "linux"
+            }
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example: |
+              {
+                "gatewayId": "24-a5-80-21-5b-29",
+                "name": "Device #1",
+                "loc": [ 45.5434085, -122.654422, 124.3 ],  
+                "tags": ["Arizona", "Phoenix"],            
+                "attributes": {
+                  "vendor": "intel",
+                  "platform": "x86",
+                  "os": "linux"
+                  }
+                }
+
+  delete:
+    description: |
+      **Delete one Device**
+
+      Delete a specific device for this account. All data from all time series associated with the device will be deleted.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    responses:
+      204:
+        description: Deleted
+        
+  /activation:
+    put:
+      description: |
+        **Activate one Device**
+
+        Activates a specific device for the specified account.
+      is: [ authorization-header, response-errors-devices, response-errors-generic ]
+      body:
+        type: !include build/device_ACTIVATION.json
+        example: |
+          { 
+            "activationCode": "jq4h6d2b"
+          }
+      responses:
+        200:
+          body:
+            example:
+              {
+                "deviceToken":"eyJ0eX......",
+                "accountId":"ed6c80f7-1914-4d21-bc26-47d0bb5fdf4d"
+              }
+  /components:
+    post:
+      description: |
+        **Add a Component to a device**
+
+        Add component to an specific device. A component represents either a time series or an actuator. The type must already existing in the Component Type catalog. You can see the entries in the catalog with a call in the Component section. Or, in the UI, go to the "Account" page and click the "Catalog" tab. Make sure you use in headers Device Token received during device activation process and not Access Token for your user. *cid* is a uuid created by the user. *name* and *type* are used according to the Component section.
+      is: [ authorization-header, response-errors-devices, response-errors-generic ]
+      body:
+        type: !include build/device-component_SINGLE.json
+        example: |
+          { 
+            "cid": "436e7e74-6771-4898-9057-26932f5eb7e1",
+            "name": "temp",
+            "type": "temperature.v1.0"
+          }
+      responses:
+        201:
+          description: CREATED
+          body:
+            example:
+              { 
+                "cid": "436e7e74-6771-4898-9057-26932f5eb7e1",
+                "name": "Temperature Sensor 1",
+                "type": "temperature.v1.0"
+              }
+    /{cid}:
+      uriParameters:
+        cid:
+          description: The ID of the component to delete
+          example: 436e7e74-6771-4898-9057-26932f5eb7e1
+      delete:
+        description: |
+          **Delete one Component**
+
+          Delete a specific component for a specific device. All data will be unavailable.
+        is: [ authorization-header, response-errors-devices, response-errors-generic ]
+        responses:
+          204:
+/tags:
+  get:
+    description: |
+      **List all tags for Devices**
+
+      Get a list of all tags from devices for the specified account.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    responses:
+      200:
+        body:
+          example:
+            [     
+              "tag",
+              "tag2"
+            ]
+/attributes:
+  get:
+    description: |
+      **List all attributes of Devices**
+
+      Get a list of all devices's attribute for the specified account.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    responses:
+      200:
+        body:
+          example: |
+            {
+              "Firmware Version": [
+              "3.13.0-32-generic"
+              ],
+              "Model Name": [
+              "x64"
+              ],
+              "agent_version": [
+              "1.5.0"
+              ],
+              "attribute": [
+              "value"
+              ],
+              "hardware_model": [
+              "linux"
+              ],
+              "hardware_vendor": [
+              "Intel(R) Xeon(R) CPU E5-2680 0 @ 2.70GHz"
+              ]
+            }
+/count:
+  post:
+    description: |
+      **Advanced count of Devices**
+
+      Counts devices's based on filters.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    body:
+      type: !include build/device_SEARCH.json
+      example: |
+        {
+          "status":{
+            "operator":"like",
+            "value":""
+          },
+          "components":{
+            "operator":"exists",
+            "value": "false"
+          }
+        }
+    responses:
+      200:
+        body:
+          example: |
+            {
+              "device": {
+                "total": 1
+              }
+            }
+/search:
+  post:
+    description: |
+      **Advanced search of Devices**
+
+      Search devices's based on filters and query parameters.
+    is: [ authorization-header, response-errors-devices, response-errors-generic ]
+    queryParameters:
+      limit:
+        description: Max size of requested devices
+        type: integer
+        example: 10
+        required: false
+      skip:
+        description: Number of skipped devices
+        example: 0
+        type: integer
+        required: false
+    body:
+      type: !include build/device_SEARCH.json
+      example: |
+        {
+          "status":{
+            "operator":"like",
+            "value":""
+          },
+          "components":{
+            "operator":"exists",
+            "value": "false"
+          }
+        }
+    responses:
+      200:
+        body:
+          example:
+            [
+            {
+              "created": 1427365983710,
+              "deviceId": "dev1",
+              "gatewayId": "dev1",
+              "loc": [
+              58.30452,
+              18.50052,
+              121
+              ],
+              "name": "Sample device 1",
+              "status": "active",
+              "tags": [
+              "test"
+              ]
+            }
+            ]

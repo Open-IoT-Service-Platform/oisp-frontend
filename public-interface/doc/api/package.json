@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "json2yaml": "^1.1.0",
+    "raml2html": "^6.4.1"
+  }
+}

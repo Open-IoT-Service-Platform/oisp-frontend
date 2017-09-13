@@ -1,0 +1,300 @@
+displayName: <h2> Rule Management </h2>
+description: |
+  This API is used to manage Rules. A Rule is an association between one or more device's components, a set of conditions for those components, and a number of actions that have to be triggered in case those conditions are met.
+  
+  **Supported rule action types**
+
+  |Type |Target|Description|
+  |-----|:----:|-----------|
+  |"mail"|["test@example.com"]|Array of recipients' email addresses|
+  |"http"|["http://www.example.com"]|Array of HTTP endpoints where request should be sent.They should expect and accept POST requests.|
+  |"actuation"|["command"]| Array of commands|
+    
+
+  To receive alerts as requests to HTTP endpoint, set "type" in actions section to "http" and "target" in the same section to desired endpoint. Additionally you can add custom HTTP headers to received alerts. To do this, add "http_headers" object to "actions" section if chosen action type is http. Example:
+
+  ```json
+  "actions": [
+  {
+    "type": "http",
+    "target": [
+      "http://test.com"
+    ],
+    "http_headers":
+      {
+        "header1": "value1",
+        "header2": "value2"
+      }
+  }]```
+uriParameters:
+  accountId:
+    description: |
+      The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
+    example: 321ef007-8449-477f-9ea0-d702d77e64b9
+get:
+  is: [ authorization-header, response-errors-rules, response-errors-generic ]
+  description: |
+    **Get List of Rules**
+
+    Get a list of all rules for the specified account.
+  responses:
+    200:
+      description: OK
+      body:
+        application/json:
+          example: |
+            [
+            {
+              "externalId": 6831,
+              "name": "rule2",
+              "description": "test rule",
+              "owner": "test@example.com",
+              "naturalLanguage": "temperatura Equal 45 Or ",
+              "type": "Regular",
+              "creationDate": 1411119645083,
+              "lastUpdateDate": 1411119645083,
+              "resetType": "Manual",
+              "priority": "Low",
+              "status": "Active",
+              "population": {},
+              "conditions": {
+                "operator": "OR",
+                "values": []
+              }
+            }
+            ]
+post:
+  description: |
+    **Create a Rule**
+  is: [ authorization-header, responses-created, response-errors-rules, response-errors-generic ]
+  body:
+    application/json:
+      type: !include build/rule_POST.json
+      example: |
+        {
+          "name": "Test Rule",
+          "description": "This is a test rule",
+          "priority": "Medium",
+          "type": "Regular",
+          "status": "Active",
+          "resetType": "Automatic",
+          "actions": [
+          {
+            "type": "mail",
+            "target": [
+            "test@example.com"
+            ]
+          }
+          ],
+          "population": {
+            "ids": [ "685.1.1.1" ],
+            "attributes": null
+          },
+          "conditions": {
+            "operator": "OR",
+            "values": [
+            {
+              "component": {
+                "dataType": "Number",
+                "name": "Temp.01.1"
+              },
+              "type": "basic",
+              "values": [ "25" ],
+              "operator": ">"
+            }
+            ]
+          }
+        }
+
+/{ruleId}:
+  uriParameters:
+    ruleId:
+      description: The ID of a Rule
+      example: 2c6cbf002516cf81913471da4d41daed212bde8f
+  get:
+    is: [ authorization-header, response-errors-rules, response-errors-generic ]
+    description: |
+      **Get one Rule information**
+
+      Get specific rule details for the account.
+    responses:
+      200:
+        description: OK
+        body:
+          application/json:
+            example:
+              {
+                "id": "541c09dd63de1a9f63216f63",
+                "creationDate": 1411123677425,
+                "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                "externalId": "9bd17edc04e3a07f636af4b7be72a0967c19f0ac",
+                "lastUpdateDate": 1411123677425,
+                "name": "draft2",
+                "owner": "test@example.com",
+                "status": "Draft"
+              }
+  put:
+    is: [ authorization-header, response-errors-rules, response-errors-generic ]
+    description: |
+      **Update a Rule**
+
+      If rule doesn't exist it create a new one. Cannot be used for update of a draft rule.
+    body:
+      application/json:
+        type: !include build/rule_POST.json
+        example: |
+          {
+            "name": "Test Rule",
+            "description": "This is a test rule",
+            "priority": "Medium",
+            "type": "Regular",
+            "status": "Active",
+            "actions": [
+            {
+              "type": "http",
+              "target": [
+                "http://test.com"
+              ],
+              "http_headers":
+              {
+                "header1": "value1",
+                "header2": "value2"
+              }
+            }
+            ],
+            "conditions": {
+              "operator": "OR",
+              "values": [
+              {
+                "component": {
+                  "dataType": "Number",
+                  "name": "Temp.01.1"
+                },
+                "type": "basic",
+                "values": [
+                  "25"
+                ],
+                "operator": ">"
+              }
+              ]
+            },
+            "resetType": "Automatic",
+            "population": {
+              "ids": [
+                "685.1.1.1"
+              ],
+              "attributes": null
+            }
+          }
+    responses:
+      200:
+        description: OK
+        body:
+          application/json:
+            example: |
+              {
+                "externalId": "6831",
+                "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                "creationDate": 1411129409587,
+                "lastUpdateDate": 1411127836926,
+                "status": "Active",
+                "actions": [
+                {
+                  "type": "mail",
+                  "target": [
+                    "test@example.com"
+                  ]
+                }
+                ],
+                "id": "541c2041b3700bcbe9c76fc4"
+              }
+  /status:
+    put:
+      is: [ authorization-header, response-errors-rules, response-errors-generic ]
+      description: |
+        **Update a Status of a Rule**
+
+        Update the status of the rule. Cannot be used for changing the status of draft rule. Status value should be one of the following: ["Active", "Archived", "On-hold"]
+      body:
+        application/json:
+          type: !include build/rule_PUTStatus.json
+          example: |
+            {
+              "status": "Archived"
+            }
+      responses:
+        200:
+          description: OK
+          body:
+            application/json:
+              example: |
+                {
+                  "id": "541bfa1eb3700bcbe9c76fc2",
+                  "actions": [
+                  {
+                    "type": "mail",
+                    "target": [
+                      "test@example.com"
+                    ]
+                  }
+                  ],
+                  "creationDate": 1411119645083,
+                  "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                  "externalId": "6831",
+                  "lastUpdateDate": 1411127836926,
+                  "status": "Archived"
+                }
+/draft:
+  put:
+    is: [ authorization-header, response-errors-rules, response-errors-generic ]
+    description: |
+      **Create a Rule as a Draft**
+
+      Create a rule with a status - "Draft" for the specified account.
+    body:
+      application/json:
+        type: !include build/rule_DRAFT.json
+        example: |
+          {
+            "name": "draftRule"
+          }
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+                "id": "541c09dd63de1a9f63216f63",
+                "creationDate": 1411123677425,
+                "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                "externalId": "9bd17edc04e3a07f636af4b7be72a0967c19f0ac",
+                "lastUpdateDate": 1411123677425,
+                "name": "draftRule",
+                "owner": "test@example.com",
+                "status": "Draft"
+              }
+  /{ruleId}:
+    uriParameters:
+      ruleId:
+        description: The ID of a Rule
+        example: 2c6cbf002516cf81913471da4d41daed212bde8f
+    delete:
+      is: [ authorization-header ]
+      description: |
+        **Delete a draft rule**
+
+        Delete a specific draft rule for account
+      responses:
+        204:
+          description: OK
+
+    
+/clone/{ruleId}:
+  uriParameters:
+    ruleId:
+      description: The ID of a Rule
+      example: 2c6cbf002516cf81913471da4d41daed212bde8f
+  post:
+    is: [ authorization-header, responses-successful, response-errors-rules, response-errors-generic ]
+    description: **Clone an existing Rule**
+    

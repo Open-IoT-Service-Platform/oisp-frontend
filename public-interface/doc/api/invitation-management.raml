@@ -1,0 +1,105 @@
+displayName: <h2> Invitation Management API </h2>
+description: |
+This API handles Invitations related operations. Invitation to the account can be created by user who is an account administrator. After created, invitation notification will be send as an email message to the specific email account. Invited user has to login into IoT dashboard and the accept/decline received invitation.
+uriParameters:
+  accountId:
+    description: |
+      The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
+    example: 321ef007-8449-477f-9ea0-d702d77e64b9
+get:
+  description: |
+    **Get List of Invitations**
+    
+    Get a list of users invited to the specific account.
+  is: [ authorization-header, response-errors-invitation, response-errors-generic ]
+  responses:
+    200:
+      body:
+        example:
+          [
+            "test@example.com",
+            "test2@example.com"
+          ]
+post:
+  description: |
+    **Create Invitation**
+
+    Creation of invitation to the account for specific user (identified by email). Response documentation TBD.
+  is: [ authorization-header, response-errors-invitation, response-errors-generic ]
+  body:
+    type: !include build/invite_POST.json
+    example: |
+      {
+        "email": "test@example.com"
+      }
+  responses:
+    200:
+            
+/{email}:
+  uriParameters:
+    email:
+      description: The ID of an Account
+      example: test@example.com
+  get:
+    description: |
+      **Get list of invitations sent to specific user**
+
+      Get details about invitations send to specific user. User is identified by his email address.
+    is: [ authorization-header, response-errors-invitation, response-errors-generic ]
+    responses:
+      200:
+        description: OK
+        body:
+          example: |
+            [
+            {
+              "email": "test@example.com",
+              "accountId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+              "accountName": "Name",
+              "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+              "_id": "541c4bcc6600b5129892ce7d"
+            },
+            {
+              "email": "test@example.com",
+              "accountId": "be3c1939-ab6d-47de-80a7-6a4261386f6d",
+              "accountName": "account1",
+              "domainId": "be3c1939-ab6d-47de-80a7-6a4261386f6d",
+              "_id": "541fdefbc86e0eb48a9f2bfe"
+            }
+            ]
+  delete:
+    description: |
+      **Delete invitations**
+      
+      Delete invitations to an account for a specific user (identified by email).
+    is: [ authorization-header, response-errors-invitation, response-errors-generic ]
+    responses:
+      200:
+  /{inviteId}/status:
+    uriParameters:
+      inviteId:
+        description: The ID of an Invitation
+        example: 54afb5b5bee99b947441ae31
+    put:
+      description: |
+        **Accept Invitation**
+
+        Accept pending invitation for the specific account.
+      body:
+        type: !include build/invite_PUT.json
+        example: |
+          {
+            "accept": true
+          }
+      responses:
+        200:
+          body:
+            example: |
+              {
+                "test@example.com",
+                "domainId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                "accountId": "0d66c8b6-9f4d-4551-a9c8-d356c2dd033d",
+                "accountName": "Account",
+                "_id": "54afb5b5bee99b947441ae31"
+              }
+              

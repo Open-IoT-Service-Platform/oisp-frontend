@@ -284,6 +284,14 @@ module.exports = function (grunt) {
                     '../build/dashboard/public/css/font-awesome.min.css'
                 ]
             }
+        },
+        exec: {
+            build: {
+		cmd: 'cd doc/api; make install',
+	    },
+            clean: {
+                cmd: 'cd doc/api; make clean',
+            }
         }
     });
     grunt.event.on('coverage', function (lcovFileContents, done) {
@@ -306,14 +314,16 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-istanbul');
-	grunt.loadNpmTasks('grunt-bumpup');
+    grunt.loadNpmTasks('grunt-bumpup');
+    grunt.loadNpmTasks('grunt-exec');
 
     // Default task(s).
     grunt.registerTask('default', [
         'jshint:local',
         'karma:local',
         'mocha_istanbul:local',
-        'makeReport'
+        'makeReport',
+        'exec:build'
     ]);
 
     grunt.registerTask('validate', [
@@ -347,11 +357,12 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('build', 'Creates build dir with distributable and uglified code', [
-            'clean:build',
-            'copy',
-            'bumpup',
-            'awesome',
-            'clean:tmp']
+        'clean:build',
+        'exec:build',
+        'copy',
+        'bumpup',
+        'awesome',
+        'clean:tmp']
     );
 
     grunt.registerTask('awesome', [
@@ -362,4 +373,6 @@ module.exports = function (grunt) {
         'filerev',
         'usemin'
     ]);
+    grunt.registerTask('clean-api',[ 'exec:clean' ]);
+    grunt.registerTask('build-api',[ 'exec:build' ]);
 };
