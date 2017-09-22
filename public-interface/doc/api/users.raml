@@ -67,7 +67,7 @@ description: Handles user creation, updating, deleting and password changes and 
 
     * Invoke POST /users/forgot_password. After this step user will receive email with a url, which can be used to set a new password via IoT Dashboard. In email there will be user's token as a part of resetPassword url. Token is required for successful completion of next steps. Token is unique for user and action.
     * Invoke PUT /users/forgot_password, with token from email received by user after completion of point 1. In a request body you have to put new password and token.
-  put:
+  post:
     description: |
       **Request change password**
 
@@ -81,7 +81,7 @@ description: Handles user creation, updating, deleting and password changes and 
           }
 
     is: [responses-successful, response-errors-users, response-errors-generic ]
-  post:
+  put:
     description: |
       **Update password**
 
@@ -114,12 +114,12 @@ description: Handles user creation, updating, deleting and password changes and 
             "currentpwd": "Qwerty1",
             "password": "Qwerty2"
           }
-/request_user_verification:
+/request_user_activation:
   post:
     description: |
-      **Request user verification**
+      **Request user activation**
 
-      Methods generate and send email, which can be used to activate user. User email has to be specified in request body.
+      Methods generate and send email, which can be used to activate user. User email has to be specified in request body and must be already added to user DB.
     body:
       application/json:
         type: !include build/user_REACTIVATE.json
