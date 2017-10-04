@@ -285,12 +285,12 @@ module.exports = function (grunt) {
                 ]
             }
         },
-        exec: {
+        shell: {
             build: {
-		cmd: 'cd doc/api; make install',
+		command: "make -C doc/api install",
 	    },
             clean: {
-                cmd: 'cd doc/api; make clean',
+                command: 'make -C doc/api clean',
             }
         }
     });
@@ -315,7 +315,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-istanbul');
     grunt.loadNpmTasks('grunt-bumpup');
-    grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-shell');
 
     // Default task(s).
     grunt.registerTask('default', [
@@ -323,7 +323,7 @@ module.exports = function (grunt) {
         'karma:local',
         'mocha_istanbul:local',
         'makeReport',
-        'exec:build'
+        'shell:build'
     ]);
 
     grunt.registerTask('validate', [
@@ -358,7 +358,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', 'Creates build dir with distributable and uglified code', [
         'clean:build',
-        'exec:build',
+        'shell:build',
         'copy',
         'bumpup',
         'awesome',
@@ -373,6 +373,6 @@ module.exports = function (grunt) {
         'filerev',
         'usemin'
     ]);
-    grunt.registerTask('clean-api',[ 'exec:clean' ]);
-    grunt.registerTask('build-api',[ 'exec:build' ]);
+    grunt.registerTask('clean-api',[ 'shell:clean' ]);
+    grunt.registerTask('build-api',[ 'shell:build' ]);
 };
