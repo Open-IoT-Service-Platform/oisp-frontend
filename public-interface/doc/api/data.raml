@@ -4,7 +4,7 @@ uriParameters:
     description: |
       The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
     example: 321ef007-8449-477f-9ea0-d702d77e64b9
-/{deviceId}:
+/data/{deviceId}:
   uriParameters:
     deviceId:
       description: The ID of a Device
@@ -18,9 +18,11 @@ uriParameters:
       * `Device location (loc)` should be sent as [_decimal latitude_, _decimal longitude_, _height in meters_] using WGS84 Datum
 
       * `Attributes` should be sent as key:value pairs, where both key and value sent as string
+
+      <meta name="access-roles" path="POST:/api/data/{deviceId}">
     is: [ authorization-header, response-errors-data, response-errors-generic ]
     body:
-      type: !include build/data_POST.json
+      type: !include data_POST.json
       example: |
         {
           "on": 1354741967799,
@@ -58,7 +60,7 @@ uriParameters:
     responses:
       201:
         description: CREATED
-/data/search:
+/accounts/{accountId}/data/search:
   post:
     description: |
       **Retrieve Data**
@@ -75,13 +77,14 @@ uriParameters:
 
       * Due to a defect (2137), the `from` parameter must be included. Set it to 0 to represent the epoch.
 
+      <meta name="access-roles" path="POST:/api/accounts/{accountId}/data/data/search">
     is: [ authorization-header, response-errors-data, response-errors-generic ]
     queryParameters:
       output:
         description: Format of data, `csv` or `email`
         example: csv
     body:
-      type: !include build/data_SEARCH.json
+      type: !include data_SEARCH.json
       examples:
         Example 1: |
           {
@@ -154,7 +157,7 @@ uriParameters:
           }
     responses:
       201:
-/search/advanced:
+/accounts/{accountId}/data/search/advanced:
   post:
     description: |
       **Advanced Data Inquiry**
@@ -191,9 +194,11 @@ uriParameters:
         > Conversely, if the filter combination is empty (e.g. `componentID` value that doesn't exist in the supplied `deviceID`), no objects will be returned. It is the client responsibility to ensure the filters sent are valid.
 
         > The device/component/gateway filters do not support "slowly changing dimensions": e.g. if the device list is filtered by _deviceName_ and a device name changed from "My Device X" to "My Device Y" on April, his past measurements (January-March) will also be returned when requesting "My Device Y", although they were measured when the device name was different.
+
+        <meta name="access-roles" path="POST:/api/accounts/{accountId}/data/search/advanced">
     is: [ authorization-header, response-errors-data, response-errors-generic ]
     body:
-      type: !include build/data_SEARCH_ADVANCED.json
+      type: !include data_SEARCH_ADVANCED.json
       examples:
         example inquiry:
           {

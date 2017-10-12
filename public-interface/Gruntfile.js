@@ -28,7 +28,8 @@ module.exports = function (grunt) {
                 'dashboard/public/js/**/*.js',
                 'iot-entities/**/*.js',
                 'engine/**/*.js',
-                'lib/**/*.js'],
+                'lib/**/*.js',
+		'doc/api/*.js'],
             codeCoverageExclude: [
                 "**/iot-entities/*","**/iot-entities/postgresql/*",
                 "**/iot-entities/redis/*",
@@ -287,10 +288,13 @@ module.exports = function (grunt) {
         },
         shell: {
             build: {
-		command: "make -C doc/api install",
-	    },
+                command: "make -C doc/api install"
+            },
             clean: {
-                command: 'make -C doc/api clean',
+                command: 'make -C doc/api clean'
+            },
+            test: {
+                command: 'make -C doc/api test'
             }
         }
     });
@@ -331,7 +335,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('run_test', [
-        'mocha_istanbul:local_without_coverage'
+        'mocha_istanbul:local_without_coverage',
+	'shell:test'
     ]);
 
     grunt.registerTask('teamcity_codevalidation', [

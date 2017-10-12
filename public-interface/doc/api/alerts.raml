@@ -11,6 +11,8 @@ get:
     **Get List of Alerts**
       
     Get a list of all alerts for the specified account.
+
+    <meta name="access-roles" path="GET:/api/accounts/{accountId}/alerts">
   is: [ authorization-header, response-errors-alerts, response-errors-generic ]
   responses:
     200:
@@ -51,6 +53,8 @@ get:
       **Get Alert information**
 
       Get specific alert details connected with the account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/alerts/{alertId}">
     responses:
       200:
         description: OK
@@ -96,13 +100,21 @@ get:
         **Reset Alert**
 
         Change alert status to - "Closed". Alert won't be active any more.
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/alerts/{alertId}/reset">
       is: [ authorization-header, responses-successful, response-errors-alerts, response-errors-generic ]
   /status/{statusName}:
     uriParameters:
       statusName:
-        description: The Name of a new alert status.
+        description: The Name of a new alert status. Should be one of ['New', 'Open', 'Closed']
         example: "Closed"
     put:
+      description: |
+        **Update Alert status**
+
+        Change status of the Alert. Status should have one of the following values: ['New', 'Open', 'Closed']
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/alerts/{alertId}/status/{statusName}">
       is: [ authorization-header, responses-successful, response-errors-alerts, response-errors-generic ]
   /comments:
     post:
@@ -111,9 +123,11 @@ get:
         **Add comments to the Alert**
         
         Add list of comments to the alert.
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/alerts/{alertId}/comments">
       body:
         application/json:
-          type: !include build/alert_COMMENTS.json
+          type: !include alert_COMMENTS.json
           example:
             [
             {

@@ -9,9 +9,11 @@ post:
     **Send actuation command**
 
     Send actuation command to the device for specific component (actuator)
+
+    <meta name="access-roles" path="POST:/api/accounts/{accountId}/control">
   is: [ authorization-header, response-errors-complex-command, response-errors-actuation, response-errors-generic ]
   body:
-    type: !include build/command_POST.json
+    type: !include command_POST.json
     example: |
       {
         "commands":
@@ -33,7 +35,7 @@ post:
   responses:
     200:
       description: OK
-/{commandName}:
+/commands/{commandName}:
   uriParameters:
     commandName:
       description: Name for command to be created
@@ -43,9 +45,11 @@ post:
       **Save complex command**
 
       Saves multiple simple commands as a complex one which can be later executed as one.
+
+      <meta name="access-roles" path="POST:/api/accounts/{accountId}/control/commands/{commandName}">
     is: [ authorization-header, response-errors-complex-command, response-errors-actuation, response-errors-generic ]
     body:
-      type: !include build/command_POST.json
+      type: !include command_POST.json
       example: |
         {
           "commands": [
@@ -91,6 +95,8 @@ post:
         | 0 | missing | Return all data available |
         | -86400 | missing | return all data with timestamps in the last 24 hours (86,400 seconds) |
         | 1407979291000 | 1407980711000 | return all observations with timestamps between 2014-08-13T18:21:31.000 UTC and 2014-08-13T18:45:11.000 UTC |
+
+        <meta name="access-roles" path="GET:/api/accounts/{accountId}/control/devices/{deviceId}">
     is: [ authorization-header, response-errors-complex-command, response-errors-actuation, response-errors-generic ]
     queryParameters:
       from:

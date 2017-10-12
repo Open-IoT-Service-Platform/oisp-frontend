@@ -5,10 +5,12 @@ post:
     **Create an Account**
 
     Important: After creating account, user Authorization token must be refreshed to access the new account data.
+
+    <meta name="access-roles" path="POST:/api/accounts">
   is: [ authorization-header, response-errors-acounts, response-errors-generic ]
   body:
     application/json:
-      type: !include build/account_ACCOUNT.json
+      type: !include account_ACCOUNT.json
       example:
         {
           "name": "AccountName"
@@ -40,6 +42,8 @@ post:
     is: [ authorization-header, response-errors-acounts, response-errors-generic ]
     description: |
       **Get Account information**
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}">
     responses:
       200:
         body:
@@ -64,10 +68,12 @@ post:
   put:
     description: |
       **Update an Account**
+
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}">
     is: [ authorization-header, responses-successful, response-errors-acounts, response-errors-generic ]
     body:
       application/json:
-        type: !include build/account_UPDATE.json
+        type: !include account_UPDATE.json
         example: |
           {
             "name": "NEWAccountName",
@@ -89,6 +95,8 @@ post:
       **Delete an Account.**
 
       Deletes an Account and all its data.
+
+      <meta name="access-roles" path="DELETE:/api/accounts/{accountId}">
     is: [ authorization-header, response-errors-acounts, response-errors-generic ]
     responses:
       204:
@@ -99,6 +107,8 @@ post:
         **Get Account Activation Code**
 
         The Account Activation Code is the transient activation code that can be used to activate devices for the account. It expires after one hour.
+
+        <meta name="access-roles" path="GET:/api/accounts/{accountId}/activationcode">
       is: [ authorization-header, response-errors-acounts, response-errors-generic ]
       responses:
         200:
@@ -116,6 +126,8 @@ post:
           **Renew Account Activation Code**
 
           Forces the renewal of the Account Activation Code.
+
+          <meta name="access-roles" path="PUT:/api/accounts/{accountId}/activationcode/refresh">
         is: [ authorization-header, response-errors-acounts, response-errors-generic ]
         responses:
           200:
@@ -138,10 +150,12 @@ post:
         You can upgrade a standard user of your account (who currently has "user" privileges - default for invited users) to an admin. To do so, you have to be an admin of account for which you want to upgrade another user's access. {role} is supposed to be "user" or "admin".
 
         Remember that user can be promoted from user to admin, but admin privileges cannot be revoked.
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/users/{userId}">
       is: [ authorization-header, responses-successful, response-errors-acounts, response-errors-generic]
       body:
         application/json:
-          type: !include build/user_PUT.json
+          type: !include user_PUT.json
           example: |
             {
               "id": "{userId}",

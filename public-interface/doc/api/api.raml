@@ -44,49 +44,49 @@ traits:
 
 #Auth API
 /v1/api/auth:
-  !include auth.raml
+  !include build/auth.raml
   
 
 #Users API
 /v1/api/users:
-  !include users.raml
+  !include build/users.raml
 
 
 #Accounts API
 /v1/api/accounts:
-  !include accounts.raml
+  !include build/accounts.raml
 
 
 #Rules API
 /v1/api/accounts/{accountId}/rules:
-  !include rules.raml
+  !include build/rules.raml
 
 
 #Alert API
-/v1/api/account/{accountId}/alerts:
-  !include alerts.raml
+/v1/api/accounts/{accountId}/alerts:
+  !include build/alerts.raml
 
 
 #Devices API
-/v1/api/account/{accountId}/devices:
-  !include devices.raml
+/v1/api/accounts/{accountId}/devices:
+  !include build/devices.raml
 
 
 #Advanced Data API
-/v1/api/accounts/{accountId}/data:
-  !include data.raml
+/v1/api:
+  !include build/data.raml
 
 
 #Component Types Catalog
 /v1/api/accounts/{accountId}/cmpcatalog:
-  !include component-types.raml
+  !include build/component-types.raml
 
 
 #Control Device API
 /v1/api/accounts/{accountId}/control:
-  !include control-device.raml
+  !include build/control-device.raml
 
 
 #Invitation Management
 /v1/api/accounts/{accountId}/invites:
-  !include invitation-management.raml
+  !include build/invitation-management.raml

@@ -23,34 +23,35 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+/*jshint esnext: true */
 
 "use strict";
 const fs = require('fs');
 const path = require('path');
 
-const BUILD_FOLDER = "build/"
+const BUILD_FOLDER = "build/";
 
 const args = process.argv;
 
 args.shift();
 args.shift();
-args.forEach(function(val, index, array){
+args.forEach(function(val){
     if (fs.existsSync(val)){
-		try{
-		    const file      = fs.readFileSync(val);
-		    const json_file = JSON.parse(file);
-		    console.log("Processing " + val  + "!");
-		    for (const name in json_file){
-			json_file[name]["$schema"] = "http://json-schema.org/draft-03/schema";
+                try{
+                    const file      = fs.readFileSync(val);
+                    const jsonFile = JSON.parse(file);
+                    console.log("Processing " + val  + "!");
+                    for (var name in jsonFile){
+                        jsonFile[name]["$schema"] = "http://json-schema.org/draft-03/schema";
 
-			const json_file_out = BUILD_FOLDER + path.basename(val, '.json') + "_" + name + ".json"
+                        const jsonFileOut = BUILD_FOLDER + path.basename(val, '.json') + "_" + name + ".json";
 
-			fs.writeFileSync(json_file_out, JSON.stringify(json_file[name], null, 2));
-		    }
-		} catch (err){
-		    console.error("Could not parse file " + val + ". Error: ", err);
-		}
+                        fs.writeFileSync(jsonFileOut, JSON.stringify(jsonFile[name], null, 2));
+                    }
+                } catch (err){
+                    console.error("Could not parse file " + val + ". Error: ", err);
+                }
     } else {
-		console.error("Could not open file " + val + "!");
+                console.error("Could not open file " + val + "!");
     }
 });

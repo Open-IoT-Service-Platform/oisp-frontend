@@ -23,6 +23,8 @@ get:
     **List all Component Types for an Account**
 
     Get a list of all Component Types, with minimal data for each component if `full` paramter is omitted or `false`. If `full=true` the detailed data is retrieved.
+
+    <meta name="access-roles" path="GET:/api/accounts/{accountId}/cmpcatalog">
   is: [ authorization-header, response-errors-component, response-errors-generic ]
   queryParameters:
     full:
@@ -95,9 +97,11 @@ post:
     **Create a new custom Component Type**
 
     When creating a brand new component, dimension and version attributes are used for determining if the component exists. If not, a new component is created which auto-generated id results the concatenation of dimension and version values.
+
+    <meta name="access-roles" path="POST:/api/accounts/{accountId}/cmpcatalog">
   is: [ authorization-header, response-errors-component, response-errors-generic ]
   body:
-    type: !include build/component_POST.json
+    type: !include component_POST.json
     example:
       {	
         "dimension": "temperature",
@@ -136,6 +140,8 @@ post:
       **Get Component Type Details**
 
       Get a complete description of a component type specified by Id
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/cmpcatalog/{componentId}">
     is: [ authorization-header, response-errors-component, response-errors-generic ]
     responses:
       200:
@@ -161,9 +167,11 @@ post:
       **Update a Component Type**
 
       Updates a component type definition by creating a brand new component which definition is composed by the origin component data plus the requested changes having in mind that minor version info (version attribute) is incremented by 1.
+
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}/cmpcatalog/{componentId}">
     is: [ authorization-header, response-errors-component, response-errors-generic ]
     body:
-      type: !include build/component_PUT.json
+      type: !include component_PUT.json
       example: |
         {			
           "format": "integer",

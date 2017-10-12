@@ -1,5 +1,12 @@
   displayName: <h2> Authorization </h2>
-  description: This part of the API handles authorization. The authorization is done with JWT. The API can be used to get a JWT token and retrieve information about it.
+  description: |
+    This part of the API handles authorization. The authorization is done based on JSON Web Tokens (JWT). The API can be used to get a JWT and retrieve information about it. The actuall access-role is included in the JWT and can be one of the following:
+      * **anon** - anonymous, not authorized,
+      * **device** - IoT Device
+      * **user** - user of account(s)
+      * **admin** - admin user of account(s)
+      * **sysadmin** - admin with system wide rights
+      * **system** - role of component doing system wide analytics
   /token:
     post:
       description: |
@@ -9,14 +16,14 @@
 
         User JWT token is valid for 24h and contains user access information. On access change, token should be refreshed, to use new privileges. Example situation that require token refresh:
 
-        <ul>
-        <li> User creates new account - to use new account, token must be refreshed </li>
-        <li> User has been invited to new account - to have access to this account, token should be refreshed </li>
-        <li> User account role has been updated, for instance admin privileges were granted - to use new level of access, token must be refreshed </li>
-        </ul>
+        * User creates new account - to use new account, token must be refreshed
+        * User has been invited to new account - to have access to this account, token should be refreshed
+        * User account role has been updated, for instance admin privileges were granted - to use new level of access, token must be refreshed
+
+        <meta name="access-roles" path="POST:/auth/token">
       body:
         application/json:
-          type: !include build/authorization_AUTH.json
+          type: !include authorization_AUTH.json
           example: |
             {
               "username": "user@example.com",
@@ -31,7 +38,10 @@
 
   /tokenInfo:
     get:
-      description: Get info about the JWT token
+      description: |
+        Get info about the JWT token
+        
+        <meta name="access-roles" path="GET:/auth/tokenInfo">
       is: [  authorization-header ]
       responses:
         200:
@@ -53,7 +63,10 @@
 
   /me:
     get:
-      description: "Get user information about the owner of the JWT token"
+      description: |
+        Get user information about the owner of the JWT token
+        
+        <meta name="access-roles" path="GET:/auth/me">
       is: [  authorization-header ]
       responses:
         200:

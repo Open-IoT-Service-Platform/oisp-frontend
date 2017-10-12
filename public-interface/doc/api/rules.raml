@@ -37,6 +37,8 @@ get:
     **Get List of Rules**
 
     Get a list of all rules for the specified account.
+
+    <meta name="access-roles" path="GET:/api/accounts/{accountId}/rules">
   responses:
     200:
       description: OK
@@ -66,10 +68,12 @@ get:
 post:
   description: |
     **Create a Rule**
+
+    <meta name="access-roles" path="POST:/api/accounts/{accountId}/rules">
   is: [ authorization-header, responses-created, response-errors-rules, response-errors-generic ]
   body:
     application/json:
-      type: !include build/rule_POST.json
+      type: !include rule_POST.json
       example: |
         {
           "name": "Test Rule",
@@ -117,6 +121,8 @@ post:
       **Get one Rule information**
 
       Get specific rule details for the account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/rules/{ruleId}">
     responses:
       200:
         description: OK
@@ -139,9 +145,11 @@ post:
       **Update a Rule**
 
       If rule doesn't exist it create a new one. Cannot be used for update of a draft rule.
+
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}/rules/{ruleId}">
     body:
       application/json:
-        type: !include build/rule_POST.json
+        type: !include rule_POST.json
         example: |
           {
             "name": "Test Rule",
@@ -215,9 +223,11 @@ post:
         **Update a Status of a Rule**
 
         Update the status of the rule. Cannot be used for changing the status of draft rule. Status value should be one of the following: ["Active", "Archived", "On-hold"]
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/rules/{ruleId}/status">
       body:
         application/json:
-          type: !include build/rule_PUTStatus.json
+          type: !include rule_PUTStatus.json
           example: |
             {
               "status": "Archived"
@@ -251,9 +261,11 @@ post:
       **Create a Rule as a Draft**
 
       Create a rule with a status - "Draft" for the specified account.
+
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}/rules/draft">
     body:
       application/json:
-        type: !include build/rule_DRAFT.json
+        type: !include rule_DRAFT.json
         example: |
           {
             "name": "draftRule"
@@ -284,6 +296,8 @@ post:
         **Delete a draft rule**
 
         Delete a specific draft rule for account
+
+        <meta name="access-roles" path="DELETE:/api/accounts/{accountId}/rules/draft/{ruleId}">
       responses:
         204:
           description: OK
@@ -296,5 +310,7 @@ post:
       example: 2c6cbf002516cf81913471da4d41daed212bde8f
   post:
     is: [ authorization-header, responses-successful, response-errors-rules, response-errors-generic ]
-    description: **Clone an existing Rule**
-    
+    description: |
+      **Clone an existing Rule**
+
+      <meta name="access-roles" path="POST:/api/accounts/{accountId}/rules/clone/{ruleId}">

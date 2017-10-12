@@ -9,6 +9,8 @@ get:
     **List Devices**
     
     If no query paramters are given, then it will retrieve a list of all devices for the specified account, with minimal data for each device. Otherwise, the query parameters will filter the desired result.
+
+    <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices">
   is: [ authorization-header, response-errors-devices, response-errors-generic ]
   queryParameters:
     sort:
@@ -94,10 +96,12 @@ post:
     Device attributes should be sent as key:value pairs, where both key and value are string
 
     Device attributes collection can not contain keys: deviceId, deviceName, gatewayId, tags, location, components.
+
+    <meta name="access-roles" path="POST:/api/accounts/{accountId}/devices">
   is: [ authorization-header, response-errors-devices, response-errors-generic]
   body:
     application/json:
-      type: !include build/device_POST.json
+      type: !include device_POST.json
       example: |
         { 
           "deviceId": "24-a5-80-21-5b-29",
@@ -147,6 +151,8 @@ post:
       **Get one Device**
 
       Get full detail for specific device for the specified account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices/{deviceId}">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     responses:
       200:
@@ -177,10 +183,12 @@ post:
       **Update One Device**
 
       Update a single device. The device ID (deviceId) cannot be updated as it is the key. If the device id does not exist, an error will be returned. The list of components represents the entire list of components for the device.
+
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}/devices/{deviceId}">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     body:
       application/json:
-        type: !include build/device_PUT.json
+        type: !include device_PUT.json
         example: |
           {
             "gatewayId": "24-a5-80-21-5b-29",
@@ -215,6 +223,8 @@ post:
       **Delete one Device**
 
       Delete a specific device for this account. All data from all time series associated with the device will be deleted.
+
+      <meta name="access-roles" path="DELETE:/api/accounts/{accountId}/devices/{deviceId}">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     responses:
       204:
@@ -226,9 +236,11 @@ post:
         **Activate one Device**
 
         Activates a specific device for the specified account.
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/devices/{deviceId}/activation">
       is: [ authorization-header, response-errors-devices, response-errors-generic ]
       body:
-        type: !include build/device_ACTIVATION.json
+        type: !include device_ACTIVATION.json
         example: |
           { 
             "activationCode": "jq4h6d2b"
@@ -247,9 +259,11 @@ post:
         **Add a Component to a device**
 
         Add component to an specific device. A component represents either a time series or an actuator. The type must already existing in the Component Type catalog. You can see the entries in the catalog with a call in the Component section. Or, in the UI, go to the "Account" page and click the "Catalog" tab. Make sure you use in headers Device Token received during device activation process and not Access Token for your user. *cid* is a uuid created by the user. *name* and *type* are used according to the Component section.
+
+        <meta name="access-roles" path="POST:/api/accounts/{accountId}/devices/{deviceId}/components">
       is: [ authorization-header, response-errors-devices, response-errors-generic ]
       body:
-        type: !include build/device-component_SINGLE.json
+        type: !include device-component_SINGLE.json
         example: |
           { 
             "cid": "436e7e74-6771-4898-9057-26932f5eb7e1",
@@ -276,6 +290,8 @@ post:
           **Delete one Component**
 
           Delete a specific component for a specific device. All data will be unavailable.
+
+          <meta name="access-roles" path="DELETE:/api/accounts/{accountId}/devices/{deviceId}/activation/{cid}">
         is: [ authorization-header, response-errors-devices, response-errors-generic ]
         responses:
           204:
@@ -285,6 +301,8 @@ post:
       **List all tags for Devices**
 
       Get a list of all tags from devices for the specified account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices/tags">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     responses:
       200:
@@ -300,6 +318,8 @@ post:
       **List all attributes of Devices**
 
       Get a list of all devices's attribute for the specified account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices/attributes">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     responses:
       200:
@@ -331,9 +351,11 @@ post:
       **Advanced count of Devices**
 
       Counts devices's based on filters.
+
+      <meta name="access-roles" path="POST:/api/accounts/{accountId}/devices/count">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     body:
-      type: !include build/device_SEARCH.json
+      type: !include device_SEARCH.json
       example: |
         {
           "status":{
@@ -360,6 +382,8 @@ post:
       **Advanced search of Devices**
 
       Search devices's based on filters and query parameters.
+
+      <meta name="access-roles" path="POST:/api/accounts/{accountId}/devices/search">
     is: [ authorization-header, response-errors-devices, response-errors-generic ]
     queryParameters:
       limit:
@@ -373,7 +397,7 @@ post:
         type: integer
         required: false
     body:
-      type: !include build/device_SEARCH.json
+      type: !include device_SEARCH.json
       example: |
         {
           "status":{

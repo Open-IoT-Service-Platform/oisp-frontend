@@ -1,5 +1,22 @@
 displayName: <h2> User Management </h2>
 description: Handles user creation, updating, deleting and password changes and retrieval
+post:
+  description: |
+    **Add User **
+    Add **new** user. If not existing, email is added to the user DB and message is sent to the email owner to activate. If existing, *User already esists* error is given. In the open system, the access role is **anon**, i.e. everyone can request a tenant. It is recommended to protect the subscription by a challenge response test like Captcha to protect agains robot spamming. Closed or single tenant systems could protect by requesting an authenticated access role like **admin**.
+    
+    <meta name="access-roles" path="POST:/api/users">
+  is: [ authorization-header, response-errors-users, response-errors-generic ]
+  body:
+    type: !include user_POST.json
+    example: |
+      {
+      "email": "test@example.com",
+      "password": "Querty2"
+      }
+  responses:
+    201:
+      description: CREATED
 /{userId}:
   uriParameters:
     userId:
@@ -9,12 +26,14 @@ description: Handles user creation, updating, deleting and password changes and 
   get: 
     description: |
       **Get User information**
+      
+      <meta name="access-roles" path="GET:/api/users/{userId}">
     is: [ authorization-header, response-errors-users, response-errors-generic ]
     responses:
       200:
         body:
           application/json:
-            example:
+            example: |
               {
                 "id":"53e95985c8406a147700b94d",
                 "accounts":{
@@ -37,10 +56,12 @@ description: Handles user creation, updating, deleting and password changes and 
       **Update user attributes.**
 
       As an user, you can add attributes to your user data. Attributes can be any key/value pair.
+
+       <meta name="access-roles" path="PUT:/api/users/{userId}">
     is: [ authorization-header, response-errors-users, response-errors-generic ]
     body:
       application/json:
-        type: !include build/user_PUT.json
+        type: !include user_PUT.json
         example: |
           {   
             "attributes":{
@@ -56,6 +77,8 @@ description: Handles user creation, updating, deleting and password changes and 
       **Delete a User.**
 
       This action will result in deleting your user data, and also accounts if they do not have any other administrators. You will also no longer be able to use your old token.
+
+       <meta name="access-roles" path="DELETE:/api/users/{userId}">
     is: [ authorization-header, response-errors-users, response-errors-generic ]
     responses:
       204:
@@ -72,9 +95,11 @@ description: Handles user creation, updating, deleting and password changes and 
       **Request change password**
 
       Methods generate and send email, which can be used to change password. User email has to be specified in request body.
+
+      <meta name="access-roles" path="POST:/api/users/forgot_password">
     body:
       application/json:
-        type: !include build/user_FORGOT_PASSWORD.json
+        type: !include user_FORGOT_PASSWORD.json
         example: |
           {
             "email":"test@example.com"
@@ -86,9 +111,11 @@ description: Handles user creation, updating, deleting and password changes and 
       **Update password**
 
       Method set new password for the user. In request body you have put token received in a email (send after invoking POST /users/forgot_password) and the new password.
+
+      <meta name="access-roles" path="PUT:/api/users/forgot_password">
     body:
       application/json:
-        type: !include build/user_CHANGE_PASSWORD_USING_TOKEN.json
+        type: !include user_CHANGE_PASSWORD_USING_TOKEN.json
         example: |
           {
             "token":"ki2pc9RdnVVSKoN4",
@@ -105,10 +132,12 @@ description: Handles user creation, updating, deleting and password changes and 
       **Change password**
 
       Methods set new password for a user (identified by email).
+
+      <meta name="access-roles" path="PUT:/api/users/{email}/change_password">
     is: [ authorization-header, responses-successful, response-errors-users, response-errors-generic ]
     body:
       application/json:
-        type: !include build/user_CHANGE_PASSWORD_USING_OLD.json
+        type: !include user_CHANGE_PASSWORD_USING_OLD.json
         example: |
           {
             "currentpwd": "Qwerty1",
@@ -119,13 +148,29 @@ description: Handles user creation, updating, deleting and password changes and 
     description: |
       **Request user activation**
 
-      Methods generate and send email, which can be used to activate user. User email has to be specified in request body and must be already added to user DB.
+      Methods generate and send email, which can be used to activate user. User email has to be specified in request body and must be already in user DB, i.e. invited or added.
+
+      <meta name="access-roles" path="POST:/api/users/request_user_activation">
     body:
       application/json:
-        type: !include build/user_REACTIVATE.json
+        type: !include user_REACTIVATE.json
         example: |
           {
             "email":"test@example.com"
           }
     is: [ responses-successful, response-errors-users, response-errors-generic ]
-    
+/activate:
+  post:
+    description: |
+      **Activate User**
+      The activation has been requested earlier with the /request_user_activation path
+
+      <meta name="access-roles" path="POST:/api/users/activate">
+    body:
+      application/json:
+        type: !include user_ACTIVATE.json
+        example: |
+          {
+          "token": "abcdefg1234"
+          }
+    is: [ responses-successful, response-errors-users, response-errors-generic ]

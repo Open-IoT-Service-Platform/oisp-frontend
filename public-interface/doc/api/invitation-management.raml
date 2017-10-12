@@ -11,6 +11,8 @@ get:
     **Get List of Invitations**
     
     Get a list of users invited to the specific account.
+
+    <meta name="access-roles" path="GET:/api/accounts/{accountId}/invites">
   is: [ authorization-header, response-errors-invitation, response-errors-generic ]
   responses:
     200:
@@ -25,9 +27,11 @@ post:
     **Create Invitation**
 
     Creation of invitation to the account for specific user (identified by email). Response documentation TBD.
+
+    <meta name="access-roles" path="POST:/api/accounts/{accountId}/invites">
   is: [ authorization-header, response-errors-invitation, response-errors-generic ]
   body:
-    type: !include build/invite_POST.json
+    type: !include invite_POST.json
     example: |
       {
         "email": "test@example.com"
@@ -45,6 +49,8 @@ post:
       **Get list of invitations sent to specific user**
 
       Get details about invitations send to specific user. User is identified by his email address.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/invites/{email}">
     is: [ authorization-header, response-errors-invitation, response-errors-generic ]
     responses:
       200:
@@ -72,6 +78,8 @@ post:
       **Delete invitations**
       
       Delete invitations to an account for a specific user (identified by email).
+
+      <meta name="access-roles" path="DELETE:/api/accounts/{accountId}/invites/{email}">
     is: [ authorization-header, response-errors-invitation, response-errors-generic ]
     responses:
       200:
@@ -85,8 +93,10 @@ post:
         **Accept Invitation**
 
         Accept pending invitation for the specific account.
+
+        <meta name="access-roles" path="PUT:/api/accounts/{accountId}/invites/{email}/{inviteId}/status">
       body:
-        type: !include build/invite_PUT.json
+        type: !include invite_PUT.json
         example: |
           {
             "accept": true
