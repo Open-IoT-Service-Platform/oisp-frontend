@@ -1,4 +1,9 @@
 displayName: <h2> Device Management </h2>
+description: |
+  This section handles the device managent. E.g. add or register devices, remove devices, component management, search for devices. In many cases the *{accountId}* is clear implicitly since a Device is assigned to at most one account. Therefore, the respective *accountId* does not need to be given when **access role** is **device**. Instead a short version of the path, omiting ``accounts/{accountId}``, can be used. For example,  there is a short version of the path ``/v1/api/accounts/{accountId}/devices/{deviceId}``, which is ``/v1/api/devices/{deviceId}``.
+
+  A special case is the ``*/activation`` method, which can be used by a new device to be added to an account, even though it does not (yet) belong to this account.
+  
 uriParameters:
   accountId:
     description: |
@@ -235,7 +240,7 @@ post:
       description: |
         **Activate one Device**
 
-        Activates a specific device for the specified account.
+        Activates a specific device for the specified account. If a device is activating itself, a short path, omitting ``accounts/{accountId}`` can be used because there is a unique mapping from *activationCode* to *accountId*
 
         <meta name="access-roles" path="PUT:/api/accounts/{accountId}/devices/{deviceId}/activation">
       is: [ authorization-header, response-errors-devices, response-errors-generic ]

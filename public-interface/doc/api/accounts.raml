@@ -133,11 +133,33 @@ post:
           200:
             body:
               application/json:
-                example:
+                example: |
                   {
                     "activationCode": "bBnvBWrT",
                     "timeLeft": 1404419896
                   }
+  /users:
+    get:
+      description: |
+        **List all Users for Account**
+
+        This call will retrieve a list of users assigned to an account.
+
+        <meta name="access-roles" path="GET:/api/accounts/{accountId}/users">
+      is: [ authorization-header, responses-successful, response-errors-acounts, response-errors-generic]
+      responses:
+        200:
+          body:
+            example: |
+              {
+                "id":"321ef007-8449-477f-9ea0-d702d77e64b9",
+                "email":"test@example.com",
+                "termsAndConditions":true,
+                "verified":true,
+                "type":"user",
+                "created":1506889801491,
+                "updated":1506891324133
+              }
   /users/{userId}:
     uriParameters:
       userId:
