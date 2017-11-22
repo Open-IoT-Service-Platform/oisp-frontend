@@ -139,6 +139,12 @@ limitations under the License.
         </div>
     </div>
 
+    <div class="row" ng-if="showAlert()">
+        <div class="col-md-4 col-md-offset-4 text-center alert alert-warning">
+            <span ng-repeat="value in truncatedSeries">{{value}} {{$last ? '' : ($index==truncatedSeries.length-2) ? ' and ' : ', '}}</span> has been potentially truncated.
+        </div>
+    </div>
+
     <div class="tab-content" ng-show="!noData()">
         <div id="chartTab" class="tab-pane" ng-class="{'active': activeTab == 'chart'}">
             <iot-metrics-chart ng-if="!noMetrics() && !status.inProgress"
@@ -189,3 +195,4 @@ limitations under the License.
         </div>
     </div>
 </div>
+

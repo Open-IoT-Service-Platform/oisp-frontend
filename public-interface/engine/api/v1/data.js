@@ -153,6 +153,7 @@ function DataInquiryResponse(data, deviceLookUp, queryMeasureLocation) {
     _self.to = data.endDate;
     _self.maxItems = data.maxPoints;
     _self.series = [];
+    _self.pointsLimit = '1000';
     data.components.forEach(function(component) {
         var serie = {};
         if(!deviceLookUp[component.componentId]) {

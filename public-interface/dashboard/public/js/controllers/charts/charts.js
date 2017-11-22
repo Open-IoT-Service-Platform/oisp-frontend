@@ -350,6 +350,25 @@ iotController.controller('ChartCtrl', function( $scope,
         return !$scope.chartSeries || !$scope.chartSeries.series || $scope.chartSeries.series.length === 0;
     };
 
+    
+    $scope.showAlert =function(){
+        if(typeof $scope.chartSeries === "undefined" ){
+            return false;
+        }
+        $scope.truncatedSeries = [];
+        var limit = parseInt($scope.chartSeries.pointsLimit);
+        var temp = 0;
+        $scope.chartSeries.series.forEach(function (serie) {
+            if(temp < serie.points.length) {
+                temp = serie.points.length;
+            }
+            if(serie.points.length >= limit) {
+                $scope.truncatedSeries.push(serie.componentName);
+            }
+        });
+        return temp >= limit;
+    };
+
     $scope.chartData = [];
     /*jshint newcap: false */
     $scope.tableChartData = new ngTableParams({
