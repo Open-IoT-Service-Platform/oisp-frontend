@@ -114,7 +114,7 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
                                     deviceId: device.deviceId,
                                     gatewayId: device.gatewayId,
                                     componentId: command.componentId,
-                                    command: device.components[0].componentType.command.commandString,
+                                    command: device.components[0].command.commandString,
                                     params: command.parameters
                                 }
                             };

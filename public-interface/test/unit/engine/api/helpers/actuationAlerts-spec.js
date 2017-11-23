@@ -32,6 +32,7 @@ describe("Actuation alerts", function () {
         ruleOnlyWithActuationStub,
         deviceStub,
         componentStub,
+        httpBindingStub,
         websocketBindingStub,
         mqttBindingStub,
         actuationMock,
@@ -121,6 +122,11 @@ describe("Actuation alerts", function () {
             ]
         };
 
+        httpBindingStub = {
+            _id : DEVICE_ID,
+             type: "http"
+        };
+
         websocketBindingStub = {
             _id : DEVICE_ID,
             lastConnectedAt: 1421840797534
@@ -146,7 +152,7 @@ describe("Actuation alerts", function () {
 
         connectionBindingsMock = {
             find: sinon.stub().returns(Q.resolve(websocketBindingStub)),
-            findLatestConnection: sinon.stub().returns(Q.resolve({}))
+            findLatestConnection: sinon.stub().returns(Q.resolve(httpBindingStub))
         };
     }
 
