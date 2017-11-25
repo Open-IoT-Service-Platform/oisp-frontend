@@ -126,14 +126,14 @@ a.menu {
 
 .logo, .intel-logo {
     display: inline-block;
-    width: 32px;
+    width: 47px;
     height: 32px;
-    background-image: url('../../img/common/1and1-logo-320-dpi-hires.png');
+    background-image: url('../../img/common/intel-logo-320-dpi-hires.png');
     margin: 9px;
     vertical-align: middle;
     text-indent: -9999em;
     background-repeat: no-repeat;
-    background-size: 32px 32px;
+    background-size: 47px 32px;
 }
 
 .intel-logo {

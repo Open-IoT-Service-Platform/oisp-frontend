@@ -19,7 +19,7 @@ jshint_output.xml
 */.idea/*
 .idea
 *.orig
-coverage/*
+public-interface/coverage/*
 *build/*
 public-interface/test/e2e/input/*
 public-interface/test/e2e/output/*

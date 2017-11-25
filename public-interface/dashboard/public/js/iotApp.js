@@ -324,8 +324,11 @@ iotAppLogin.filter('rawHtml', rawHtmlFilter);
 
 var iotAppRun = function($rootScope, ngI18nResourceBundle){
     $rootScope.i18n = {};
-    ngI18nResourceBundle.get({locale: 'en'}).success(function (resourceBundle) {
+    ngI18nResourceBundle.get({
+        locale: 'en'
+    }).success(function (resourceBundle) {
         $rootScope.i18n = resourceBundle;
+        $rootScope.i18n.copyright.current_year = (new Date()).getFullYear();
         $rootScope.appReady = true;
     });
 };

@@ -1,5 +1,5 @@
 {
-    "app_title"  : "IoT Analytics in cooperation with",
+    "app_title"  : "Open IoT Connector",
     "auth": {
         "login": "Sign in",
         "sign_in": "Sign in",
@@ -65,6 +65,10 @@
           "verifyUserEmail_true": "Email address",
           "verifyUserEmail_false": "Username"
         }
+    },
+    "copyright": {
+        "owner": "Intel",
+        "current_year": ""
     },
     "time_period": [{"s": "Seconds"},
         {"m": "Minutes"},
