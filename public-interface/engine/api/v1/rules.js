@@ -97,21 +97,17 @@ var deleteRule = function (options, callback) {
     var accountId = options.domainId,
         externalId = options.externalId;
 
-    var deletedRuleData = {
-        status: Rule.ruleStatus.deleted,
-        synchronizationStatus: Rule.ruleSynchronizationStatus.notsynchronized
-    };
+    return Rule.deleteRule(externalId, accountId)
+        .then(function() {
 
-    return Rule.update(externalId, accountId, deletedRuleData)
-        .then(function (result) {
-            callback(null, result);
+            callback(null);
         })
-        .catch(function (err) {
-            var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
-            if (err && err.code) {
-                errMsg = errBuilder.build(err);
+        .catch (function(err) {
+            var errMsg = errBuilder.Errors.Rule.DeletionError;
+            if(err && err.code) {
+                errMsg = err;
             }
-            callback(errMsg);
+            callback(errBuilder.build(errMsg));
         });
 };
 
