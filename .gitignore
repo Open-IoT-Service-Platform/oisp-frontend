@@ -29,3 +29,4 @@ selenium-server-standalone-2.40.0.jar
 public-interface/.tmp/*
 public-interface/dashboard/public/generated
 *.pem
+public-interface/dashboard/public/api.html

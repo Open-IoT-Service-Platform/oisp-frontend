@@ -122,7 +122,7 @@ iotController.controller('ChartCtrl', function( $scope,
         {text: $rootScope.i18n.charts.refreshRates.noRefresh, seconds: 31536000} // about 1 year
     ];
 
-    $scope.refreshRateSeconds = 30;
+    $scope.refreshRateSeconds = 5;
 
     $scope.filters = {
         chart: {
@@ -238,7 +238,7 @@ iotController.controller('ChartCtrl', function( $scope,
         }
 
         if (period.id !== 1) {
-            $scope.selectRefreshRate($scope.refreshRates[$scope.refreshRates.length-1].seconds);
+            $scope.selectRefreshRate($scope.refreshRates[0].seconds);
         }
 
         if (period.id === customTimeId) {
