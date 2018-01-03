@@ -2,9 +2,10 @@
  * angular-recaptcha build:2014-10-30
  * https://github.com/vividcortex/angular-recaptcha
  * Copyright (c) 2014 VividCortex
+ * Modified by Steven Briscoe
  **/
 
-/*global angular, Recaptcha */
+/*global angular, window.Recaptcha */
 (function (ng) {
     'use strict';
 
@@ -97,7 +98,7 @@
 
     }]);
 
-}(angular, Recaptcha));
+}(angular, window.Recaptcha));
 
 /*global angular, Recaptcha */
 (function (ng, Recaptcha) {
@@ -204,4 +205,4 @@
         };
     }]);
 
-}(angular, Recaptcha));
+}(angular, window.Recaptcha));

@@ -20,7 +20,7 @@ limitations under the License.
     </div>
     <div class="modal-body">
         <input type='email' class="form-control" ng-model="toInvite.email" required placeholder="Email" name="email">
-        <div class="col-xs-offset-2" ng-show="recaptcha.enabled" vc-recaptcha key="recaptcha.key" lang="en" theme="white">
+        <div class="col-xs-offset-2" ng-if="recaptcha.enabled" vc-recaptcha key="recaptcha.key" lang="en" theme="white">
         </div>
         <div class="alert alert-warning" ng-show="error">
             {{error}}

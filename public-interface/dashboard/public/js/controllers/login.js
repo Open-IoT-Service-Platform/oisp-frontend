@@ -255,8 +255,7 @@ iotController.controller('LoginCtrl', function($scope,
     };
 
     $scope.termsAndConditions = function(){
-        $('#termsAndConditionModal').appendTo("body");
-        $('#termsAndConditionModal').modal('show');
+        $('#termsAndConditionModal').appendTo("body").modal('show');
     };
 });
 

@@ -18,24 +18,37 @@
 'use strict';
 iotServices.factory('googleCaptchaService', ['$http', function($http) {
 
-    var URL = '/ui/google/captchakey';
+    var REMOTE_JS_URL = '//www.google.com/recaptcha/api/js/recaptcha_ajax.js';
+    var API_URL = '/ui/google/captchakey';
     var googleCaptchaPublicKey;
 
-    return {
+    var googleCaptchaService = {
+        loadGoogleCaptcha: function(successCallback, errorCallback){
+            var script = document.createElement('script');
+            script.onload = successCallback;
+            script.onerror = errorCallback;
+            script.src = REMOTE_JS_URL;
+
+            document.head.appendChild(script);
+        },
         getGoogleCaptchaKey: function(successCallback, errorCallback){
             if(!googleCaptchaPublicKey) {
                 $http({
                     method: 'GET',
-                    url: URL
+                    url: API_URL
                 })
-                    .success(function (data, status) {
-                        if(data.captchaPublicKey) {
-                            googleCaptchaPublicKey = data.captchaPublicKey;
-                        }
+                .success(function (data, status) {
+                    if(data.captchaPublicKey) {
+                        googleCaptchaPublicKey = data.captchaPublicKey;
+                    }
+                    googleCaptchaService.loadGoogleCaptcha(function(){
+                        // Remote Google Captcha now loaded
+
                         successCallback(data, status);
-                    }).error(function (data, status) {
-                        errorCallback(data, status);
                     });
+                }).error(function (data, status) {
+                    errorCallback(data, status);
+                });
             } else {
                 successCallback({
                     captchaPublicKey : googleCaptchaPublicKey
@@ -43,4 +56,6 @@ iotServices.factory('googleCaptchaService', ['$http', function($http) {
             }
         }
     };
+
+    return googleCaptchaService;
 }]);
