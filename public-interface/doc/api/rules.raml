@@ -269,6 +269,19 @@ post:
                   "lastUpdateDate": 1411127836926,
                   "status": "Archived"
                 }
+/rules/delete_rule_with_alerts/{ruleId}:
+  delete:
+    is: [ authorization-header, response-errors-rules, response-errors-generic ]
+    description: |
+      **Delete a Rule**
+
+      Delete a rule with ID ruleId.
+      
+      <meta name="access-roles" path="PUT:/api/accounts/{accountId}/delete_rule_with_alerts/{ruleId}">
+    responses:
+      204:
+        description: OK
+        
 /draft:
   put:
     is: [ authorization-header, response-errors-rules, response-errors-generic ]
