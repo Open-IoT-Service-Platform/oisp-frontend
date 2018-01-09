@@ -21,8 +21,8 @@
 
 var addUser = require('./addUser');
 var removeTestUser = require('./removeTestUser');
+var ResetDB = require('./resetDB');
 var command = process.argv[2];
-
 
 switch (command) {
     case 'addUser':
@@ -32,6 +32,12 @@ switch (command) {
     case 'removeTestUser':
         var removeTestUserCommand = new removeTestUser();
         removeTestUserCommand.remove();
+        break;
+    case 'resetDB':
+        var databaseResetter = new ResetDB();
+        databaseResetter.reset(function(){
+            console.log("Database reset");
+        });
         break;
     default:
         console.log ("Command : ", command , " not supported ");
