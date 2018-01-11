@@ -219,6 +219,13 @@ exports.getAlerts = function (params, resultCallback) {
     });
 };
 
+exports.deleteAlerts = function (params, resultCallback) {
+
+        Alert.deleteAlerts(params.accountId, params.status, function (err, result) {
+            resultCallback(err, result);
+        });
+};
+
 exports.getAlert = function (params, resultCallback) {
 
     Alert.findByExternalId(params.accountId, params.alertId, function (err, alert) {

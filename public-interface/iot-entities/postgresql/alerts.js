@@ -73,6 +73,22 @@ exports.findByStatus = function (accountId, status, callback) {
         });
 };
 
+exports.deleteAlerts = function (accountId, status, callback) {
+    var filter = {
+        where: {
+            accountId: accountId
+        }
+    };
+
+    alerts.destroy(filter)
+        .then(function (res) {
+            callback(null, res);
+        })
+        .catch(function (err) {
+            callback(err);
+        });
+};
+
 exports.findByExternalId = function (accountId, alertId, callback) {
     var filter = {
         where: {

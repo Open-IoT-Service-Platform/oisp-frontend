@@ -18,7 +18,9 @@
 
 var alert = require('../../api/v1/alerts'),
     httpStatuses = require('../../res/httpStatuses'),
+    Response = require('../../../lib/response').response,
     errors  = require('../../../lib/errorHandler/index').errBuilder.Errors,
+    errBuilder = require('../../../lib/errorHandler/index').errBuilder,
     logger = require('../../../lib/logger/index').init();
 
 exports.usage = function(req, res){
@@ -92,6 +94,23 @@ exports.getAlerts = function(req, res, next) {
             res.status(httpStatuses.OK.code).send(result);
         } else {
             next(err);
+        }
+    });
+};
+
+exports.deleteAlerts = function(req, res, next) {
+    var responder = new Response(res, next);
+    var params = {accountId: req.params.accountId};
+
+    if (!req.params.accountId) {
+        next(errBuilder.build(errBuilder.Errors.Alert.AccountNotFound));
+    }
+
+    alert.deleteAlerts(params, function(err){
+        if(!err){
+            responder(httpStatuses.DeleteOK.code);
+        } else {
+            responder(err);
         }
     });
 };

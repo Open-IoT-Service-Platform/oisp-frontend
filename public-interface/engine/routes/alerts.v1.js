@@ -25,6 +25,8 @@ module.exports = {
     register:  function (app) {
         app.get(VERSION + FULL_PATH, alerts.getAlerts);
 
+        app.delete(VERSION + FULL_PATH, alerts.deleteAlerts);
+        
         app.get(VERSION + FULL_PATH + "/:alertId", alerts.getAlert);
 
         app.post(VERSION + PATH, schemaValidator.validateSchema(schemas.alert.POST), alerts.trigger);
