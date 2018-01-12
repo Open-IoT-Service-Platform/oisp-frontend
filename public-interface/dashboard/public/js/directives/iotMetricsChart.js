@@ -80,7 +80,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
         }
 
         scope.getLocalTimeFromUTC = function(milis) {
-            return new Date(milis - (new Date(milis).getTimezoneOffset() * 60 * 1000)).getTime();
+            return milis;
         };
 
         function generateScales(series, callback){
@@ -286,7 +286,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                     deviceComponentPair.points.forEach(function(value){
                         if(!isNaN(value.value)){
                             seriesData.push({
-                                "x": scope.getLocalTimeFromUTC(parseInt(value.ts)) / 1000,
+                                "x": scope.getLocalTimeFromUTC(parseInt(value.ts))/1000,
                                 "y": parseFloat(value.value)
                             });
                         }
@@ -445,15 +445,11 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                 graph:  mGraph.main,
                 hideXLegend: true,
                 formatter: function(series, x, y) {
-                    var timezoneDiff = (new Date().getTimezoneOffset() / 60) * (-1);
-                    var timezoneString;
-                    if(timezoneDiff > 0) {
-                        timezoneString = "GMT+" + timezoneDiff.toString();
-                    } else {
-                        timezoneString = "GMT" + timezoneDiff.toString();
-                    }
+                    var rawDateStr = new Date(x *1000).toString();
+                    var date = rawDateStr.replace("GMT","");
+                    var timezoneStrPos = date.indexOf("(");
+                    date = '<span class="date">' + date.slice(0, timezoneStrPos-1) +'</span>';
 
-                    var date = ('<span class="date">' + new Date(x *1000).toUTCString() + '</span>').replace("GMT", timezoneString);
                     var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
 
                     var formatter = series.yFormatter || defaultFormatter;
