@@ -26,7 +26,8 @@ var cfenvReader = require('./lib/cfenv/reader'),
  redis_credentials = cfenvReader.getServiceCredentials("myredis"),
  rule_engine_credentials = cfenvReader.getServiceCredentials("rule-engine-credentials-ups"),
  gateway_user_credentials = cfenvReader.getServiceCredentials("gateway-credentials-ups"),
- dashboard_security_credentials = cfenvReader.getServiceCredentials("dashboard-security-ups");
+ dashboard_security_credentials = cfenvReader.getServiceCredentials("dashboard-security-ups"),
+ kafka_credentials = cfenvReader.getServiceCredentials("kafka-ups");
 
 var config = {
     api: {
@@ -135,8 +136,8 @@ var config = {
             password : ""
         },
         kafka: {
-            hosts: "",
-            username: ""
+            hosts: kafka_credentials.hosts,
+            topics: kafka_credentials.topics
         },
         ingestion: 'REST',
         userScheme: null // default
@@ -208,10 +209,6 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     // config.logger.maxLines = 60000;
 
     config.controlChannel.ws.secure = false;
-}
-
-if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
-    config.postgres.database = config.postgres.database + "_test";
 }
 
 module.exports = config;

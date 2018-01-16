@@ -30,7 +30,7 @@
     "errorhandler": "^1.4.0",
     "express": "^4.12.4",
     "jsjws": "^2.1.1",
-    "kafka-node": "^0.2.12",
+    "kafka-node": "^2.3.0",
     "moment": ">=2.5.1",
     "mqtt": "0.3.11",
     "nock": "~0.27.3",

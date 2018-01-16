@@ -24,7 +24,8 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     RuleValidator = require('../helpers/index').rulesValidator,
     validator = new RuleValidator(),
     uuid = require('node-uuid'),
-    Q = require('q');
+    Q = require('q'),
+    rulesUpdateNotifier = require('../helpers/rules-update-notifier');
 
 var buildInternalRule = function (options) {
     var accountId = ((typeof options.domainId) === 'object' && (typeof options.domainId.public_id) === 'string') ? options.domainId.public_id : options.domainId,
@@ -79,6 +80,7 @@ var addRule = function (options, callback) {
                     });
             })
             .then(function (result) {
+                rulesUpdateNotifier.notify();
                 callback(null, result);
             })
             .catch(function (err) {
@@ -97,17 +99,21 @@ var deleteRule = function (options, callback) {
     var accountId = options.domainId,
         externalId = options.externalId;
 
-    return Rule.deleteRule(externalId, accountId)
-        .then(function() {
+    var deletedRuleData = {
+        status: Rule.ruleStatus.deleted,
+        synchronizationStatus: Rule.ruleSynchronizationStatus.notsynchronized
+    };
 
-            callback(null);
+    return Rule.update(externalId, accountId, deletedRuleData)
+        .then(function (result) {
+            callback(null, result);
         })
-        .catch (function(err) {
-            var errMsg = errBuilder.Errors.Rule.DeletionError;
-            if(err && err.code) {
-                errMsg = err;
+        .catch(function (err) {
+            var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
+            if (err && err.code) {
+                errMsg = errBuilder.build(err);
             }
-            callback(errBuilder.build(errMsg));
+            callback(errMsg);
         });
 };
 
@@ -260,6 +266,7 @@ var updateRule = function (options, callback) {
                     });
             })
             .then(function (result) {
+                rulesUpdateNotifier.notify();
                 callback(null, result);
             })
             .catch(function (err) {
@@ -297,6 +304,7 @@ var updateRuleStatus = function (options, callback) {
                 });
         })
         .then(function (result) {
+            rulesUpdateNotifier.notify();
             callback(null, result);
         })
         .catch(function (err) {
