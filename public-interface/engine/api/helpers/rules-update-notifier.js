@@ -39,7 +39,7 @@ exports.notify = function () {
     }
 
     try {
-=        kafkaProducer.send([
+        kafkaProducer.send([
             {
                 topic: config.drsProxy.kafka.topics.rule_engine,
                 messages: ""
