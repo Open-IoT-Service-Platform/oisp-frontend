@@ -115,6 +115,23 @@ exports.deleteAlerts = function(req, res, next) {
     });
 };
 
+exports.deleteAlert = function(req, res, next) {
+    var responder = new Response(res, next);
+    var params = {accountId: req.params.accountId, alertId: req.params.alertId};
+
+    if (!req.params.accountId) {
+        next(errBuilder.build(errBuilder.Errors.Alert.AccountNotFound));
+    }
+
+    alert.deleteAlert(params, function(err){
+        if(!err){
+            responder(httpStatuses.DeleteOK.code);
+        } else {
+            responder(err);
+        }
+    });
+};
+
 exports.getAlert = function(req, res, next) {
     var params = {accountId: req.params.accountId, alertId: req.params.alertId};
     alert.getAlert(params, function(err, alert){

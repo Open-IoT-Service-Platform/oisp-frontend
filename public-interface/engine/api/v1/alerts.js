@@ -226,6 +226,13 @@ exports.deleteAlerts = function (params, resultCallback) {
         });
 };
 
+exports.deleteAlert = function (params, resultCallback) {
+
+        Alert.deleteByExternalId(params.accountId, params.alertId, function (err, result) {
+            resultCallback(err, result);
+        });
+};
+
 exports.getAlert = function (params, resultCallback) {
 
     Alert.findByExternalId(params.accountId, params.alertId, function (err, alert) {
