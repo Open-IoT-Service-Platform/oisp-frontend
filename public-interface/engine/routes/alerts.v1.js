@@ -29,6 +29,8 @@ module.exports = {
         
         app.get(VERSION + FULL_PATH + "/:alertId", alerts.getAlert);
 
+        app.delete(VERSION + FULL_PATH + "/:alertId", alerts.deleteAlert);
+
         app.post(VERSION + PATH, schemaValidator.validateSchema(schemas.alert.POST), alerts.trigger);
         app.post(VERSION + FULL_PATH, schemaValidator.validateSchema(schemas.alert.POST), alerts.trigger);
 

@@ -204,6 +204,46 @@ describe('alerts service', function(){
         });
     });
 
+    describe('delete alert', function(){
+        it('should call success callback if everything is ok', function(){
+            // prepare
+            var successCallback = sinon.spy(),
+                errorCallback = sinon.spy(),
+                status = 204;
+
+            httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(status);
+
+            // execute
+            service.deleteAlert(successCallback, errorCallback);
+            httpBackend.flush();
+
+            // attest
+            expect(successCallback.calledOnce).to.equal(true);
+            expect(errorCallback.calledOnce).to.equal(false);
+            expect(successCallback.args[0].length).to.equal(4);
+            expect(successCallback.args[0][0].length).to.equal(status);
+        });
+
+        it('should call error callback if something goes wrong', function(){
+            // prepare
+            var successCallback = sinon.spy(),
+                errorCallback = sinon.spy();
+                status = 404;
+
+            httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(internalError.code, internalError.message);
+
+            // execute
+            service.deleteAlert(successCallback, errorCallback);
+            httpBackend.flush();
+
+            // attest
+            expect(successCallback.calledOnce).to.equal(false);
+            expect(errorCallback.calledOnce).to.equal(true);
+            expect(errorCallback.args[0].length).to.equal(4);
+            expect(errorCallback.args[0][1]).to.equal(internalError.code);
+        });
+    });
+
     describe('update status', function(){
         it('should call success callback if everything is ok', function(){
             // prepare

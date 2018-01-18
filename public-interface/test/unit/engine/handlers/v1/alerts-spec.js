@@ -244,6 +244,57 @@ describe('alerts handler', function() {
             done();
         });
     });
+    describe('delete alert', function(){
+        beforeEach(function() {
+            initResponseMock();
+        });
+
+        var params = {
+            alertId: reqMock.params.alertId,
+            accountId: reqMock.params.accountId
+        };
+
+        it('should delete alert and return 204', function(done){
+            // prepare
+            var apiMock = {
+                deleteAlert: sinon.stub().callsArgWith(1, null)
+                };
+
+            alertsHandler.__set__('alert', apiMock);
+
+            // execute
+            alertsHandler.deleteAlert(reqMock, resMock, {});
+
+            // attest
+            expect(resMock.send.calledOnce).to.equal(true);
+            expect(responseCode).to.equal(httpStatuses.DeleteOK.code);
+            expect(apiMock.deleteAlert.calledOnce).to.equal(true);
+            expect(apiMock.deleteAlert.args[0].length).to.equal(2);
+            expect(apiMock.deleteAlert.calledWith(params)).to.equal(true);
+
+            done();
+        });
+        it('should not delete alert if something crashes and should return 404 error code', function(done){
+            // prepare
+            var error = new Error(404),
+                apiMock = {
+                    deleteAlert: sinon.stub().callsArgWith(1, error)
+                },
+                nextSpy = sinon.spy();
+
+            alertsHandler.__set__('alert', apiMock);
+
+            // execute
+            alertsHandler.deleteAlert(reqMock, {}, nextSpy);
+
+            // attest
+            expect(nextSpy.calledWith(error)).to.equal(true);
+            expect(apiMock.deleteAlert.calledOnce).to.equal(true);
+            expect(apiMock.deleteAlert.calledWith(params)).to.equal(true);
+
+            done();
+        });
+    });
     describe('delete alerts', function(){
         beforeEach(function() {
             initResponseMock();
