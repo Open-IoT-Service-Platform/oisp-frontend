@@ -1,5 +1,5 @@
 {
-    "app_title"  : "Open IoT Connector",
+    "app_title"  : "Open IoT Service Platform (OISP)",
     "auth": {
         "login": "Sign in",
         "sign_in": "Sign in",
