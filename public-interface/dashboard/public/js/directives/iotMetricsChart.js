@@ -369,7 +369,11 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                         "y": 0
                     });
 
-                    series.push(fakeSeries);
+                    /* Disabling the fake series being pushed to series.
+                       This fixes the bug of real time graph.
+                       Keep the code until the use of fakeSeries is discovered. 
+                     */
+                    // series.push(fakeSeries);
                     chartSeries = series;
                 }
 
@@ -523,6 +527,8 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                 rickshawChart();
             }, 10);
         };
+
+
 
         scope.$watch(attributes.data, function(value) {
             renderChart(value);
