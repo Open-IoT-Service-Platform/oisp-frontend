@@ -129,6 +129,18 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                 $http(requestOptions).success(successCallback).error(errorCallback);
             });
         },
+        deleteAlert: function(alertId, successCallback, errorCallback){
+            if(confirm("Are you sure want to delete?")){
+                sessionService.addAccountIdPrefix('/alerts/' + alertId)
+                    .then(function(url) {
+                        console.log("url", url);
+                        $http({
+                            method: 'DELETE',
+                            url: url
+                        }).success(successCallback).error(errorCallback);
+                });
+            }
+        },
         data: summary
     };
 }]);

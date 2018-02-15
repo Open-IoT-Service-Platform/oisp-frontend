@@ -51,7 +51,7 @@ iotController.controller('EditAlertCtrl', function($scope, $routeParams, $locati
     }, function(){
         $scope.error = i18n.alerts.errors.loadAlerts;
     });
-
+    
     $scope.addComment = function(gc){
         if (gc !== undefined && gc !== null && gc !== '') {
             var comment = {
