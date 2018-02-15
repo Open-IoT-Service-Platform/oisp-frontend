@@ -178,4 +178,12 @@ iotController.controller('ListAlertsCtrl', function($scope,
             goToDetails(givenAlert);
         }
     };
+
+    $scope.deleteAlert = function(alert){
+        alertsService.deleteAlert(alert.alertId, function(){
+            $scope.tableAlerts.reload();
+        }, function(){
+            $scope.error = i18n.alerts.errors.deleteAlert;
+        });
+    };
 });
