@@ -497,13 +497,26 @@ iotController.controller('ChartCtrl', function( $scope,
             })[0];
 
             if (oldSerie) {
-                var newPoints = serie.points.filter(function(point) {
+                var newPoints = oldSerie.points.length > 0 ? serie.points.filter(function(point) {
                     // we only want to add points newer than those already in serie
                     // and serie is ordered, so we can just compare to last point
                     return (point.ts > oldSerie.points[oldSerie.points.length - 1].ts);
-                });
+                }) : [];
+                if(newPoints.length > 0){
+                    var latestTimestamp = parseInt(newPoints[newPoints.length-1].ts);
+                    var minTimestamp = parseInt(latestTimestamp + $scope.filters.chart.timePeriod.value * 1000);
+
+                    while (oldSerie.points.length > 0) {
+                        if(oldSerie.points[0].ts < minTimestamp){
+                            oldSerie.points.shift();
+                        } else {
+                            break;
+                        }
+                    }
+                }
                 oldSerie.points = oldSerie.points.concat(newPoints);
             }
+
         });
     };
 

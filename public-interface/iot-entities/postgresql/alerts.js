@@ -35,7 +35,6 @@ exports.isStatusValid = function (status) {
 };
 
 exports.new = function (newAlert, callback) {
-
     var alertModel = interpreter.toDb(newAlert);
     alertModel["status"] = statuses.new;
     delete alertModel.id;
@@ -89,7 +88,7 @@ exports.deleteAlerts = function (accountId, status, callback) {
         });
 };
 
-exports.deleteByExternalId = function (accountId, alertId, status, callback) {
+exports.deleteByExternalId = function (accountId, alertId, callback) {
     var filter = {
         where: {
             id: alertId,
