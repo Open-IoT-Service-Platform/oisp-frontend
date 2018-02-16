@@ -74,7 +74,6 @@ iotController.controller('controlCtrl', function($scope,
                 var device = $scope.searchResult.devices.filter(function (device) {
                     return device.deviceId === item;
                 })[0];
-
                 if (device && device.components) {
                     device.components.forEach(function (component) {
 
@@ -95,7 +94,7 @@ iotController.controller('controlCtrl', function($scope,
 
                     });
                 }
-            }
+           }
         });
     }, true);
 
@@ -154,7 +153,7 @@ iotController.controller('controlCtrl', function($scope,
                     }
                 }
             }
-        });
+        });     
     }, true);
 
     $scope.selectedParameter = {

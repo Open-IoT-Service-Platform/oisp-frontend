@@ -526,6 +526,7 @@
             "cloneRule": "Cannot clone rule",
             "loadAll": "Cannot load alerts",
             "loadAlerts": "Cannot load alert",
+            "deleteAlert": "Cannot delete alert",
             "updateAlerts": "Cannot change alert status"
         },
         "id": "ID",
