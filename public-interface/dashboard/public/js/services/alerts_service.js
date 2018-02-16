@@ -133,7 +133,6 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
             if(confirm("Are you sure want to delete?")){
                 sessionService.addAccountIdPrefix('/alerts/' + alertId)
                     .then(function(url) {
-                        console.log("url", url);
                         $http({
                             method: 'DELETE',
                             url: url
