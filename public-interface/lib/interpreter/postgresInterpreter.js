@@ -510,7 +510,6 @@ var rulesInterpreter = function (lookUpTable, inverseLookUpTable) {
                     parsePupulations(entity);
                     removesEmptyFields(entity);
                 }
-                delete entity.synchronizationStatus;
                 return entity;
             });
         },

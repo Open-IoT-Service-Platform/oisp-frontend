@@ -18,9 +18,44 @@
 var Kafka = require('kafka-node'),
     config = require('../../../config'),
     logger = require('../../../lib/logger').init(),
-    kafkaProducer = null;
+    rules = require("../../../iot-entities/postgresql/rules"),
+    kafkaProducer = null,
+    syncCheckTimer = null;
+
+var send = function() {
+    if ( kafkaProducer ) {
+        try {
+            kafkaProducer.send([
+                {
+                    topic: config.drsProxy.kafka.topics.rule_engine,
+                    messages: ""
+                }
+            ], function (err) {
+                if (err) {
+                    logger.error("Error when sending rules-update message to Kafka: " + JSON.stringify(err));
+                } 
+            });
+        } catch(exception) {
+            logger.error("Exception occured when sending rules-update message to Kafka: " + exception);
+        }
+
+        syncCheckTimer = setTimeout( function() {
+            rules.findBySynchronizationStatus(rules.ruleStatus.active, rules.ruleSynchronizationStatus.notsynchronized)
+                .then(function (noSyncRules) {
+                    if ( noSyncRules && noSyncRules.length > 0 ){
+                        send();
+                    }
+                })
+        }, 1000)
+    }
+}
 
 exports.notify = function () {
+    if ( syncCheckTimer != null ) {
+        clearInterval(syncCheckTimer);
+        syncCheckTimer = null;
+    }
+
     if ( kafkaProducer === null ) {
         var kafkaClient;
         try {
@@ -36,21 +71,19 @@ exports.notify = function () {
         } catch (exception) {
             logger.error("Exception occured creating Kafka Producer: " + exception);
         }
-    }
 
-    try {
-        kafkaProducer.send([
-            {
-                topic: config.drsProxy.kafka.topics.rule_engine,
-                messages: ""
-            }
-        ], function (err) {
-            if (err) {
-                logger.error("Error when sending rules-update message to Kafka: " + JSON.stringify(err));
-            } 
-        });
-    } catch(exception) {
-        logger.error("Exception occured when sending rules-update message to Kafka: " + exception);
+        kafkaProducer.on('ready', function() {
+            kafkaProducer.createTopics([config.drsProxy.kafka.topics.rule_engine], false, function (err, data) {
+                if (!err) {
+                    send()
+                }
+                else {
+                    console.log("Cannot create "+config.drsProxy.kafka.topics.rule_engine + " topic "+err)
+                }
+            });
+        })
     }
-
+    else {
+        send();
+    }
 };
