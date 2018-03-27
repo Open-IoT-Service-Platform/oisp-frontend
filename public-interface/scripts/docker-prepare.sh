@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export TERM=xterm
 
 cd /app/public-interface
 npm install
