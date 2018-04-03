@@ -338,9 +338,18 @@ var parseFilters = function (filters, attributes, callback) {
 
     var result = {};
     delete filters._;
-    result.limit = parseInt(filters.limit);
-    result.offset = parseInt(filters.skip);
-    result.where = {};
+    if(undefined == filters.limit){
+        result.limit = null;
+    }else{
+        result.limit = parseInt(filters.limit);
+    };
+
+    if(undefined == filters.skip){
+	result.offset = null;
+    }else{
+	result.offset = parseInt(filters.skip);
+    };
+   result.where = {};
     if (filters.sort && filters.sort in attributes) {
         var order = filters.order === "desc" ? DESC : ASC;
         result.order = [[attributes[filters.sort].fieldName, order]];
@@ -375,6 +384,9 @@ var parseFiltersToSql = function (filters, attributes, callback) {
         queryfilters += (" OFFSET " + parseInt(filters.skip));
     }
 
+    if(queryfilters == '' || queryfilters == undefined){
+    	queryfilters = null;
+    }
     callback(null, queryfilters);
 };
 
