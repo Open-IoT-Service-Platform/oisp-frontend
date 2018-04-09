@@ -76,6 +76,31 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                 }).success(successCallback).error(errorCallback);
             });
         },
+        deleteAlerts: function(successCallback, errorCallback){
+            sessionService.addAccountIdPrefix('/alerts')
+            .then(function(url){
+                $http({
+                    method: 'DELETE',
+                    url: url,
+                    params: {
+                        "_" : utilityService.timeStamp()
+                    }
+                }).success(successCallback)
+                  .error(errorCallback);
+            });
+        },
+        deleteAlert: function(alertId, successCallback, errorCallback){
+            sessionService.addAccountIdPrefix('/alerts/' + alertId)
+            .then(function(url){
+                $http({
+                    method: 'DELETE',
+                    url: url,
+                    params: {
+                        "_" : utilityService.timeStamp()
+                    }
+                }).success(successCallback).error(errorCallback);
+            });
+        },
         updateStatus: function(options, successCallback, errorCallback){
             var alert = options.alert,
                 alertId = alert.alertId,
