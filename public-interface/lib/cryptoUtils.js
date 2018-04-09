@@ -23,7 +23,7 @@ module.exports = {
     hash: function(password, salt) {
             // salt is passed in by verify to hash a password using a previously stored salt
             salt = salt || crypto.randomBytes(32).toString('base64');
-            var hashed = crypto.pbkdf2Sync(password, salt, 20000, 32).toString('base64');
+            var hashed = crypto.pbkdf2Sync(password, salt, 20000, 32,'sha1').toString('base64');
             // store the method, algorithm, iterations and keylength with the hashed password
             // this allows for backward compatibility when we implemented new hashing schemes
             // salt is stored in a separate column
