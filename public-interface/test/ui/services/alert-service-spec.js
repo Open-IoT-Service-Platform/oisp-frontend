@@ -30,6 +30,10 @@ describe('alerts service', function(){
             code: 500,
             message: 'internal server error'
         },
+        internalError = {
+            code: 500,
+            message: 'internal server error'
+        },
         accountId = 1;
 
     beforeEach(function(){
@@ -169,7 +173,8 @@ describe('alerts service', function(){
             // prepare
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
-                status = 204;
+                status = 204,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts?.*$')).respond(status);
 
@@ -181,14 +186,17 @@ describe('alerts service', function(){
             expect(successCallback.calledOnce).to.equal(true);
             expect(errorCallback.calledOnce).to.equal(false);
             expect(successCallback.args[0].length).to.equal(4);
-            expect(successCallback.args[0][0].length).to.equal(status);
+            expect(successCallback.args[0][1]).to.equal(status);
+            fakeconfirm.restore();
         });
 
         it('should call error callback if something goes wrong', function(){
             // prepare
             var successCallback = sinon.spy(),
-                errorCallback = sinon.spy();
+                errorCallback = sinon.spy(),
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
                 status = 404;
+
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts?.*$')).respond(internalError.code, internalError.message);
 
@@ -201,6 +209,7 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(true);
             expect(errorCallback.args[0].length).to.equal(4);
             expect(errorCallback.args[0][1]).to.equal(internalError.code);
+            fakeconfirm.restore();
         });
     });
 
@@ -209,31 +218,36 @@ describe('alerts service', function(){
             // prepare
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
-                status = 204;
+                alertId = 2,
+                status = 204,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(status);
 
             // execute
-            service.deleteAlert(successCallback, errorCallback);
+            service.deleteAlert(alertId, successCallback, errorCallback);
             httpBackend.flush();
 
             // attest
             expect(successCallback.calledOnce).to.equal(true);
             expect(errorCallback.calledOnce).to.equal(false);
             expect(successCallback.args[0].length).to.equal(4);
-            expect(successCallback.args[0][0].length).to.equal(status);
+            expect(successCallback.args[0][1]).to.equal(status);
+            fakeconfirm.restore();
         });
 
         it('should call error callback if something goes wrong', function(){
             // prepare
             var successCallback = sinon.spy(),
-                errorCallback = sinon.spy();
+                errorCallback = sinon.spy(),
+                alertId = 2,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
                 status = 404;
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(internalError.code, internalError.message);
 
             // execute
-            service.deleteAlert(successCallback, errorCallback);
+            service.deleteAlert(alertId, successCallback, errorCallback);
             httpBackend.flush();
 
             // attest
@@ -241,6 +255,7 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(true);
             expect(errorCallback.args[0].length).to.equal(4);
             expect(errorCallback.args[0][1]).to.equal(internalError.code);
+            fakeconfirm.restore();
         });
     });
 
