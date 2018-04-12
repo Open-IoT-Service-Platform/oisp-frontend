@@ -45,58 +45,24 @@ var heartBeat = function(producer, partition, topic) {
 }
 
 exports.start = function () {
-    var topic = config.drsProxy.kafka.topics.heartbeat.name;
-    var partition = 0;
-    
+  
     kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.hosts});
 
     kafkaProducer = new Kafka.HighLevelProducer(kafkaClient, { requireAcks: 1, ackTimeoutMs: 500 });    
 
     kafkaProducer.on('ready', function () {
-
+        var topic = config.drsProxy.kafka.topics.heartbeat.name;
+        var interval = parseInt(config.drsProxy.kafka.topics.heartbeat.interval);
+        var partition = 0;
+    
         kafkaProducer.createTopics([topic], true, function (error, data) {
             if (!error) {
-                var kafkaOffset = new Kafka.Offset(kafkaClient);
-                    
-                kafkaOffset.fetchLatestOffsets([topic], function (error, offsets) {
-                    var offset = offsets ? offsets[topic][partition] : 0;
-                    var topics = [{ topic: topic, offset: offset+1, partition: partition}]
-                    var options = { autoCommit: true, fromOffset: true};
-
-                    var kafkaConsumer = new Kafka.Consumer(kafkaClient, topics, options);
-
-                    var servicesToMonitor = ['websocket-server', 'backend'];
-                    var ready = false;
-                    kafkaConsumer.on('message', function (message) {
-                        if ( ready == false ) {
-                            var i=0;
-                            for(i=0; i<servicesToMonitor.length; i++) {
-                                if ( servicesToMonitor[i] != null && servicesToMonitor[i].trim() === message.value.trim() ) {
-                                  servicesToMonitor[i] = null;
-                                }
-                            }
-                                
-                            for(i=0; i<servicesToMonitor.length; i++) {
-                                if ( servicesToMonitor[i] != null ) {
-                                    break;
-                                }
-                            }
-
-                            if ( i == servicesToMonitor.length ) {
-                                ready = true;
-                                var interval = parseInt(config.drsProxy.kafka.topics.heartbeat.interval);
-                                
-                                
-                                heartBeat(kafkaProducer, partition, topic);
-                                heartBeatInterval = setInterval( function (producer, partition, topic) {
-                                    heartBeat(producer, partition, topic);
-                                }, interval, kafkaProducer, partition, topic );
-
-                                rulesUpdateNotifier.notify();
-                            }
-                        }
-                    })
-                })
+                
+                heartBeat(kafkaProducer, partition, topic);
+                heartBeatInterval = setInterval( function (producer, partition, topic) {
+                    heartBeat(producer, partition, topic);
+                }, interval, kafkaProducer, partition, topic );
+                rulesUpdateNotifier.notify();
             }
         })
     })
