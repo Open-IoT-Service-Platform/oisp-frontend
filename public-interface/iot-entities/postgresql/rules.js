@@ -322,7 +322,7 @@ exports.all = function (accountId) {
         }
     };
     filter.attributes = ['id', 'externalId', 'name', 'description', 'owner', 'created', 'updated', 'priority', 'status',
-        'deviceNames', 'deviceTags', 'devices', 'deviceAttributes', 'naturalLanguage'];
+        'deviceNames', 'deviceTags', 'devices', 'deviceAttributes', 'naturalLanguage', 'synchronizationStatus'];
 
     return rules.findAll(filter)
         .then(function (rules) {
