@@ -173,7 +173,8 @@ describe('alerts service', function(){
             // prepare
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
-                status = 204;
+                status = 204,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts?.*$')).respond(status);
 
@@ -186,13 +187,16 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(false);
             expect(successCallback.args[0].length).to.equal(4);
             expect(successCallback.args[0][1]).to.equal(status);
+            fakeconfirm.restore();
         });
 
         it('should call error callback if something goes wrong', function(){
             // prepare
             var successCallback = sinon.spy(),
-                errorCallback = sinon.spy();
+                errorCallback = sinon.spy(),
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
                 status = 404;
+
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts?.*$')).respond(internalError.code, internalError.message);
 
@@ -205,6 +209,7 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(true);
             expect(errorCallback.args[0].length).to.equal(4);
             expect(errorCallback.args[0][1]).to.equal(internalError.code);
+            fakeconfirm.restore();
         });
     });
 
@@ -214,7 +219,8 @@ describe('alerts service', function(){
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
                 alertId = 2,
-                status = 204;
+                status = 204,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true);
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(status);
 
@@ -227,6 +233,7 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(false);
             expect(successCallback.args[0].length).to.equal(4);
             expect(successCallback.args[0][1]).to.equal(status);
+            fakeconfirm.restore();
         });
 
         it('should call error callback if something goes wrong', function(){
@@ -234,6 +241,7 @@ describe('alerts service', function(){
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
                 alertId = 2,
+                fakeconfirm = sinon.stub(window,"confirm").returns(true),
                 status = 404;
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(internalError.code, internalError.message);
@@ -247,6 +255,7 @@ describe('alerts service', function(){
             expect(errorCallback.calledOnce).to.equal(true);
             expect(errorCallback.args[0].length).to.equal(4);
             expect(errorCallback.args[0][1]).to.equal(internalError.code);
+            fakeconfirm.restore();
         });
     });
 

@@ -89,7 +89,7 @@ exports.deleteAlerts = function (accountId, status, callback) {
         });
 };
 
-exports.deleteByExternalId = function (accountId, alertId, status, callback) {
+exports.deleteByExternalId = function (accountId, alertId, callback) {
     var filter = {
         where: {
             id: alertId,

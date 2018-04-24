@@ -38,7 +38,8 @@ var http = require('http'),
     google = require('./lib/google'),
     models = require('./iot-entities/postgresql/models'),
     systemUsers = require('./lib/dp-users/systemUsers'),
-    forceSSL = require('express-force-ssl');
+    forceSSL = require('express-force-ssl'),
+    heartBeat = require('./lib/heartbeat');
 
 var XSS = iotRoutes.cors,
     appServer = express(),
@@ -135,6 +136,8 @@ models.sequelize.authenticate().then(function() {
                     if (!module.parent) {
                         httpServer.listen(api_port, function () {
                             console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
+                            heartBeat.start();
+
                         });
                     } else {
                         module.exports.server = appServer;
