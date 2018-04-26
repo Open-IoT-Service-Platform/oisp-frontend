@@ -132,6 +132,77 @@ describe('alerts handler', function() {
         });
 
     });
+    describe('get unread alerts', function(){
+        beforeEach(function() {
+            initResponseMock();
+        });
+
+        var localreqMock = {
+                forwardedHeaders: {
+                    baseUrl: 'https://dashboard.enableiot.com'
+                },
+                query: {status:'New'},
+                params: {
+                    alertId: 123,
+                    accountId: uuid.v4(),
+                    status: ''
+                }
+            };
+
+        var params = {
+            accountId: localreqMock.params.accountId,
+            status:'New'
+        };
+
+        it('should get list of alerts for account and return OK if request is valid and account exists', function(done){
+            // prepare
+            var alertsRes = [
+                    {
+                        alertId: '123'
+                    },
+                    {
+                        alertId: '124'
+                    }
+                ],
+                apiMock = {
+                    getUnreadAlerts: sinon.stub().callsArgWith(1, null, alertsRes)
+                };
+
+            alertsHandler.__set__('alert', apiMock);
+
+            // execute
+            alertsHandler.getUnreadAlerts(localreqMock, resMock, {});
+
+            // attest
+            expect(resMock.send.calledWith(alertsRes)).to.equal(true);
+            expect(responseCode).to.equal(httpStatuses.OK.code);
+            expect(apiMock.getUnreadAlerts.calledOnce).to.equal(true);
+            expect(apiMock.getUnreadAlerts.args[0].length).to.equal(2);
+            expect(apiMock.getUnreadAlerts.calledWith(params)).to.equal(true);
+
+            done();
+        });
+        it('should not get list of alerts if something crashes and should return error code', function(done){
+            // prepare
+            var error = new Error(errorCode),
+                apiMock = {
+                    getUnreadAlerts: sinon.stub().callsArgWith(1, error, null)
+                },
+                nextSpy = sinon.spy();
+
+            alertsHandler.__set__('alert', apiMock);
+
+            // execute
+            alertsHandler.getUnreadAlerts(localreqMock, {}, nextSpy);
+
+            // attest
+            expect(nextSpy.calledWith(error)).to.equal(true);
+            expect(apiMock.getUnreadAlerts.calledOnce).to.equal(true);
+            expect(apiMock.getUnreadAlerts.calledWith(params)).to.equal(true);
+
+            done();
+        });
+    });
     describe('get alert', function(){
         beforeEach(function() {
             initResponseMock();

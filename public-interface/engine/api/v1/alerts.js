@@ -212,6 +212,13 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
     });
 };
 
+exports.getUnreadAlerts = function (params, resultCallback) {
+
+    Alert.findByStatus(params.accountId, params.status, function (err, result) {
+        resultCallback(err, result);
+    });
+};
+
 exports.getAlerts = function (params, resultCallback) {
 
     Alert.findByStatus(params.accountId, params.status, function (err, result) {

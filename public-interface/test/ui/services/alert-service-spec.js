@@ -194,7 +194,7 @@ describe('alerts service', function(){
             // prepare
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
-                fakeconfirm = sinon.stub(window,"confirm").returns(true);
+                fakeconfirm = sinon.stub(window,"confirm").returns(true),
                 status = 404;
 
 
@@ -241,7 +241,7 @@ describe('alerts service', function(){
             var successCallback = sinon.spy(),
                 errorCallback = sinon.spy(),
                 alertId = 2,
-                fakeconfirm = sinon.stub(window,"confirm").returns(true);
+                fakeconfirm = sinon.stub(window,"confirm").returns(true),
                 status = 404;
 
             httpBackend.expectDELETE(new RegExp('/accounts/'+accountId+'/alerts/' + alertId)).respond(internalError.code, internalError.message);
