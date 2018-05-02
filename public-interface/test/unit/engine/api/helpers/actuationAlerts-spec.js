@@ -63,15 +63,16 @@ describe("Actuation alerts", function () {
         componentStub = {
             id: componentId1,
             domainId: accountId1,
-
-            command: {
-                commandString: COMMAND_STRING,
-                parameters: [
-                    {
-                        "name": PARAM.name,
-                        "values": PARAM.values
-                    }
-                ]
+            componentType:{
+                command: {
+                    commandString: COMMAND_STRING,
+                    parameters: [
+                        {
+                            "name": PARAM.name,
+                            "values": PARAM.values
+                        }
+                    ]
+                }
             }
         };
 
@@ -279,7 +280,7 @@ describe("Actuation alerts", function () {
                         expect(content.deviceId).to.be.equal(deviceStub.deviceId);
                         expect(content.gatewayId).to.be.equal(deviceStub.gatewayId);
                         expect(content.componentId).to.be.equal(componentStub.id);
-                        expect(content.command).to.be.equal(componentStub.command.commandString);
+                        expect(content.command).to.be.equal(componentStub.componentType.command.commandString);
                         expect(content.params[0].values).to.be.equal(PARAM.values);
                         expect(content.params[0].name).to.be.equal(PARAM.name);
                     }

@@ -106,7 +106,8 @@ describe('dataApi.search', function () {
                         }
                     ]
                 }
-            ]
+            ],
+            "pointsLimit": '1000'
         };
         deviceMock = {
             findByCriteria:sinon.stub().callsArgWith(2, null, deviceList)
