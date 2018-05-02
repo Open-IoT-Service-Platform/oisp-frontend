@@ -23,10 +23,12 @@ var alerts = require ('../handlers/v1/alerts'),
 
 module.exports = {
     register:  function (app) {
+        app.get(VERSION + FULL_PATH + "/unread", alerts.getUnreadAlerts);
+
         app.get(VERSION + FULL_PATH, alerts.getAlerts);
 
         app.delete(VERSION + FULL_PATH, alerts.deleteAlerts);
-        
+
         app.get(VERSION + FULL_PATH + "/:alertId", alerts.getAlert);
 
         app.delete(VERSION + FULL_PATH + "/:alertId", alerts.deleteAlert);
