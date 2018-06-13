@@ -80,7 +80,7 @@ describe('dataApi.exportToCsv', function () {
                 "testdevice01,Device 10,436e7e74-1111-1111-9057-26932f5eb7e1,Sensor 1,Temperature Sensor.v1.0,1406212541097,17\n" +
                 "testdevice01,Device 10,436e7e74-1111-1111-9057-26932f5eb7e1,Sensor 1,Temperature Sensor.v1.0,1406212754276,21";
         mail = {
-            subject: 'Enable IoT measures - Intel(r) Corporation',
+            subject: 'OISP measures - Intel(r) Corporation',
             attachments: [
                 {
                     'filename': '0-1491040000000.csv',
