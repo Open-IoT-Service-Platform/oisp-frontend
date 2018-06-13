@@ -43,7 +43,7 @@ describe("Mailer tests", function(){
         };
         config = {
             mail: {
-                from: 'IoT Analytics - Intel(r) Corporation <sysadmin@us.enableiot.com>',
+                from: 'OISP - Intel(r) Corporation <sysadmin@us.enableiot.com>',
                 smtp: {
                     transport: "SMTP",
                     host: "localhost",

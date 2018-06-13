@@ -54,7 +54,7 @@ exports.addInvite = function (accountId, host, email, resultCallback) {
             invites.new(accountId, data, function (err, invite) {
                 if (!err) {
                     var mail = {
-                        subject: 'Enable IoT invitation',
+                        subject: 'OISP invitation',
                         host: host,
                         accountName: invite.accountName,
                         email: email

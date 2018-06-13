@@ -118,7 +118,7 @@ function sendActivationEmail(host, email, resultCallback) {
 
     if (host && config.verifyUserEmail) {
         var options = {
-            subject: 'Enable IoT verification',
+            subject: 'OISP verification',
             email: email,
             type: userInteractionToken.TYPE.ACTIVATE_USER,
             tokenExpiration: config.biz.domain.defaultActivateTokenExpiration,
@@ -325,7 +325,7 @@ exports.addPasswordToken = function (email, host, resultCallback) {
             if (user.password && user.salt) {
 
                 var options = {
-                    subject: 'Enable IoT recover password - Intel(r) Corporation',
+                    subject: 'OISP recover password - Intel(r) Corporation',
                     email: email,
                     type: userInteractionToken.TYPE.PASSWORD_RESET,
                     tokenExpiration: config.biz.domain.defaultPasswordTokenExpiration,
