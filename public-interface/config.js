@@ -103,7 +103,7 @@ var config = {
         }
     },
     mail:{
-        from: 'IoT Analytics <' + mail_user_credentials.sender + '>',
+        from: 'OISP <' + mail_user_credentials.sender + '>',
         smtp: {
             transport: "SMTP",
             host: mail_credentials.host,

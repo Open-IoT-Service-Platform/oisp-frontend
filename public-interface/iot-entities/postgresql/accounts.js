@@ -59,6 +59,12 @@ exports.new = function (accountData, userId, transaction) {
         created: accountData.created
     };
 
+    for(var value in replacements){
+        if(undefined == replacements[value]){
+            replacements[value] = null;
+        }
+    }
+
     return sequelize.query(ADD_ACCOUNT_QUERY, {replacements: replacements, transaction: transaction})
         .then(function (result) {
             if (result && result.length > 0 && result[0][0]) {

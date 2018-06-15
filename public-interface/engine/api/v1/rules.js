@@ -227,7 +227,7 @@ var updateRule = function (options, callback) {
         externalId = options.externalId,
         validationErrors = validator.validate(rule);
 
-    if (rule.status !== Rule.ruleStatus.draft) {
+    if (rule.status === Rule.ruleStatus.draft) {
         callback(errBuilder.build(errBuilder.Errors.Rule.InternalError.SavingNonDraftError));
     }
 
