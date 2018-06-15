@@ -48,7 +48,7 @@ var getReplacementsForQuery = function (userModel, id) {
         });
     }
 
-    return {
+    var replaceObject = {
         id: id,
         email: userModel.email,
         password: userModel.password,
@@ -61,6 +61,12 @@ var getReplacementsForQuery = function (userModel, id) {
         role: role,
         type: userModel.type
     };
+    for(var value in replaceObject){
+        if (undefined == replaceObject[value]){
+            replaceObject[value] = null;
+        }
+    }
+    return replaceObject;
 };
 
 exports.new = function (userData, transaction) {

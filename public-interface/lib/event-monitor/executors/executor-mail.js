@@ -24,7 +24,7 @@ module.exports = function() {
         execute: function(options, done) {
             async.each(options.action.target, function(target, asyncCallback) {
                 var data = {
-                    subject: 'Enable IoT alert - Intel(r) Corporation',
+                    subject: 'OISP alert - Intel(r) Corporation',
                     email: target,
                     data: options.data
                 };

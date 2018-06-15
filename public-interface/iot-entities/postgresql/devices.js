@@ -360,7 +360,7 @@ exports.findByCriteria = function (criteria, queryParameters, resultCallback) {
             if (filters) {
                 query += (filters);
             }
-            return sequelize.query(query, devices, {type: sequelize.QueryTypes.SELECT})
+            return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
                 .then(function (result) {
                     if (result) {
                         var filters = {

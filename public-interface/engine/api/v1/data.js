@@ -482,7 +482,7 @@ exports.sendByEmail = function(accountId, searchRequest, resultCallback) {
             if (err) {
                 resultCallback(err, res);
             } else {
-                var subject = 'Enable IoT measures - Intel(r) Corporation';
+                var subject = 'OISP measures - Intel(r) Corporation';
                 var attachments = [
                     { 'filename': res.from + '-' + res.to + '.csv', 'contents': res.csv }
                 ];
