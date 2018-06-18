@@ -22,7 +22,7 @@ var sequelize = require('./models').sequelize,
 
 exports.all = function (accountId, resultCallback) {
     var query = 'SELECT * FROM "dashboard"."deviceAttributesView" where "accountId" = :accountId';
-    sequelize.query(query, deviceAttributes, {replacements: {accountId: accountId}, type: sequelize.QueryTypes.SELECT})
+    sequelize.query(query, {model:deviceAttributes, replacements: {accountId: accountId}, type: sequelize.QueryTypes.SELECT})
         .then(function (result) {
             var formattedResult = {};
             if (result && Array.isArray(result)) {
