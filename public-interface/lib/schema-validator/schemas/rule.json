@@ -238,6 +238,11 @@
                 "enum": ["Active", "Archived", "On-hold"],
                 "required": true
             },
+            "synchronizationStatus": {
+                "type": "string",
+                "enum": ["NotSync", "Sync"],
+                "required": false
+            },
             "population": {
                 "type": "object",
                 "required": true,
