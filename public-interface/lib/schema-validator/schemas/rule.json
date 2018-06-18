@@ -58,6 +58,11 @@
                 "enum": ["Draft"],
                 "required": false
             },
+	    "synchronizationStatus": {
+                "type": "string",
+                "enum": ["NotSync", "Sync"],
+                "required": false
+            },
             "population": {
                 "type": "object",
                 "required": false,
