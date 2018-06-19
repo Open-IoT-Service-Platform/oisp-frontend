@@ -75,10 +75,11 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
                     componentTypeId: compId
                 }
             ]
-        }
+        },
+        transaction: t
     };
 
-    return componentTypes.findAll(query, {transaction: t})
+    return componentTypes.findAll(query)
         .then(function (components) {
             if (components && components.length > 0) {
                 if (!Array.isArray(compId)) {
@@ -94,7 +95,7 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
 };
 
 exports.findByDimensionAndAccount = function (dimension, accountId, t) {
-    return componentTypes.findAll({where: {accountId: accountId, dimension: dimension}}, {transaction: t})
+    return componentTypes.findAll({where: {accountId: accountId, dimension: dimension}, transaction: t})
         .then(function (component) {
             return Q.resolve(interpreterHelper.mapAppResults(component, interpreter));
         });
