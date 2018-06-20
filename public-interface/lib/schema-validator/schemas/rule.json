@@ -61,7 +61,7 @@
 	    "synchronizationStatus": {
                 "type": "string",
                 "enum": ["NotSync", "Sync"],
-                "required": false
+                "required": true
             },
             "population": {
                 "type": "object",
@@ -246,7 +246,7 @@
             "synchronizationStatus": {
                 "type": "string",
                 "enum": ["NotSync", "Sync"],
-                "required": false
+                "required": true
             },
             "population": {
                 "type": "object",
