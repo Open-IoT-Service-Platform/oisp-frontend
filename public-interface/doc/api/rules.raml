@@ -97,6 +97,7 @@ post:
           "type": "Regular",
           "status": "Active",
           "resetType": "Automatic",
+          "synchronizationStatus": "NotSync",
           "actions": [
           {
             "type": "mail",
@@ -172,6 +173,7 @@ post:
             "priority": "Medium",
             "type": "Regular",
             "status": "Active",
+            "synchronizationStatus": "NotSync",
             "actions": [
             {
               "type": "http",
@@ -296,7 +298,8 @@ post:
         type: !include rule_DRAFT.json
         example: |
           {
-            "name": "draftRule"
+            "name": "draftRule",
+            "synchronizationStatus": "NotSync"
           }
     responses:
       200:
