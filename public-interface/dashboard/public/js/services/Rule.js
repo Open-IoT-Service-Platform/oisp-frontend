@@ -27,6 +27,7 @@ iotServices.factory('Rule', ['$http', 'utilityService','sessionService',
         this.priority =  null;
         this.type = null;
         this.status = 'Draft';
+        this.synchronizationStatus = "NotSync";
         this.resetType = 'Manual';
         this.actions = [{
             "type": "",
