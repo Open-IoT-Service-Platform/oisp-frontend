@@ -358,6 +358,7 @@ describe('schema validator', function(){
                 resetType: 'Automatic',
                 priority: 'High',
                 status: 'Active',
+                synchronizationStatus: 'NotSync',
                 population: {
                     ids: ['11-22-33-44'],
                     tags: ['arg', 'jujuy']
@@ -398,6 +399,7 @@ describe('schema validator', function(){
                 resetType: 'Automatic',
                 priority: 'High',
                 status: 'Active',
+                synchronizationStatus: 'NotSync',
                 population: {
                     tags: ['arg', 'jujuy']
                 },
@@ -431,6 +433,7 @@ describe('schema validator', function(){
                 resetType: 'Automatic',
                 priority: 'High',
                 status: 'Draft',
+                synchronizationStatus: "NotSync",
                 population: {
                     ids: ['11-22-33-44'],
                     tags: ['arg', 'jujuy']

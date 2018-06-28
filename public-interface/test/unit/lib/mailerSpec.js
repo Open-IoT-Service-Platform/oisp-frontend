@@ -79,9 +79,8 @@ describe("Mailer tests", function(){
 
     var validateNodeMailerIsCalledWithCorrectArgs = function () {
         expect(nodemailerMock.createTransport.calledOnce).to.equal(true);
-        expect(nodemailerMock.createTransport.args[0].length).to.equal(2);
-        expect(nodemailerMock.createTransport.args[0][0]).to.equal('SMTP');
-        expect(JSON.stringify(nodemailerMock.createTransport.args[0][1])).to.equal(JSON.stringify(config.mail.smtp));
+        expect(nodemailerMock.createTransport.args[0].length).to.equal(1);
+        expect(nodemailerMock.createTransport.args[0][0]).to.equal(config.mail.smtp);
     };
 
     var validateTemplateIsCalledWithCorrectArgs = function () {
