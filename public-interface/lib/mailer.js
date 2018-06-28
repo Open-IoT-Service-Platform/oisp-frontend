@@ -88,7 +88,7 @@ module.exports = {
     send: function(templateName, params) {
         
         if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
-            nodemailer.createTestAccount((err, account) => {
+            nodemailer.createTestAccount(function(err, account) {
                 if (err) {
                     logger.error('Failed to create a testing account. ' + err.message);
                 }

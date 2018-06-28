@@ -157,7 +157,7 @@ describe("query helper parseFiltersToSql",function(){
 
         //assert
         assertCallbackSucceded();
-        assertResultInCallbackIsEqualTo('');
+        assertResultInCallbackIsEqualTo(null);
         expect(filters._).to.equal(undefined);
         done();
     });

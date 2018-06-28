@@ -344,7 +344,7 @@ describe('rules api', function(){
         it('should call callback with InvalidData error if there is any validation error', function(done){
             // prepare
             rule.conditions.values[0].operator = "error_operator";
-            rule.status = 'draft'
+            rule.status = 'Active'
             // execute
             rulesManager.updateRule({domain: domain, userId: user.id, rule: rule}, callback);
 
@@ -359,9 +359,9 @@ describe('rules api', function(){
             done();
         });
 
-        it('should call callback with SavingNonDraftError if rule has different status then draft', function(done){
+        it('should call callback with SavingNonDraftError if rule status is draft', function(done){
             // prepare
-            rule.status = 'Active';
+            rule.status = 'draft';
 
             // execute
             rulesManager.updateRule({domain: domain, userId: user.id, rule: rule}, callback);
@@ -376,7 +376,7 @@ describe('rules api', function(){
         it('should call callback with .InternalError.UpdatingError error if something goes wrong when updating rule', function(done){
             // prepare
             ruleMock.addOrUpdateDraft.returns(Q.reject());
-            rule.status = 'draft'
+            rule.status = 'Active'
             // execute
             rulesManager.updateRule({domain: domain, userId: user.id, rule: rule}, callback)
                 .then(function(){
