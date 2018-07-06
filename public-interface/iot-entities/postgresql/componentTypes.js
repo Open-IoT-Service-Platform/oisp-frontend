@@ -72,7 +72,8 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
                 },
                 {
                     accountId: null,
-                    componentTypeId: compId
+                    componentTypeId: compId,
+                    default: true
                 }
             ]
         },
@@ -95,7 +96,23 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
 };
 
 exports.findByDimensionAndAccount = function (dimension, accountId, t) {
-    return componentTypes.findAll({where: {accountId: accountId, dimension: dimension}, transaction: t})
+	var query = {
+	        where: {
+	            $or: [
+	                {
+	                    accountId: accountId,
+	                    dimension: dimension
+	                },
+	                {
+	                    accountId: null,
+	                    dimension: dimension,
+	                    default: true
+	                }
+	            ]
+	        },
+	        transaction: t
+	    };
+    return componentTypes.findAll(query)
         .then(function (component) {
             return Q.resolve(interpreterHelper.mapAppResults(component, interpreter));
         });
