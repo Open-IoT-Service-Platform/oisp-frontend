@@ -73,7 +73,7 @@ describe('rules api', function(){
         device = {
             components: [{name: 'Temp Sensor 1'}]
         },
-        savedRule, userProxy, ruleMock, callback, accountMock, devicesMock;
+        savedRule, userProxy, ruleMock, callback, accountMock, devicesMock, rulesUpdateNotifierMock;
 
     beforeEach(function(){
         savedRule = {};
@@ -114,6 +114,10 @@ describe('rules api', function(){
             getDevices: sinon.stub().callsArgWith(2, null, [device])
         };
 
+        rulesUpdateNotifierMock = {
+            notify : function(){}
+        };
+
         callback = sinon.spy();
 
         rulesManager.__set__('User', userProxy);
@@ -121,6 +125,7 @@ describe('rules api', function(){
         rulesManager.__set__('Account', accountMock);
         rulesValidator.__set__('Device', devicesMock);
         rulesManager.__set__('validator', new rulesValidator());
+        rulesManager.__set__('rulesUpdateNotifier', rulesUpdateNotifierMock)
 
     });
 
