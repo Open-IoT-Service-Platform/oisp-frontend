@@ -88,10 +88,13 @@ var getTokenInfo = function(token, req, callback){
 
         var header = jws.getParsedHeader();
         var payload = jws.getParsedPayload();
+    	var expireDate = new Date(payload.exp);
 
-        if(new Date() > new Date(payload.exp)){
+        if(new Date() > expireDate){
             callback();
         } else {
+        	var timestamp = expireDate.getTime();
+        	payload.exp = timestamp;
             var result = {
                 header: header,
                 payload: payload
