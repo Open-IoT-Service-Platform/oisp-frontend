@@ -213,6 +213,7 @@ var refreshToken = function (req, res, next) {
 };
 
 var getCurrentUser = function (req, res, next) {
+	console.log("asd");
     if (!req.identity) {
         res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
         res.header('Expires', '-1');
@@ -248,6 +249,7 @@ module.exports = function (cfg, forceSSL) {
 
     passport.use(localStrategy);
 
+    app.get('/api/auth/me', getCurrentUser);
     app.get('/auth/me', getCurrentUser);
 
     app.put('/auth/me', refreshToken,
