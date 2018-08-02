@@ -1,0 +1,1 @@
+./public-interface/deploy/postgres/base/V00.00.02_00__components.sql
