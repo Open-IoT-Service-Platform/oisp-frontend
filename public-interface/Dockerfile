@@ -8,6 +8,7 @@ WORKDIR /app
 RUN npm install
 
 ADD . /app
+ENV TERM xterm
 RUN node_modules/grunt-cli/bin/grunt build-api
 
 EXPOSE 4001
