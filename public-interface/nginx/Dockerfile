@@ -1,6 +1,6 @@
 FROM oisp/frontend
 
-FROM nginx:1.13.1
+FROM nginx:1.13.1-alpine
 
 ARG WEBSOCKET_SERVER
 ARG DASHBOARD_SERVER
