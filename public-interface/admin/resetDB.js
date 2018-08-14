@@ -20,26 +20,24 @@ var models = require('../iot-entities/postgresql/models'),
 var ResetDB = function(){};
 
 ResetDB.prototype.reset = function(cb){
-	models.sequelize.authenticate()
-    .then(function() {
-        var tables = [];
-        Object.keys(models.sequelize.models)
-        .forEach(function(model){
-            const tableData = models.sequelize.models[model].getTableName();
-            const tableName = '"' + tableData.schema + '"."' + tableData.tableName + '"';
-            tables.push(tableName);
-        });
-
-        const tableNames = tables.join(', ');
-
-        return models.sequelize.query('DROP TABLE IF EXISTS ' + tableNames + ' CASCADE');
-    })
+    models.sequelize.authenticate()
 	.then(function() {
+            var tables = [];
+	    var fn = function(model){
+		const tableData = models.sequelize.models[model].getTableName();
+		const tableName = '"' + tableData.schema + '"."' + tableData.tableName + '"';
+		return models.sequelize.query('TRUNCATE TABLE ' + tableName + ' CASCADE');
+	    }
+            requests = Object.keys(models.sequelize.models)
+		.map(fn);
+            return Promise.all(requests);
+	})
+	.then(() => {
 	    return models.initSchema();
 	})
-    .then(function() {
-        return systemUsers.create();
-    });
+	.then(function() {
+            return systemUsers.create();
+	});
 }
 
 module.exports = ResetDB;
