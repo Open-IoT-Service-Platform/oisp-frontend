@@ -57,7 +57,8 @@ exports.findByStatus = function (accountId, status, callback) {
     var filter = {
         where: {
             accountId: accountId
-        }
+        },
+	order: 'created DESC'
     };
 
     if (status) {
