@@ -123,16 +123,16 @@ exports.updateInviteStatus = function (req, res) {
     if (!data || !req.params || !req.params.inviteId || !req.identity) {
         return res.status(errors.Generic.InvalidRequest.code).send( errors.Generic.InvalidRequest.message);
     }
-
-    return invites.updateInviteStatus(req.params.inviteId, data.accept, req.identity)
-        .then(function (inv) {
-            var resBody = inv;
-            if (!inv) {
-                resBody = httpStatuses.DeleteOK;
-            }
-            res.status(httpStatuses.OK.code).send(resBody);
-        })
-        .catch(function (err) {
-            res.status(err.code).send(err.message);
+    
+    invites.updateInviteStatus(req.params.inviteId, data.accept, req.identity, function(err, inv) {
+    		if (!err) {
+        		var resBody = inv;
+                if (!inv) {
+                    resBody = httpStatuses.DeleteOK;
+                }
+                res.status(httpStatuses.OK.code).send(resBody);
+    		} else {
+        		res.status(err.status).send(err.message);
+    		}
         });
 };
