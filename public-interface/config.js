@@ -211,9 +211,5 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     config.controlChannel.ws.secure = false;
 }
 
-if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
-    config.postgres.database = config.postgres.database + "_test";
-}
-
 
 module.exports = config;

@@ -392,7 +392,7 @@ exports.addComponents = function(deviceId, components, accountId) {
                     .catch(function(err) {
                         logger.warn("devices.addComponents - unable to add component for device: " + deviceId + "error: " + JSON.stringify(err));
                         return postgresProvider.rollback(transaction)
-                            .done(function(){
+                            .then(function(){
                                 var errMsg = errBuilder.Errors.Device.Component.AddingError;
                                 if (err && err.code) {
                                     errMsg = errBuilder.build(err);

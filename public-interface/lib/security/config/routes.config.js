@@ -132,6 +132,12 @@ module.exports = [
 
     ["/dashboard",                               verbs.GET,          "ui:public"                             ],
     ["/validate",                                verbs.GET,          "ui:public"                             ],
+
+    /*The endpoint /auth/me implements the login service at dashboard user interface.
+      The GET method is currently implemented for the REST API as well.
+      If it is needed, others can be too, to do that: Add the route here just like below,
+      also specify what it will do at ../authentication.js (e.g app.put('/api/auth/me', ...))*/
+    ["/api/auth/me",                             verbs.GET,          "user:admin",    36000                  ],
     ["/auth/me",                                 verbs.GET,          "user:admin",    36000                  ],
     ["/auth/me",                                 verbs.DELETE,       "user:admin",    36000                  ],
     ["/auth/me",                                 verbs.PUT,          "user:admin",    36000                  ],
