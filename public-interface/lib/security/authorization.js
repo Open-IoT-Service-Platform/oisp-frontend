@@ -47,7 +47,7 @@ var generateToken = function(subjectId, accounts, role, expire, callback){
         jti: uuid.v4(),
         iss: iss,
         sub: subjectId,
-        exp: expireDate,
+        exp: expireDate.getTime(),
         accounts: accounts
     };
 
