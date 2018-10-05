@@ -117,7 +117,7 @@ var canUserModifyInvitation = function(user, invitation) {
     return (user && user.email === invitation.email);
 };
 
-exports.updateInviteStatus = function (inviteId, accept, userId) {
+exports.updateInviteStatus = function (inviteId, accept, userId, resultCallback) {
     return postgresProvider.startTransaction()
         .then(function (transaction) {
             return invites.findById(inviteId, transaction)
@@ -134,12 +134,12 @@ exports.updateInviteStatus = function (inviteId, accept, userId) {
                             if (accept) {
                                 return addAccountFromInvitation(foundUser, foundInvite, transaction)
                                     .then(function() {
-                                        return foundInvite;
+                                        resultCallback(null, foundInvite);
                                     });
                             } else {
                                 return invites.delete(inviteId, transaction)
                                     .then(function() {
-                                        return Q.resolve();
+                                        resultCallback(null, null);
                                     })
                                     .catch(function () {
                                         throw errBuilder.Errors.Invite.DeleteError;
@@ -161,7 +161,7 @@ exports.updateInviteStatus = function (inviteId, accept, userId) {
                             if (err && err.code) {
                                 errMsg = errBuilder.build(err);
                             }
-                            throw errMsg;
+                            resultCallback(errMsg);
                         });
                 });
         });

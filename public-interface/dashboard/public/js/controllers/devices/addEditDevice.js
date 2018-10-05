@@ -90,6 +90,10 @@ iotController.controller('AddEditDeviceCtrl', function($scope,
     };
 
     $scope.saveDevice = function(){
+    	var loc = $scope.device.loc;
+    	loc.latitude = typeof loc.latitude !== "number" ? parseFloat(loc.latitude) : loc.latitude;
+    	loc.longitude = typeof loc.longitude !== "number" ? parseFloat(loc.longitude) : loc.longitude;
+    	loc.height = typeof loc.height !== "number" ? parseFloat(loc.height) : loc.height;
         if($scope.addMode){
             devicesService.addDevice($scope.device, function(){
                 goToDevices();

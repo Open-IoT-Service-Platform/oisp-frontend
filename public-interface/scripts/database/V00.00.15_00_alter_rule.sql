@@ -1,0 +1,1 @@
+./public-interface/deploy/postgres/base/V00.00.15_00_alter_rule.sql

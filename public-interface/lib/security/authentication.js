@@ -248,6 +248,7 @@ module.exports = function (cfg, forceSSL) {
 
     passport.use(localStrategy);
 
+    app.get('/api/auth/me', getCurrentUser);
     app.get('/auth/me', getCurrentUser);
 
     app.put('/auth/me', refreshToken,
