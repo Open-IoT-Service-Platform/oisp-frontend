@@ -64,6 +64,14 @@ iotController.controller('AddEditDeviceCtrl', function($scope,
             if (data) {
                 devicesService.getDevice($routeParams.deviceId, function (data) {
                         $scope.device = data;
+                        if (typeof data.loc !== "undefined") {
+                            var loc = {
+                                latitude : parseFloat(data.loc.latitude),
+                                longitude : parseFloat(data.loc.longitude),
+                                height : parseFloat(data.loc.height)
+                            };
+                            $scope.device.loc = loc;
+                        }
                     },
                     function (error) {
                         $scope.error = error.message || error;
@@ -91,9 +99,11 @@ iotController.controller('AddEditDeviceCtrl', function($scope,
 
     $scope.saveDevice = function(){
     	var loc = $scope.device.loc;
-    	loc.latitude = typeof loc.latitude !== "number" ? parseFloat(loc.latitude) : loc.latitude;
-    	loc.longitude = typeof loc.longitude !== "number" ? parseFloat(loc.longitude) : loc.longitude;
-    	loc.height = typeof loc.height !== "number" ? parseFloat(loc.height) : loc.height;
+    	if (typeof loc !== "undefined") {
+        	loc.latitude = typeof loc.latitude !== "number" ? parseFloat(loc.latitude) : loc.latitude;
+        	loc.longitude = typeof loc.longitude !== "number" ? parseFloat(loc.longitude) : loc.longitude;
+        	loc.height = typeof loc.height !== "number" ? parseFloat(loc.height) : loc.height;
+    	}   	
         if($scope.addMode){
             devicesService.addDevice($scope.device, function(){
                 goToDevices();
