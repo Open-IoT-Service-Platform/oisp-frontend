@@ -271,21 +271,6 @@ exports.addComponents = function (components, deviceId, accountId, transaction) 
         });
 };
 
-exports.updateLastVisit = function (deviceId) {
-
-    var filter = {
-        where: {
-            id: deviceId
-        }
-    };
-    var lastVisit = new Date();
-
-    return devices.update({lastVisit: lastVisit}, filter)
-        .catch(function (err) {
-            throw err;
-        });
-};
-
 exports.getTotals = function (accountId, resultCallback) {
 
     var filter = {

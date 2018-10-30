@@ -48,8 +48,7 @@ module.exports = function (sequelize, DataTypes) {
                 type: DataTypes.ENUM('active', 'created'),
                 allowNull: false,
                 defaultValue: 'created'
-            },
-            lastVisit:DataTypes.DATE
+            }
         },
         {
             createdAt: 'created',

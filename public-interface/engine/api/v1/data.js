@@ -82,14 +82,6 @@ exports.collectData = function (options, resultCallback) {
                             submitData = proxy.submitDataREST;
                         }
 
-                        //Connecting with AA API
-                        Object.keys(latestObservationTimes).forEach(function (cid) {
-                            Component.updateLastObservationTS(cid, latestObservationTimes[cid], function (err) {
-                                if(err) {
-                                    logger.error("Error occured when updating last observation timestamp for component " + cid + ": " + err);
-                                }
-                            });
-                        });
                         Object.keys(oldObservationTimes).forEach(function (cid) {
                             DeviceComponentMissingExportDays.addHistoricalDaysWithDataIfNotExisting(cid, oldObservationTimes[cid], function (err) {
                                 if(err) {
@@ -97,11 +89,6 @@ exports.collectData = function (options, resultCallback) {
                                 }
                             });
                         });
-                        //Updating last visit
-                        DevicesAPI.updateLastVisit(deviceId)
-                            .catch(function(err) {
-                               logger.warn('Error occurred while updating device lastVisit, err - ' + JSON.stringify(err));
-                            });
 
                         logger.debug("Data to Send: " + JSON.stringify(data));
                         submitData(data, function (err) {
