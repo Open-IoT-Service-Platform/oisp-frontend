@@ -51,12 +51,12 @@ describe(fileToTest, function(){
         assert.equal(mMet.on, message.on, "The on is not the expected");
         assert.isArray(mMet.data, "The Data Array were not proper initialized");
         assert.lengthOf(mMet.data, 1, "The length of data is not the expected");
-        d = mMet.data[0];
-        assert.equal(d.value, message.v, "The length of data is not the expected");
-        assert.equal(d.on, message.on, "The length of data is not the expected");
-        assert.equal(d.cid, message.componentId, "The length of data is not the expected");
-        assert.notProperty(d, "attributes", "The attributes are not expected");
-        assert.notProperty(d, "loc", "The loc are not expected");
+        var data = mMet.data[0];
+        assert.equal(data.value, message.v, "The length of data is not the expected");
+        assert.equal(data.on, message.on, "The length of data is not the expected");
+        assert.equal(data.cid, message.componentId, "The length of data is not the expected");
+        assert.notProperty(data, "attributes", "The attributes are not expected");
+        assert.notProperty(data, "loc", "The loc are not expected");
         assert.lengthOf(mMet.data, mMet.count, "The length of data is not the expected");
 
         message = {
@@ -71,14 +71,14 @@ describe(fileToTest, function(){
         assert.equal(mMet.on, message.on, "The on is not the expected");
         assert.isArray(mMet.data, "The Data Array were not proper initialized");
         assert.lengthOf(mMet.data, 1, "The length of data is not the expected");
-        d = mMet.data[0];
-        assert.equal(d.value, message.value, "The length of data is not the expected");
-        assert.equal(d.on, message.on, "The length of data is not the expected");
-        assert.equal(d.cid, message.cid, "The length of data is not the expected");
-        assert.notProperty(d, "attributes", "The attributes are not expected");
-        assert.property(d, "loc", "The loc are not expected");
+        data = mMet.data[0];
+        assert.equal(data.value, message.value, "The length of data is not the expected");
+        assert.equal(data.on, message.on, "The length of data is not the expected");
+        assert.equal(data.cid, message.cid, "The length of data is not the expected");
+        assert.notProperty(data, "attributes", "The attributes are not expected");
+        assert.property(data, "loc", "The loc are not expected");
         assert.lengthOf(mMet.data, mMet.count, "The length of data is not the expected");
-        assert.deepEqual(d.loc, message.loc, "The location is missing");
+        assert.deepEqual(data.loc, message.loc, "The location is missing");
         message = {
             accountId: "myAccount33",
             cid: "000-2223-5556-77877-22222234",
@@ -91,14 +91,14 @@ describe(fileToTest, function(){
         assert.equal(mMet.on, util.data, "The on is not the expected");
         assert.isArray(mMet.data, "The Data Array were not proper initialized");
         assert.lengthOf(mMet.data, 1, "The length of data is not the expected");
-        d = mMet.data[0];
-        assert.equal(d.value, message.value, "The length of data is not the expected");
-        assert.equal(d.on, util.data, "The length of data is not the expected");
-        assert.equal(d.cid, message.cid, "The length of data is not the expected");
-        assert.notProperty(d, "attributes", "The attributes are not expected");
-        assert.property(d, "loc", "The loc are not expected");
+        data = mMet.data[0];
+        assert.equal(data.value, message.value, "The length of data is not the expected");
+        assert.equal(data.on, util.data, "The length of data is not the expected");
+        assert.equal(data.cid, message.cid, "The length of data is not the expected");
+        assert.notProperty(data, "attributes", "The attributes are not expected");
+        assert.property(data, "loc", "The loc are not expected");
         assert.lengthOf(mMet.data, mMet.count, "The length of data is not the expected");
-        assert.deepEqual(d.loc, message.loc, "The location is missing");
+        assert.deepEqual(data.loc, message.loc, "The location is missing");
         done();
    });
     it('Shall Convert Metric Obj to MQTT using Data Array>', function(done) {
@@ -123,21 +123,21 @@ describe(fileToTest, function(){
         assert.equal(mMet.on, message.on, "The on is not the expected");
         assert.isArray(mMet.data, "The Data Array were not proper initialized");
         assert.lengthOf(mMet.data, message.data.length, "The length of data is not the expected");
-        d = mMet.data[0];
-        assert.equal(d.value, message.data[0].v, "The length of data is not the expected");
-        assert.equal(d.on, message.data[0].on, "The length of data is not the expected");
-        assert.equal(d.cid, message.data[0].componentId, "The length of data is not the expected");
-        assert.notProperty(d, "attributes", "The attributes are not expected");
-        assert.notProperty(d, "loc", "The loc are not expected");
+        var data = mMet.data[0];
+        assert.equal(data.value, message.data[0].v, "The length of data is not the expected");
+        assert.equal(data.on, message.data[0].on, "The length of data is not the expected");
+        assert.equal(data.cid, message.data[0].componentId, "The length of data is not the expected");
+        assert.notProperty(data, "attributes", "The attributes are not expected");
+        assert.notProperty(data, "loc", "The loc are not expected");
         assert.lengthOf(mMet.data, mMet.count, "The length of data is not the expected");
-        d = mMet.data[1];
-        assert.equal(d.value, message.data[1].value, "The length of data is not the expected");
-        assert.equal(d.on, message.on, "The length of data is not the expected");
-        assert.equal(d.cid, message.data[1].cid, "The length of data is not the expected");
-        assert.property(d, "attributes", "The attributes are not expected");
-        assert.property(d, "loc", "The loc are not expected");
-        assert.deepEqual(d.loc, message.data[1].loc, "The loc are not expected");
-        assert.deepEqual(d.attributes, message.data[1].attributes, "The loc are not expected");
+        data = mMet.data[1];
+        assert.equal(data.value, message.data[1].value, "The length of data is not the expected");
+        assert.equal(data.on, message.on, "The length of data is not the expected");
+        assert.equal(data.cid, message.data[1].cid, "The length of data is not the expected");
+        assert.property(data, "attributes", "The attributes are not expected");
+        assert.property(data, "loc", "The loc are not expected");
+        assert.deepEqual(data.loc, message.data[1].loc, "The loc are not expected");
+        assert.deepEqual(data.attributes, message.data[1].attributes, "The loc are not expected");
         assert.lengthOf(mMet.data, mMet.count, "The length of data is not the expected");
 
         done();

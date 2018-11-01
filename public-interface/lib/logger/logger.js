@@ -20,7 +20,7 @@ var loggerConf = require('../../config').logger,
     winstonLogger = require('./winstonLogger');
 
 function getLevelToCompare(options) {
-    var levelToCompare = loggerConf.logLevel;
+    var levelToCompare = loggerConf.level;
     if (options && options.forceLogLevel) {
         levelToCompare = options.forceLogLevel;
     }

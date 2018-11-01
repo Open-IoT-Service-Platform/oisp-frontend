@@ -13,31 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 var winston = require('winston'),
     expressWinston = require('express-winston'),
     loggerConf = require('../../config').logger,
     logLevel = require('./logLevel');
+
+winston.addColors(logLevel.logLevels.colors);
 
 var getLogConfiguration = function (baseConfig) {
     baseConfig.level = loggerConf.logLevel;
     return baseConfig;
 };
 
-module.exports = new winston.Logger({
-    transports: [
-        new (winston.transports.Console) (getLogConfiguration(loggerConf.transport.console))
-    ],
-    levels: logLevel.levelValue,
-    colors: logLevel.levelColors
+module.exports = winston.createLogger({
+	format: loggerConf.format,
+	levels: logLevel.logLevels.levels,
+    transports: loggerConf.frontendTransports,
+    exitOnError: loggerConf.exitOnError,
+    maxLines: loggerConf.maxLines
 });
 
 module.exports.httpLogger = function () {
     expressWinston.requestWhitelist.push('body');
     expressWinston.responseWhitelist.push('body');
     return expressWinston.logger({
-        transports: [
-            new (winston.transports.Console) (getLogConfiguration(loggerConf.transport.console))
-        ],
+    	level: loggerConf.level,
+        format: loggerConf.format,
+        transports: loggerConf.httpTransports,
         meta: false,
         msg: " REQUESTED: {{req.url}}, {{req.method}}, requestId={{req.headers['x-iotkit-requestid']}} {{req.headers['x-intel-loglevel']}}" +
         " RESPONDED: {{req.url}}, {{req.method}}, HTTP Code: {{res.statusCode}}, requestId={{req.headers['x-iotkit-requestid']}} {{req.headers['x-intel-loglevel']}}",

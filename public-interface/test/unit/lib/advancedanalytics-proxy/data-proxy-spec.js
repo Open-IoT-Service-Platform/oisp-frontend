@@ -314,6 +314,7 @@ describe('Data proxy', function() {
 
             // prepare
             var error = errBuilder.build(errBuilder.Errors.Data.SubmissionError);
+        	var errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             MetricMock = {
                 prepareDataIngestionMsg: sinon.stub().throws(error)
             };
@@ -325,7 +326,7 @@ describe('Data proxy', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
-            expect(callback.calledWith(error)).to.equal(true);
+            expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
             done();
         });
@@ -333,6 +334,7 @@ describe('Data proxy', function() {
         it('should not submit data and return error if kafka failed', function (done) {
             // prepare
             var error = errBuilder.build(errBuilder.Errors.Data.SubmissionError);
+            var errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             KafkaHLProducerMock = sinon.stub().returns(
                 {
                     send: sinon.stub().callsArgWith(1, error, null)
@@ -346,7 +348,7 @@ describe('Data proxy', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
-            expect(callback.calledWith(error)).to.equal(true);
+            expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
             done();
         });

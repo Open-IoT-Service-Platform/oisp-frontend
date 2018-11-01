@@ -85,16 +85,12 @@ describe('listUsersSpec', function(){
     }));
 
     it('should change selected menu to "domains"', function(){
-        sinon.stub(usersServiceAPI,
-                    'getUsers',
-                    function(sc){
-                        sc([]);
-                    });
-        sinon.stub(invitesServiceAPI,
-                    'getInvites',
-                    function(accountId, sc){
-                        sc([]);
-                    });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([]);
+        });
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(accountId, sc){
+            sc([]);
+        });
         scope.$watch = function(a,b){b(typeof a === "string" ? scope[a] :  a())};
 
         ctrl = controllerProvider('AccountCtrl', {
@@ -118,20 +114,16 @@ describe('listUsersSpec', function(){
     });
 
     it('should show one active user and one invited', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: false,
-                    role: "user"
-                }]);
-            });
-        sinon.stub(invitesServiceAPI,
-            'getInvites',
-            function(sc){
-                sc(["invited@user.mail"]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: false,
+                role: "user"
+            }]);
+        });
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(sc){
+            sc(["invited@user.mail"]);
+        });
         scope.$watch = function(a,b){b(typeof a === "string" ? scope[a] :  a())};
 
         ctrl = controllerProvider('AccountCtrl', {
@@ -161,21 +153,15 @@ describe('listUsersSpec', function(){
             verified: false,
             accounts: [{"1": "user"}]
         };
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([userStub]);
-            });
-        sinon.stub(usersServiceAPI,
-            'updateUserAccounts',
-            function(user){
-                userStub = user;
-            });
-        sinon.stub(invitesServiceAPI,
-            'getInvites',
-            function(sc){
-                sc(["invited@user.mail"]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([userStub]);
+        });
+        sinon.stub(usersServiceAPI, 'updateUserAccounts').callsFake(function(user){
+            userStub = user;
+        });
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(sc){
+            sc(["invited@user.mail"]);
+        });
         scope.$watch = function(a,b){b(typeof a === "string" ? scope[a] :  a())};
 
         console.log(scope.users);

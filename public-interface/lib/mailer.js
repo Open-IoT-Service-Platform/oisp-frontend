@@ -24,64 +24,67 @@ var path = require('path'),
     logger = require('./logger').init();
 
 var sendMail = function (templateName, params, smtpConfig) {
-    emailTemplates(templatesDir, function(err, template) {
-        if (err) {
-            logger.error('mailer. send, error getting templates: ' + JSON.stringify(err));
-        } else {
-            
-            console.log(JSON.stringify(smtpConfig,null,"\t"))
-            var transport = nodemailer.createTransport(smtpConfig);
-
-            params.footer = config.mail.footer;
-
-            template(templateName, params, function(err, html, text) {
-                if (err) {
-                    logger.error('mailer. send, error getting template ' + templateName + ': ' + JSON.stringify(err));
-                } else {
-                    var mail = {
-                        from: config.mail.from,
-                        to: params.email,
-                        subject: params.subject || templateName,
-                        html: html,
-                        text: text
-                    };
-                    var shouldBeBlocked = false;
-                    config.mail.blockedDomains.some(function(blockedDomain) {
-                        if(params.email.indexOf(blockedDomain) > 0) {
-                            shouldBeBlocked = true;
-                            return true;
-                        }
-                    });
-                    if (params.email.split("@").length !== 2){
-                        shouldBeBlocked = true;
-                    } else if (params.email.split("@")[1].indexOf(".") < 1) {
-                        shouldBeBlocked = true;
-                    }
-
-                    if(shouldBeBlocked) {
-                        logger.info('Email to ' + params.email + ' was blocked and not sent.');
-                        return;
-                    } else {
-                        logger.info('Sending email to: ' + params.email);
-                    }
-
-                    if (params.attachments) {
-                        mail.attachments = params.attachments;
-                    }
-                    transport.sendMail(mail, function(err, responseStatus) {
-                        if (err) {
-                            logger.error(JSON.stringify(err));
-                        } else {
-                            logger.info(JSON.stringify(responseStatus.message));
-                            if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
-                                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-                            }
-                        }
-                    });
-                }
-            });
+	params.footer = config.mail.footer;
+	var transport = nodemailer.createTransport(smtpConfig);
+	const emailTemplate = new emailTemplates({ 
+		views: { 
+			root: templatesDir,
+			options: {
+				extension: 'ejs'
+			},
+			locals: params
+		},
+		// set path for automatic css inlining for the templates
+		juice: true,
+		juiceResources: {
+			preserveImportant: true,
+			webResources: {
+				relativeTo: templatesDir + '/' + templateName
+			}
+		},
+		message: {
+			from: config.mail.from
+		},
+		transport: transport,
+	});
+	
+	var shouldBeBlocked = false;
+    config.mail.blockedDomains.some(function(blockedDomain) {
+        if(params.email.indexOf(blockedDomain) > 0) {
+            shouldBeBlocked = true;
+            return true;
         }
     });
+    if (params.email.split("@").length !== 2){
+        shouldBeBlocked = true;
+    } else if (params.email.split("@")[1].indexOf(".") < 1) {
+        shouldBeBlocked = true;
+    }
+
+    if(shouldBeBlocked) {
+        logger.info('Email to ' + params.email + ' was blocked and not sent.');
+        return;
+    } else {
+        logger.info('Sending email to: ' + params.email);
+    }
+	
+	emailTemplate.send({
+		template: templateName,
+		// html and text gets rendered automatically so 
+		// it does not have to be set in messages
+		message: {
+			to: params.email,
+			subject: params.subject || templateName,
+			attachments: params.attachments || {}
+		}
+	}).then(res => {
+		logger.info(JSON.stringify(res.originalMessage));
+		if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
+            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+        }
+	}).catch(err => {
+		logger.error('mailer. send, error sending the mail: ' + JSON.stringify(err));
+	})
 }
 
 module.exports = {

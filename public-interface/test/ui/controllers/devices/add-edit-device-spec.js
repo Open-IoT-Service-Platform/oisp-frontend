@@ -63,11 +63,9 @@ describe('AddEditDeviceCtrlSpec', function(){
 
     it('should change "tags" model when loading', function(){
 
-        var stub = sinon.stub(devicesServiceAPI,
-            "getTags",
-            function(sc, ec){
-                sc(['t1']);
-            });
+        var stub = sinon.stub(devicesServiceAPI, "getTags").callsFake(function(sc, ec){
+            sc(['t1']);
+        });
         scope.$watch = function(a,b){b(a())};
 
         ctrl = controllerProvider('AddEditDeviceCtrl', {
@@ -87,7 +85,7 @@ describe('AddEditDeviceCtrlSpec', function(){
     it('should save device and change path when clicking save button', function(){
 
         var did = Math.random(),
-            saveStub = sinon.stub(devicesServiceAPI, 'addDevice', function(device, sc, ec){
+            saveStub = sinon.stub(devicesServiceAPI, 'addDevice').callsFake(function(device, sc, ec){
                 expect(device.id).to.equal(did);
                 sc(device);
             }),
@@ -115,12 +113,12 @@ describe('AddEditDeviceCtrlSpec', function(){
     it('should update device and change path when clicking save button', function(){
 
         var did = Math.random(),
-            getStub = sinon.stub(devicesServiceAPI, 'getDevice', function(deviceId, sc, ec){
+            getStub = sinon.stub(devicesServiceAPI, 'getDevice').callsFake(function(deviceId, sc, ec){
                 expect(deviceId).to.equal(did);
                 sc({id: deviceId, status: 'ready'});
             }),
             saveStub = sinon.stub(devicesServiceAPI, 'addDevice'),
-            updateStub = sinon.stub(devicesServiceAPI, 'updateDevice', function(device, sc, ec){
+            updateStub = sinon.stub(devicesServiceAPI, 'updateDevice').callsFake(function(device, sc, ec){
                 expect(device.id).to.equal(did);
                 sc(device);
             });

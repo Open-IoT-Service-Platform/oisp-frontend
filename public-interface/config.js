@@ -27,7 +27,9 @@ var cfenvReader = require('./lib/cfenv/reader'),
  rule_engine_credentials = cfenvReader.getServiceCredentials("rule-engine-credentials-ups"),
  gateway_user_credentials = cfenvReader.getServiceCredentials("gateway-credentials-ups"),
  dashboard_security_credentials = cfenvReader.getServiceCredentials("dashboard-security-ups"),
- kafka_credentials = cfenvReader.getServiceCredentials("kafka-ups");
+ kafka_credentials = cfenvReader.getServiceCredentials("kafka-ups"),
+ winston = require('winston');
+ 
 
 var config = {
     api: {
@@ -164,18 +166,17 @@ var config = {
         }
     },
     logger: {
-        transport: {
-            console: {
-                handleExceptions: true,
-                json: false,
-                colorize: true,
-                prettyPrint: false,
-                timestamp: true,
-                exitOnError: false
-            }
-        },
-        "logLevel": "info", //Default verbosity,
-        "maxLines": 30
+        level: 'info', //Default verbosity,
+    	format: winston.format.combine(
+    	        winston.format.colorize(),
+    	        winston.format.simple(),
+    	        winston.format.timestamp(),
+    	        winston.format.printf(info => { return `${info.timestamp}-${info.level}: ${info.message}`; })
+    	     ),
+        frontendTransports: [new winston.transports.Console({ handleExceptions: true })],
+        httpTransports: [new winston.transports.Console({ handleExceptions: true })],
+        exitOnError: false,
+        maxLines: 30
     },
     login : {
         maxUnsuccessfulAttempts: 10,

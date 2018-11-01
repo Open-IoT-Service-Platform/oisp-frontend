@@ -105,12 +105,10 @@ describe('edit domain', function(){
     }));
 
     it('should edit domain name', function(){
-        sinon.stub(accountsServiceAPI,
-                    'updateAccount',
-                    function(domainId, domain, sc){
-                        expect(domain.name).to.equal('New Domain Name');
-                        sc();
-                    });
+        sinon.stub(accountsServiceAPI, 'updateAccount').callsFake(function(domainId, domain, sc){
+            expect(domain.name).to.equal('New Domain Name');
+            sc();
+        });
         scope.selectAccount = sinon.spy();
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,
@@ -158,11 +156,9 @@ describe('edit domain', function(){
     });
 
     it('should show error on edit domain name', function(){
-        sinon.stub(accountsServiceAPI,
-                    'updateAccount',
-                    function(domainId, domain, sc, ec){
-                        ec('Error');
-                    });
+        sinon.stub(accountsServiceAPI, 'updateAccount').callsFake(function(domainId, domain, sc, ec){
+            ec('Error');
+        });
         scope.selectAccount = sinon.spy();
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,
@@ -185,12 +181,10 @@ describe('edit domain', function(){
     });
 
     it('should edit health time period', function(){
-        sinon.stub(accountsServiceAPI,
-            'updateAccount',
-            function(domainId, domain, sc){
-                expect(domain.healthTimePeriod).to.equal(172800);
-                sc();
-            });
+        sinon.stub(accountsServiceAPI, 'updateAccount').callsFake(function(domainId, domain, sc){
+            expect(domain.healthTimePeriod).to.equal(172800);
+            sc();
+        });
         scope.selectAccount = sinon.spy();
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,

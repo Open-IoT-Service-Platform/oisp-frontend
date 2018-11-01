@@ -35,8 +35,11 @@ ResetDB.prototype.reset = function(cb){
 	.then(() => {
 	    return models.initSchema();
 	})
-	.then(function() {
-            return systemUsers.create();
+	.then(function() {	
+        return systemUsers.create();
+	})
+	.finally(function() {
+		models.sequelize.close();
 	});
 }
 

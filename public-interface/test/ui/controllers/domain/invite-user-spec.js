@@ -129,36 +129,28 @@ describe('inviteUserSpec', function(){
             return scope.currentUser;
         };
 
-        sinon.stub(accountsServiceAPI,
-            'getActivationCode',
-            function(id, successCallback){
-                successCallback(null, {activationCode: id});
-            });
+        sinon.stub(accountsServiceAPI, 'getActivationCode').callsFake(function(id, successCallback){
+            successCallback(null, {activationCode: id});
+        });
     }));
 
     it('should invite a user', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: false,
-                    role: "admin"
-                }]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: false,
+                role: "admin"
+            }]);
+        });
         var invited = [];
 
-        sinon.stub(invitesServiceAPI,
-            'getInvites',
-            function(sc){
-                sc(invited);
-            });
-        sinon.stub(invitesServiceAPI,
-            'addInvite',
-            function(newInvite, sc){
-                invited.push(newInvite.email);
-                sc();
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(sc){
+            sc(invited);
         });
+        sinon.stub(invitesServiceAPI, 'addInvite').callsFake(function(newInvite, sc){
+            invited.push(newInvite.email);
+            sc();
+    });
 
         scope.$watch = function(a,b){b(typeof a === "string" ? scope[a] :  a())};
         ctrl = controllerProvider('AccountCtrl', {
@@ -205,24 +197,18 @@ describe('inviteUserSpec', function(){
     });
 
     it('should return a conflict', function(){
-         sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: false,
-                    role: "user"
-                }]);
-            });
+         sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+             sc([{
+                 email: "admin@user.mail",
+                 verified: false,
+                 role: "user"
+             }]);
+         });
         var invited = [];
-        sinon.stub(invitesServiceAPI,
-            'getInvites',
-            function(sc){
-                sc(invited);
-            });
-        sinon.stub(invitesServiceAPI,
-        'addInvite',
-        function(newInvite, sc, ec){
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(sc){
+            sc(invited);
+        });
+        sinon.stub(invitesServiceAPI, 'addInvite').callsFake(function(newInvite, sc, ec){
             ec(null, 409);
         });
 
@@ -269,21 +255,17 @@ describe('inviteUserSpec', function(){
     });
 
     it('should cancel modal dialog', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: false,
-                    role: "user"
-                }]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: false,
+                role: "user"
+            }]);
+        });
         var invited = [];
-        sinon.stub(invitesServiceAPI,
-            'getInvites',
-            function(sc){
-                sc(invited);
-            });
+        sinon.stub(invitesServiceAPI, 'getInvites').callsFake(function(sc){
+            sc(invited);
+        });
         var addInviteSpy = sinon.stub(invitesServiceAPI,
             'addInvite');
 

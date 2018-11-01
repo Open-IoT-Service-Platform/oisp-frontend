@@ -50,6 +50,7 @@ describe('time api', function() {
                     return time;
                 },
                 error = errBuilder.build(errBuilder.Errors.Time.DateReceiveError),
+                errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code },
                 callback = sinon.spy();
 
             timeManager.__set__('actualTime', timeMock);
@@ -59,7 +60,7 @@ describe('time api', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
-            expect(callback.calledWith(error)).to.equal(true);
+            expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
             done();
         });

@@ -76,11 +76,9 @@ describe('listComponentsSpec', function(){
         sessionServiceAPI.getCurrentAccount = function(){
             return scope.currentUser.account;
         };
-        sinon.stub(accountsServiceAPI,
-            'getActivationCode',
-            function(id, successCallback){
-                successCallback(null, {activationCode: id});
-            });
+        sinon.stub(accountsServiceAPI, 'getActivationCode').callsFake(function(id, successCallback){
+            successCallback(null, {activationCode: id});
+        });
     }));
 
     it('should list current components - default grouping', function(){

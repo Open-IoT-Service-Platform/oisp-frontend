@@ -25,8 +25,12 @@ var expect = require('expect.js'),
 
 describe('usersApi.changePassword', function () {
     var usersManager;
+    var error;
+    var errorObj;
 
     beforeEach(function () {
+    	error = null;
+    	errorObj = null;
         usersManager = rewire('../../../../../../engine/api/v1/users');
         Q.longStackSupport = true;
     });
@@ -39,19 +43,22 @@ describe('usersApi.changePassword', function () {
                 password: "weak"
             },
             callback = sinon.spy();
+        error = errBuilder.build(2401);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
         // execute
         usersManager.changePasswordOfUser(email, userIdentifier, data, callback);
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(errBuilder.build(2401))).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
         done();
     });
 
     it('should not change password when user is not found', function (done) {
         // prepare
-        var error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest),
-            email = "email@email",
+        error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
+        var email = "email@email",
             userIdentifier = "indentifier",
             data = {
                 password: "VeryStrongPasswordWithSpecialCharacters123?"
@@ -66,15 +73,16 @@ describe('usersApi.changePassword', function () {
         usersManager.changePasswordOfUser(email, userIdentifier, data, callback);
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(error)).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
         done();
     });
 
     it('should not change password when user id is missing', function (done) {
         // prepare
-        var error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest),
-            user = {},
+        error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
+        var user = {},
             userIdentifier = "indentifier",
             email = "email@email",
             data = {
@@ -90,13 +98,15 @@ describe('usersApi.changePassword', function () {
         usersManager.changePasswordOfUser(email, userIdentifier, data, callback);
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(error)).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
         done();
     });
 
     it('should not change password when given old password is incorrect', function (done) {
         // prepare
+    	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+    	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
         var user = {
                 id: uuid.v4(),
                 password: "OldPassword",
@@ -122,7 +132,7 @@ describe('usersApi.changePassword', function () {
         usersManager.changePasswordOfUser(email, userIdentifier, data, callback);
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
         done();
     });

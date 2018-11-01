@@ -37,11 +37,14 @@ describe('dataApi.collectData', function () {
         proxyMock,
         componentId,
         callback,
-        error;
+        error,
+        errorObj;
 
     beforeEach(function () {
         callback = sinon.spy();
         error = null;
+        errorObj = null;
+        errorObj = null;
         componentId = uuid.v4();
         options = {
             deviceId: "deviceId",
@@ -142,6 +145,7 @@ describe('dataApi.collectData', function () {
     it('should return error if not authorized', function (done) {
         // prepare
         error = errBuilder.build(errBuilder.Errors.Generic.NotAuthorized);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
         deviceResponse.gatewayId = 'gatewayId_2';
 
         // execute
@@ -149,7 +153,7 @@ describe('dataApi.collectData', function () {
 
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(error)).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj)));
 
         done();
     });
@@ -157,13 +161,14 @@ describe('dataApi.collectData', function () {
     it('should return error if components not found', function (done) {
         // prepare
         error = errBuilder.build(errBuilder.Errors.Device.Component.NotFound);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
         deviceResponse.components = [];
 
         // execute
         dataManager.collectData(options, callback);
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(error)).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj)));
 
         done();
     });
