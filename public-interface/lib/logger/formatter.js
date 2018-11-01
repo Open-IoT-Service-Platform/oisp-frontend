@@ -32,7 +32,7 @@ module.exports = function(options) {
         var tags = [];
 
 
-        if (message && logLevel && logLevelObject.levelValue[logLevel]) {
+        if (message && logLevel && logLevelObject.logLevels.levels[logLevel]) {
 
             logLine.message = limitOutputLines(message, this.maxLines);
             logLine.requestid = contextProvider.get('requestid') || 'n/a';

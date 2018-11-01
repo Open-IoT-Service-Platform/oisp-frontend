@@ -83,11 +83,9 @@ describe('newVersionDomainComponentSpec', function(){
         sessionServiceAPI.getCurrentAccount = function(){
             return scope.currentUser.account;
         };
-        sinon.stub(accountsServiceAPI,
-            'getActivationCode',
-            function(id, successCallback){
-                successCallback(null, {activationCode: id});
-            });
+        sinon.stub(accountsServiceAPI, 'getActivationCode').callsFake(function(id, successCallback){
+            successCallback(null, {activationCode: id});
+        });
         usersServiceAPI = usersService;
 
         // mocking i18n resources
@@ -96,25 +94,19 @@ describe('newVersionDomainComponentSpec', function(){
     }));
 
     it('Should add New Component Version', function(){
-        sinon.stub(componentsServiceAPI,
-            'getFullCatalog',
-            function(successCallback, errorCallback){
-                successCallback([]);
-            });
+        sinon.stub(componentsServiceAPI, 'getFullCatalog').callsFake(function(successCallback, errorCallback){
+            successCallback([]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'getComponentDefinition',
-            function(type, successCallback, errorCallback){
-                successCallback([{
-                    type: type
-                }]);
-            });
+        sinon.stub(componentsServiceAPI, 'getComponentDefinition').callsFake(function(type, successCallback, errorCallback){
+            successCallback([{
+                type: type
+            }]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'editComponent',
-            function(id, component, successCallback, errorCallback){
-                successCallback(component);
-            });
+        sinon.stub(componentsServiceAPI, 'editComponent').callsFake(function(id, component, successCallback, errorCallback){
+            successCallback(component);
+        });
 
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,
@@ -159,27 +151,21 @@ describe('newVersionDomainComponentSpec', function(){
     });
 
     it('Should display errors when trying to add  a new Component returns an array of errors', function(){
-        sinon.stub(componentsServiceAPI,
-            'getFullCatalog',
-            function(successCallback, errorCallback){
-                successCallback([]);
-            });
+        sinon.stub(componentsServiceAPI, 'getFullCatalog').callsFake(function(successCallback, errorCallback){
+            successCallback([]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'getComponentDefinition',
-            function(type, successCallback, errorCallback){
-                successCallback([{
-                    type: type
-                }]);
-            });
+        sinon.stub(componentsServiceAPI, 'getComponentDefinition').callsFake(function(type, successCallback, errorCallback){
+            successCallback([{
+                type: type
+            }]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'editComponent',
-            function(id, component, successCallback, errorCallback){
-                errorCallback({
-                    errors: ["invalid min value"]
-                });
+        sinon.stub(componentsServiceAPI, 'editComponent').callsFake(function(id, component, successCallback, errorCallback){
+            errorCallback({
+                errors: ["invalid min value"]
             });
+        });
 
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,
@@ -224,28 +210,22 @@ describe('newVersionDomainComponentSpec', function(){
     });
 
     it('Should display errors when trying to add  a new Component returns a single error', function(){
-        sinon.stub(componentsServiceAPI,
-            'getFullCatalog',
-            function(successCallback, errorCallback){
-                successCallback([]);
-            });
+        sinon.stub(componentsServiceAPI, 'getFullCatalog').callsFake(function(successCallback, errorCallback){
+            successCallback([]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'getComponentDefinition',
-            function(type, successCallback, errorCallback){
-                successCallback([{
-                    type: type
-                }]);
-            });
+        sinon.stub(componentsServiceAPI, 'getComponentDefinition').callsFake(function(type, successCallback, errorCallback){
+            successCallback([{
+                type: type
+            }]);
+        });
 
-        sinon.stub(componentsServiceAPI,
-            'editComponent',
-            function(id, component, successCallback, errorCallback){
-                errorCallback({
-                    code: 1,
-                    message: "invalid min value"
-                });
+        sinon.stub(componentsServiceAPI, 'editComponent').callsFake(function(id, component, successCallback, errorCallback){
+            errorCallback({
+                code: 1,
+                message: "invalid min value"
             });
+        });
 
         ctrl = controllerProvider('AccountCtrl', {
             $scope: scope,

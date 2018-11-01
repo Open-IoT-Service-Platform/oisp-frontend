@@ -16,29 +16,30 @@
 
 'use strict';
 
-exports.levelValue = {
-        'all': 0,
-        'debug':1,
-        'info': 2,
-        'warn': 3,
-        'error': 4,
-        'critical': 5
-};
-
-exports.levelColors = {
-    all: 'magenta',
-    debug: 'blue',
-    info : 'green',
-    warn : 'yellow',
-    error: 'red',
-    critical: 'red'
-};
+exports.logLevels = {
+		levels: {
+			all: 0,
+	        debug:1,
+	        info: 2,
+	        warn: 3,
+	        error: 4,
+	        critical: 5
+		},
+		colors: {
+			all: 'magenta',
+		    debug: 'blue',
+		    info : 'green',
+		    warn : 'yellow',
+		    error: 'red',
+		    critical: 'red'
+		}
+}
 
 
 exports.compareLevel = function(level1, level2) {
   var rv = false;
-  if (this.levelValue[level1] && this.levelValue[level2]) {
-    rv = this.levelValue[level1] >= this.levelValue[level2];
+  if (this.logLevels.levels[level1] && this.logLevels.levels[level2]) {
+    rv = this.logLevels.levels[level1] >= this.logLevels.levels[level2];
   }
   return rv;
 };

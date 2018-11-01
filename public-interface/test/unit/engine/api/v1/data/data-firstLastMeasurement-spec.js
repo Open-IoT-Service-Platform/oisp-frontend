@@ -31,7 +31,8 @@ describe('dataApi.firstLastMeasurement', function () {
         proxyMock,
         callback,
         componentMock,
-        error;
+        error,
+        errorObj;
 
     beforeEach(function () {
         callback = sinon.spy();
@@ -74,6 +75,7 @@ describe('dataApi.firstLastMeasurement', function () {
     it('should return error if ids not found', function (done) {
         // prepare
         error = errBuilder.build(errBuilder.Errors.Device.Component.NotFound);
+        errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
         componentMock.getByCustomFilter = sinon.stub().callsArgWith(2, error, null);
 
         // execute
@@ -81,7 +83,7 @@ describe('dataApi.firstLastMeasurement', function () {
 
         // attest
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.calledWith(error)).to.equal(true);
+        expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
 
         done();
     });

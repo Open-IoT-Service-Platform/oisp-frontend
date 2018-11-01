@@ -24,9 +24,11 @@ var expect = require('expect.js'),
     uuid = require('node-uuid');
 
 describe('accounts handler', function() {
-    var reqMock, resMock, nextMock, attributesValidationMock, errorCode, responseCode;
+    var reqMock, resMock, nextMock, attributesValidationMock, errorCode, responseCode, errorObj, error;
     beforeEach(function(){
         responseCode = null;
+        errorObj = null;
+        error = null;
         reqMock = {
             body: {},
             identity: uuid.v4(),
@@ -67,11 +69,13 @@ describe('accounts handler', function() {
 
         it('should not add account if request body is invalid', function (done) {
             // execute
+        	error = errBuilder.build(errBuilder.Errors.Account.InvalidData);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             accountHandler.addAccount(reqMock, resMock, nextMock);
 
             // attest
             expect(nextMock.calledOnce).to.equal(true);
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Account.InvalidData))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
 
             done();
         });

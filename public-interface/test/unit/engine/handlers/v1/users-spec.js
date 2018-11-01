@@ -27,7 +27,7 @@ var expect = require('expect.js'),
 
 
 describe('users handler', function(){
-    var reqMock, resMock, nextMock, attributesValidationMock, errorCode, responseCode;
+    var reqMock, resMock, nextMock, attributesValidationMock, errorCode, responseCode, error, errorObj;
 
     var expectResponseCode = function (code) {
         expect(resMock.send.calledOnce).to.equal(true);
@@ -43,6 +43,8 @@ describe('users handler', function(){
     };
 
     beforeEach(function() {
+    	error = null;
+    	errorObj = null;
         reqMock = {
             params: {
                 accountId: uuid.v4(),
@@ -462,6 +464,8 @@ describe('users handler', function(){
             done();
         });
         it('should not add password and return error code if params are not correct', function (done) {
+        	error = errBuilder.build(errBuilder.Errors.User.InvalidData);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             // prepare
             var userApiMock = {
                 addPasswordToken: sinon.stub().callsArgWith(2, {}, null)
@@ -475,7 +479,7 @@ describe('users handler', function(){
             usersHandler.addPasswordToken(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.User.InvalidData))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.addPasswordToken.called).to.equal(false);
 
             done();
@@ -529,6 +533,8 @@ describe('users handler', function(){
         });
         it('should not get password and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 getPasswordToken: sinon.stub().callsArgWith(1, {}, null)
             };
@@ -541,7 +547,7 @@ describe('users handler', function(){
             usersHandler.getPasswordToken(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.getPasswordToken.called).to.equal(false);
 
             done();
@@ -590,6 +596,8 @@ describe('users handler', function(){
         });
         it('should not change password and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 changePassword: sinon.stub().callsArgWith(1, {})
             };
@@ -602,7 +610,7 @@ describe('users handler', function(){
             usersHandler.changePassword(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.changePassword.called).to.equal(false);
 
             done();
@@ -651,6 +659,8 @@ describe('users handler', function(){
         });
         it('should not change password and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 changePasswordOfUser: sinon.stub().callsArgWith(3, {})
             };
@@ -663,7 +673,7 @@ describe('users handler', function(){
             usersHandler.changePasswordWithCurrentPwd(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.changePasswordOfUser.called).to.equal(false);
 
             done();
@@ -711,6 +721,8 @@ describe('users handler', function(){
         });
         it('should not get user setting and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 getUserSetting: sinon.stub().callsArgWith(4, {}, null)
             };
@@ -723,7 +735,7 @@ describe('users handler', function(){
             usersHandler.getUserSetting(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.getUserSetting.called).to.equal(false);
 
             done();
@@ -771,6 +783,8 @@ describe('users handler', function(){
         });
         it('should not get user settings and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 getUserSettings: sinon.stub().callsArgWith(3, {}, null)
             };
@@ -783,7 +797,7 @@ describe('users handler', function(){
             usersHandler.getUserSettings(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.getUserSettings.called).to.equal(false);
 
             done();
@@ -831,6 +845,8 @@ describe('users handler', function(){
         });
         it('should not add user settings and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 addUserSettings: sinon.stub().callsArgWith(4, {}, null)
             };
@@ -843,7 +859,7 @@ describe('users handler', function(){
             usersHandler.addUserSettings(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.addUserSettings.called).to.equal(false);
 
             done();
@@ -891,6 +907,8 @@ describe('users handler', function(){
         });
         it('should not update user settings and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                 updateUserSettings: sinon.stub().callsArgWith(5, {})
             };
@@ -903,7 +921,7 @@ describe('users handler', function(){
             usersHandler.updateUserSettings(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.updateUserSettings.called).to.equal(false);
 
             done();
@@ -951,6 +969,8 @@ describe('users handler', function(){
         });
         it('should not delete user settings and return error code if params are not correct', function (done) {
             // prepare
+        	error = errBuilder.build(errBuilder.Errors.Generic.InvalidRequest);
+        	errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
             var userApiMock = {
                     deleteUserSettings: sinon.stub().callsArgWith(4, {})
                 };
@@ -963,7 +983,7 @@ describe('users handler', function(){
             usersHandler.deleteUserSettings(req, {}, nextMock);
 
             // attest
-            expect(nextMock.calledWith(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest))).to.equal(true);
+            expect(nextMock.calledWith(sinon.match(errorObj))).to.equal(true);
             expect(userApiMock.deleteUserSettings.called).to.equal(false);
 
             done();

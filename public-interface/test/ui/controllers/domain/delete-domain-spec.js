@@ -110,20 +110,18 @@ describe('deleteAccountSpec', function(){
     }));
 
     it('should delete the account', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: true,
-                    role: "admin"
-                }]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: true,
+                role: "admin"
+            }]);
+        });
         accountsServiceAPI.deleteAccount = sinon.stub().callsArgWith(1);
         devicesServiceAPI.getTotal = sinon.stub().callsArgWith(0, { state: {active: 100 }});
         loginServiceAPI.currentUser = sinon.stub().callsArgWith(0, {});
         var flash = {
-            to: sinon.stub().returns(0, function(){})
+            to: sinon.stub().returns({})
         };
         var winMock = { location: sinon.spy() };
         var timeout = sinon.stub().callsArgWith(0);
@@ -167,20 +165,18 @@ describe('deleteAccountSpec', function(){
     });
 
     it('should not delete the account - user cancel', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: true,
-                    role: "admin"
-                }]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: true,
+                role: "admin"
+            }]);
+        });
         accountsServiceAPI.deleteAccount = sinon.stub().callsArgWith(0);
         devicesServiceAPI.getTotal = sinon.stub().callsArgWith(0, {});
         loginServiceAPI.currentUser = sinon.stub().callsArgWith(0, {});
         var flash = {
-            to: sinon.stub().returns(0, function(){})
+            to: sinon.stub().returns({})
         };
         var winMock = { location: sinon.spy() };
         var timeout = sinon.stub().callsArgWith(0);
@@ -224,19 +220,17 @@ describe('deleteAccountSpec', function(){
     });
 
     it('should not delete the account - error', function(){
-        sinon.stub(usersServiceAPI,
-            'getUsers',
-            function(sc){
-                sc([{
-                    email: "admin@user.mail",
-                    verified: true,
-                    role: "admin"
-                }]);
-            });
+        sinon.stub(usersServiceAPI, 'getUsers').callsFake(function(sc){
+            sc([{
+                email: "admin@user.mail",
+                verified: true,
+                role: "admin"
+            }]);
+        });
         accountsServiceAPI.deleteAccount = sinon.stub().callsArgWith(2, 500, {});
         devicesServiceAPI.getTotal = sinon.stub().callsArgWith(0, {});
         var flash = {
-            to: sinon.stub().returns(0, function(){})
+            to: sinon.stub().returns({})
         };
         var winMock = { location: sinon.spy() };
         var timeout = sinon.stub().callsArgWith(0);

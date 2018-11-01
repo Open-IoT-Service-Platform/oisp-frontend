@@ -58,7 +58,7 @@ describe('commands handler', function(){
         };
 
         commandsHandler.__set__('commandsApi', commandsApiMock);
-        commandsHandler.__set__('devices', devicesMock);
+        //commandsHandler.__set__('devices', devicesMock);
     });
 
     var validateSendStatusOK = function () {

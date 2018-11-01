@@ -307,7 +307,7 @@ describe('devices handler', function(){
             var error = new Error(404),
                 device = { deviceId: 1 },
                 mock = {
-                    updateDevice: sinon.stub().returns(Q.resolve(error))
+                    updateDevice: sinon.stub().rejects(error)
                 },
                 attributesValidationMock = {
                     checkLimitsForAttributes: sinon.stub().yields(null)
