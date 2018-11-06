@@ -212,5 +212,10 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     config.controlChannel.ws.secure = false;
 }
 
+/* override for testing if rateLimit wants to be disabled */
+if (process.argv && (process.argv.indexOf("--disable-rate-limits") !== -1)) {
+	config.rateLimit = 'limitless';
+}
+
 
 module.exports = config;
