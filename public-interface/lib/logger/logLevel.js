@@ -18,12 +18,12 @@
 
 exports.logLevels = {
 		levels: {
-			all: 0,
-	        debug:1,
-	        info: 2,
-	        warn: 3,
-	        error: 4,
-	        critical: 5
+			all: 5,
+	        debug: 4,
+	        info: 3,
+	        warn: 2,
+	        error: 1,
+	        critical: 0
 		},
 		colors: {
 			all: 'magenta',
@@ -39,7 +39,7 @@ exports.logLevels = {
 exports.compareLevel = function(level1, level2) {
   var rv = false;
   if (this.logLevels.levels[level1] && this.logLevels.levels[level2]) {
-    rv = this.logLevels.levels[level1] >= this.logLevels.levels[level2];
+    rv = this.logLevels.levels[level1] <= this.logLevels.levels[level2];
   }
   return rv;
 };
