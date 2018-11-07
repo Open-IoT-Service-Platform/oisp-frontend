@@ -43,7 +43,7 @@ var cloneObject = function(object) {
 
 var generateToken = function(device, deviceAccount) {
 
-    return Q.nfcall(auth.generateToken, device.deviceId, deviceAccount,  null, null)
+    return Q.nfcall(auth.generateToken, device.deviceId, deviceAccount, null, null, auth.tokenTypes.device)
         .catch(function(err) {
             logger.error("The Token could not be generated " + JSON.stringify(err));
             throw errBuilder.build(errBuilder.Errors.Device.ActivationError);

@@ -21,6 +21,7 @@ var uuid = require('node-uuid'),
     logger = require('../logger').init(),
     jsjws = require('jsjws'),
     keyPem = require('./key-pem'),
+    tokenTypes,
     defaultTokenExpire,
     userTokenExpire,
     iss,
@@ -34,7 +35,7 @@ var uuid = require('node-uuid'),
     utils = require('./utils'),
     errBuilder = require('./../errorHandler').errBuilder;
 
-var generateToken = function(subjectId, accounts, role, expire, callback){
+var generateToken = function(subjectId, accounts, role, expire, type, callback){
     var expireSeconds = expire || defaultTokenExpire;
     var expireDate = new Date((new Date()).getTime() + expireSeconds);
 
@@ -48,7 +49,8 @@ var generateToken = function(subjectId, accounts, role, expire, callback){
         iss: iss,
         sub: subjectId,
         exp: expireDate.getTime(),
-        accounts: accounts
+        accounts: accounts,
+        type: tokenTypes[type]
     };
 
     if (role && role === UserType.system) {
@@ -106,6 +108,13 @@ var getTokenInfo = function(token, req, callback){
                     header: header,
                     payload: payload
                 };
+                
+                // skip verifying token if it is a device token
+                if (payload.type === tokenTypes.device) {
+                	logger.debug("Token is device token, skipping user verification.");
+                	callback(result);
+                	return;
+                }
 
                 User.getUser(req.identity, function(err, user) {
                     if (!err) {
@@ -255,7 +264,7 @@ module.exports.getAuthToken = function(options) {
         if (!req.user) {
             res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(errBuilder.Errors.Generic.NotAuthorized.message);
         } else {
-            generateToken(req.user.id, req.user.accounts, req.user.type, userTokenExpire,
+            generateToken(req.user.id, req.user.accounts, req.user.type, userTokenExpire, tokenTypes.user,
                 function(err, token){
                     if(!err){
                         if(options && options.followRedirect) {
@@ -313,6 +322,8 @@ module.exports.middleware = function(secConfig, forceSSL){
 
     keyPem.init(secConfig);
 
+    tokenTypes = secConfig.tokenTypes;
+    module.exports.tokenTypes = tokenTypes;
     defaultTokenExpire = secConfig.default_token_expire * 60 * 1000;
     userTokenExpire = secConfig.user_token_expire * 60 * 1000;
     alg = secConfig.alg;

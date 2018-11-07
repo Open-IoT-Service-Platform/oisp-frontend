@@ -26,6 +26,10 @@ module.exports = {
     private_pem_path: keys_config.private_pem_path,
     public_pem_path: keys_config.public_pem_path,
     default_activation_code_expire: 60, // 1 Hour year (in minutes)
+    tokenTypes: {
+    	user: "user",
+    	device: "device"
+    },
     default_token_expire: 5256000, // 10 years (in minutes)
     user_token_expire: 1440, // 24 hours (in minutes)
     iss: 'http://enableiot.com', // JWT Issuer
