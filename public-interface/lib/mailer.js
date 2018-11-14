@@ -80,7 +80,7 @@ var sendMail = function (templateName, params, smtpConfig) {
 	}).then(res => {
 		logger.info(JSON.stringify(res.originalMessage));
 		if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
-            console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+            logger.info('Preview URL: ' + JSON.stringify(nodemailer.getTestMessageUrl(res)));
         }
 	}).catch(err => {
 		logger.error('mailer. send, error sending the mail: ' + JSON.stringify(err));
