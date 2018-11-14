@@ -56,7 +56,7 @@ module.exports = function() {
 
                     logger.debug("Device " + bind.deviceId + " was connected last time to " + bind.server + " websocket server");
 
-                    logger.info("Sending message to Websocket. Message: " + message);
+                    logger.info("Sending message to Websocket. Message: " + JSON.stringify(message));
                     var connector = connectWithWebsocket(bind.server);
                     connector.publish(message);
                 })
