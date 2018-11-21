@@ -46,13 +46,13 @@ var heartBeat = function(producer, partition, topic) {
 
 exports.start = function () {
   
-    kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.hosts});
+    kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.uri});
 
     kafkaProducer = new Kafka.HighLevelProducer(kafkaClient, { requireAcks: 1, ackTimeoutMs: 500 });    
 
     kafkaProducer.on('ready', function () {
-        var topic = config.drsProxy.kafka.topics.heartbeat.name;
-        var interval = parseInt(config.drsProxy.kafka.topics.heartbeat.interval);
+        var topic = config.drsProxy.kafka.topicsHeartbeatName;
+        var interval = parseInt(config.drsProxy.kafka.topicsHeartbeatInterval);
         var partition = 0;
     
         kafkaProducer.createTopics([topic], true, function (error, data) {

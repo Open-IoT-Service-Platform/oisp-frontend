@@ -14,22 +14,63 @@
  * limitations under the License.
  */
 
-/* default configuration handled with dynamic environment */
+// Gets the config for the configName from the OISP_FRONTEND_CONFIG environment variable
+// Returns empty object if the config can not be found
+var getOISPConfig = (function () {
+	if (!process.env.OISP_FRONTEND_CONFIG) {
+		console.log("Root config environment variable (OISP_FRONTEND_CONFIG) is missing...");
+		return function () { return {}; };
+	}
+	var frontendConfig = JSON.parse(process.env.OISP_FRONTEND_CONFIG);
+	
+	var resolveConfig = function (config, stack) {
+		if (!stack) {
+			stack = ["OISP_FRONTEND_CONFIG"];
+		}
+		for (var property in config) {
+			if (typeof config[property] === "string" && 
+					(config[property].substring(0,2) === "@@" || config[property].substring(0,2) === "%%")) {
+				var configName = config[property].substring(2, config[property].length);
+				if (!process.env[configName]) {
+					console.log("Config environment variable (" + configName + ") is missing...");
+					config[property] = {};
+				} else if (stack.indexOf(configName) !== -1) {
+					console.log("Detected cyclic reference in config decleration: " + configName + ", stopping recursion...");
+					config[property] = {};
+				} else {
+					config[property] = JSON.parse(process.env[configName]);
+					stack.push(configName);
+					resolveConfig(config[property], stack);
+					stack.pop();
+				}
+			}
+		}
+	};
+	
+	resolveConfig(frontendConfig);
+	
+	return function(configName) {
+			if (!frontendConfig[configName])
+				return {};
+			else {
+				console.log(configName + " is set to: " + JSON.stringify(frontendConfig[configName]));
+				return frontendConfig[configName];
+			}
+		};	
+})();
 
-var cfenvReader = require('./lib/cfenv/reader'),
- postgres_credentials = cfenvReader.getServiceCredentials("mypostgres"),
- backend_credentials = cfenvReader.getServiceCredentials("backend-ups"),
- mail_credentials = cfenvReader.getServiceCredentials("mysmtp"),
- mail_user_credentials = cfenvReader.getServiceCredentials("mail-ups"),
- websocket_credentials = cfenvReader.getServiceCredentials('websocket-ups'),
- reCaptcha_credentials = cfenvReader.getServiceCredentials("recaptcha-ups"),
- redis_credentials = cfenvReader.getServiceCredentials("myredis"),
- rule_engine_credentials = cfenvReader.getServiceCredentials("rule-engine-credentials-ups"),
- gateway_user_credentials = cfenvReader.getServiceCredentials("gateway-credentials-ups"),
- dashboard_security_credentials = cfenvReader.getServiceCredentials("dashboard-security-ups"),
- kafka_credentials = cfenvReader.getServiceCredentials("kafka-ups"),
- winston = require('winston');
- 
+var postgres_config = getOISPConfig("postgresConfig"),
+	backendHost_config = getOISPConfig("backendHostConfig"),
+	smtp_config = getOISPConfig("smtpConfig"),
+	mail_config = getOISPConfig("mailConfig"),
+	websocketUser_config = getOISPConfig("websocketUserConfig"),
+	recaptcha_config = getOISPConfig("recaptchaConfig"),
+	redis_config = getOISPConfig("redisConfig"),
+	ruleEngine_config = getOISPConfig("ruleEngineConfig"),
+	gateway_config = getOISPConfig("gatewayConfig"),
+	dashboardSecurity_config = getOISPConfig("dashboardSecurityConfig")
+	kafka_config = getOISPConfig("kafkaConfig"),
+    winston = require('winston');
 
 var config = {
     api: {
@@ -64,38 +105,38 @@ var config = {
             callbackURL: ''
         },
         keys: {
-            private_pem_path: dashboard_security_credentials.private_pem_path,
-            public_pem_path: dashboard_security_credentials.public_pem_path
+            private_pem_path: dashboardSecurity_config.private_pem_path,
+            public_pem_path: dashboardSecurity_config.public_pem_path
         },
         captcha: {
             googleUrl: 'http://www.google.com/recaptcha/api/verify',
-            privateKey: reCaptcha_credentials.secretKey,
-            publicKey: reCaptcha_credentials.siteKey,
-            enabled: (reCaptcha_credentials.enabled !== "false"),
-            testsCode: dashboard_security_credentials.captcha_test_code
+            privateKey: recaptcha_config.secretKey,
+            publicKey: recaptcha_config.siteKey,
+            enabled: (recaptcha_config.enabled !== "false"),
+            testsCode: dashboardSecurity_config.captcha_test_code
         },
         gatewayUser: {
-            email: gateway_user_credentials.username,
-            password: gateway_user_credentials.password
+            email: gateway_config.username,
+            password: gateway_config.password
         },
         ruleEngineUser: {
-            email: rule_engine_credentials.username,
-            password: rule_engine_credentials.password
+            email: ruleEngine_config.username,
+            password: ruleEngine_config.password
         }
     },
     verifyUserEmail: true,
     redis:{
-        host: redis_credentials.hostname,
-        password: redis_credentials.password,
-        port: redis_credentials.port
+        host: redis_config.hostname,
+        password: redis_config.password,
+        port: redis_config.port
     },
     postgres: {
-        database: postgres_credentials.dbname,
-        username: postgres_credentials.username,
-        password: postgres_credentials.password,
+        database: postgres_config.dbname,
+        username: postgres_config.username,
+        password: postgres_config.password,
         options: {
-            host: postgres_credentials.hostname,
-            port: postgres_credentials.port,
+            host: postgres_config.hostname,
+            port: postgres_config.port,
             dialect: 'postgres',
             pool: {
                 max: 12,
@@ -105,16 +146,16 @@ var config = {
         }
     },
     mail:{
-        from: 'OISP <' + mail_user_credentials.sender + '>',
+        from: 'OISP <' + mail_config.sender + '>',
         smtp: {
             transport: "SMTP",
-            host: mail_credentials.host,
-            secureConnection: (mail_credentials.protocol === 'smtps'),
-            port: mail_credentials.port,
+            host: smtp_config.host,
+            secureConnection: (smtp_config.protocol === 'smtps'),
+            port: smtp_config.port,
             requiresAuth: true,
             auth: {
-                user: mail_credentials.username,
-                pass: mail_credentials.password
+                user: smtp_config.username,
+                pass: smtp_config.password
             },
             tls:{
                 secureProtocol: "TLSv1_method"
@@ -124,8 +165,8 @@ var config = {
         blockedDomains: [ "@example.com", "@test.com" ]
     },
     drsProxy: {
-        url: backend_credentials.host,
-        dataUrl: backend_credentials.host,
+        url: backendHost_config.host,
+        dataUrl: backendHost_config.host,
         strictSsl: false,
         mqtt: {
             host: '',
@@ -138,8 +179,11 @@ var config = {
             password : ""
         },
         kafka: {
-            hosts: kafka_credentials.hosts,
-            topics: kafka_credentials.topics
+            uri: kafka_config.uri,
+            topicsObservations: kafka_config.topicsObservations,
+            topicsRuleEngine: kafka_config.topicsRuleEngine,
+            topicsHeartbeatName: kafka_config.topicsHeartbeatName,
+            topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval
         },
         ingestion: 'REST',
         userScheme: null // default
@@ -160,8 +204,8 @@ var config = {
             retryTime: 3000,
             retriesLimit: 5,
             secure: true,
-            username: websocket_credentials.username,
-            password : websocket_credentials.password,
+            username: websocketUser_config.username,
+            password : websocketUser_config.password,
             verifyCert: false
         }
     },
@@ -188,7 +232,7 @@ var config = {
         limitPerRequest: 1000 //max number of actuations which can be returned by rest api
     },
     interactionTokenGenerator: {
-        permissionKey: dashboard_security_credentials.interaction_token_permision_key
+        permissionKey: dashboardSecurity_config.interaction_token_permision_key
     }
 };
 
