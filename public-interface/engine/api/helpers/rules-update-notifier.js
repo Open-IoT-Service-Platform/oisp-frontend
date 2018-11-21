@@ -27,7 +27,7 @@ var send = function() {
         try {
             kafkaProducer.send([
                 {
-                    topic: config.drsProxy.kafka.topics.rule_engine,
+                    topic: config.drsProxy.kafka.topicsRuleEngine,
                     messages: ""
                 }
             ], function (err) {
@@ -59,7 +59,7 @@ exports.notify = function () {
     if ( kafkaProducer === null ) {
         var kafkaClient;
         try {
-            kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.hosts});
+            kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.uri});
         } catch (exception) {
             logger.error("Exception occured creating Kafka Client: " + exception);
         }
@@ -73,12 +73,12 @@ exports.notify = function () {
         }
 
         kafkaProducer.on('ready', function() {
-            kafkaProducer.createTopics([config.drsProxy.kafka.topics.rule_engine], false, function (err, data) {
+            kafkaProducer.createTopics([config.drsProxy.kafka.topicsRuleEngine], false, function (err, data) {
                 if (!err) {
                     send()
                 }
                 else {
-                    console.log("Cannot create "+config.drsProxy.kafka.topics.rule_engine + " topic "+err)
+                    console.log("Cannot create "+config.drsProxy.kafka.topicsRuleEngine + " topic "+err)
                 }
             });
         })

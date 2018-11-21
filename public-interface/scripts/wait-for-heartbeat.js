@@ -21,9 +21,9 @@ var kafka = require('kafka-node'),
 
 
     kafkaConsumer,
-    topic = config.drsProxy.kafka.topics.heartbeat.name,
+    topic = config.drsProxy.kafka.topicsHeartbeatName,
     partition = 0,
-    kafkaClient = new kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.hosts}),
+    kafkaClient = new kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.uri}),
     kafkaOffset = new kafka.Offset(kafkaClient);
 
 var getKafkaOffset = function(topic_, partition_, cb) {
