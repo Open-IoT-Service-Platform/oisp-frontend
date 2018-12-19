@@ -15,7 +15,8 @@
  */
 
 var models = require('../iot-entities/postgresql/models'),
-	systemUsers = require('../lib/dp-users/systemUsers');
+	systemUsers = require('../lib/dp-users/systemUsers'),
+	tracer = require('../lib/express-jaeger').tracer;
 
 var ResetDB = function(){};
 
@@ -35,11 +36,12 @@ ResetDB.prototype.reset = function(cb){
 	.then(() => {
 	    return models.initSchema();
 	})
-	.then(function() {	
+	.then(function() {
         return systemUsers.create();
 	})
 	.finally(function() {
 		models.sequelize.close();
+		tracer.close();
 	});
 }
 

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 'use strict';
-
-var Sequelize = require('sequelize'),
+var httpContext = require('express-http-context'),
+    tracer = require('../../../lib/express-jaeger/').tracer,
+    Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
     accounts = require('./accounts'),
     settings = require('./settings'),
@@ -56,6 +57,25 @@ var sequelize = new Sequelize(
     config.password,
     getSequelizeOptions()
 );
+
+var origQueryFunc = sequelize.query;
+function patchQuery() {
+    return function(sql, options) {
+        var initSpan = httpContext.get('initSpan');
+        var span = tracer.startSpan('postgres-call', { childOf: initSpan });
+        return origQueryFunc.apply(this, arguments).then(
+            result => {
+                span.finish();
+                return result;
+            },
+            err => {
+                span.finish();
+                throw err;
+            }
+        );
+    }
+}
+sequelize['query'] = patchQuery();
 
 var Accounts = new accounts(sequelize, Sequelize);
 var Actuations = new actuations(sequelize, Sequelize);
@@ -382,6 +402,7 @@ var executeScriptsWithoutTransaction = function () {
                 });
         });
 };
+
 
 exports.initSchema = function () {
     return executeScriptsWithTransaction()

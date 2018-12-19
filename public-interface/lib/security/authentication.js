@@ -15,8 +15,7 @@
  */
 
 'use strict';
-
-var express = require('express'),
+var express = require('../express-jaeger').express,
     passport = require('passport'),
     _localStrategy = require('passport-local').Strategy,
     _facebookStrategy = require('passport-facebook').Strategy,
