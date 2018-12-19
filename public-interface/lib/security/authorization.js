@@ -30,7 +30,7 @@ var uuid = require('node-uuid'),
     routesConfig = [],
     rolesConfig = {},
     publicRoutes = [],
-    express = require('express'),
+    express = require('../express-jaeger').express,
     accountIdRex = new RegExp("/api/accounts/(.[^/]*)"),
     utils = require('./utils'),
     errBuilder = require('./../errorHandler').errBuilder;
@@ -108,7 +108,7 @@ var getTokenInfo = function(token, req, callback){
                     header: header,
                     payload: payload
                 };
-                
+
                 // skip verifying token if it is a device token
                 if (payload.type === tokenTypes.device) {
                 	logger.debug("Token is device token, skipping user verification.");

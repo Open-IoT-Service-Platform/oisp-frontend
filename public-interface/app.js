@@ -16,7 +16,7 @@
 
 "use strict";
 var http = require('http'),
-    express = require('express'),
+    express = require('./lib/express-jaeger').express,
     uuid = require('node-uuid'),
     AlertMonitor = require('./lib/event-monitor'),
     commServer = require('./lib/comm-server'),
@@ -52,6 +52,7 @@ var XSS = iotRoutes.cors,
 /* We set the global agent to 1024 this is for
  how many concurrent sockets the agent can have open per origin
  */
+
 http.globalAgent.maxSockets = maxSockets;
 
 security.rateLimiter.init(secConfig);
@@ -60,7 +61,10 @@ appServer.set('env', ENV);
 appServer.set('port', api_port);
 appServer.disable('x-powered-by');
 appServer.enable('trust proxy');
+appServer.use(bodyParser.json({limit: config.api.bodySizeLimit}));
+appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeLimit}));
 appServer.use(favicon(__dirname + '/dashboard/public/favicon.png'));
+appServer.registerHttpContextAndStartTracing();
 appServer.use(compress());
 if (config.api.forceSSL) {
     appServer.use(forceSSL);
@@ -71,13 +75,11 @@ appServer.use('/ui/public', express.static('dashboard/public'));
 
 appServer.use(httpHeadersInjector.forwardedHeaders);
 appServer.use(contextProvider.middleware);
-
 appServer.use(bodyParser.json({limit: config.api.bodySizeLimit}));
 appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeLimit}));
 appServer.use(XSS());
 
 appServer.use(winstonLogger.httpLogger());
-
 
 (function setAppServerUseSecurityAndCaptcha(){
     var endpoints = ['/v1','/ui'];
@@ -88,8 +90,6 @@ appServer.use(winstonLogger.httpLogger());
         appServer.use(endpoints[i], google.getCaptchaPublicKey());
     }
 })();
-
-
 
 if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local") !== -1)) {
     appServer.use('/ui', function (req, res, next) {
@@ -105,6 +105,7 @@ appServer.use('/v1', function (req, res, next) {
     contextProvider.instance().set('requestid', req.headers['x-iotkit-requestid']);
     next();
 });
+
 
 /* Modules that registered his routes
  shall be unique or will be override
