@@ -120,6 +120,7 @@ module.exports = {
         },
         Data: {
             InvalidData: {code: 6400, status: 400, message: "Invalid data for Target Filter"},
+            PartialDataProcessed: {code: 6402, status: 404, message: "Only part of the data has been submitted successfully"},
             FormatError: {code: 6500, status: 500, message: "Format not accepted"},
             OffsetAndLimitBothOrNoneRequired:{code:6504, status:404, message:"offset and limit must be specified both or none"},
             WrongResponseCodeFromAA: {code: 6506, status: 500, message: "Could not send data."},

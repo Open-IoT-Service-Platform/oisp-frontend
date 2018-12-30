@@ -249,7 +249,9 @@ var authorizeRoute = function (req, res, next) {
             next();
         } else {
             if (req.path.indexOf('/api/') === 0) {
-                res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(errBuilder.Errors.Generic.NotAuthorized.message);
+              var err = errBuilder.build(
+                errBuilder.Errors.Generic.NotAuthorized.code);
+                res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(err);
             } else {
                 res.redirect('/');
             }

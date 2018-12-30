@@ -31,7 +31,6 @@ module.exports = {
     ],
     user: [
         "data:read",
-        "data:write",
         "device:admin",
         "device:read",
 

@@ -128,6 +128,26 @@ exports.getByCustomFilter = function(accountId, customFilter, resultCallback) {
     });
 };
 
+exports.findComponentsAndTypesForDevice = function(deviceId, resultCallback) {
+  var filter = {
+    where: {
+      deviceId: deviceId
+    },
+    include: [
+    {
+      model: componentTypes
+    }]
+  };
+  deviceComponents.findAll(filter)
+  .then(function(result) {
+    interpreterHelper.mapAppResults(result, interpreter, resultCallback);
+  })
+  .catch(function(err) {
+    console.log(err);
+    resultCallback(err);
+  });
+};
+
 exports.updateLastObservationTS = function (componentId, date, resultCallback) {
     var filter = {
         where: {

@@ -462,4 +462,22 @@ exports.deleteComponent = function (deviceId, componentId, transaction) {
         });
 };
 
-
+exports.belongsToAccount = function(deviceId, accountId) {
+  var filter = {
+    where: {
+      accountId: accountId,
+      id: deviceId
+    }
+  };
+  return devices.findOne(filter)
+  .then(function(result) {
+    return new Promise(function(resolve, reject) {
+      if (result !== undefined && result !== null) {
+        resolve();
+      }
+      else {
+        reject();
+      }
+    });
+  });
+};

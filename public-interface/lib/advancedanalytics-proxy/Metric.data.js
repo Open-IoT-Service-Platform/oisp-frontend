@@ -32,7 +32,8 @@ Metric.prototype.dataAsRoot = function (value) {
     var dataTemporal = {
         "cid": value.componentId || value.cid || this.globalCid,
         "on": value.on || this.on,
-        "value": value.v || value.value
+        "value": value.v || value.value,
+        "dataType": value.dataType
     };
     if (value.loc) {
         dataTemporal.loc = value.loc;
