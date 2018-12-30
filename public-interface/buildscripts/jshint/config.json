@@ -12,6 +12,7 @@
     "unused": true,
     "indent": false,
     "node" : true,
+    "esversion": 6,
     "globals": {
         "angular": true,
         "Rickshaw": true,

@@ -30,7 +30,8 @@ exports.collectData = function (req, res, next) {
         deviceId: req.params.deviceId,
         data: req.body,
         forwarded: req.headers['forwarded'] || false,
-        gatewayId: req.identity
+        identity: req.identity,
+        type: req.tokenInfo.payload.type
     };
 
     data.collectData(options, function(err) {
