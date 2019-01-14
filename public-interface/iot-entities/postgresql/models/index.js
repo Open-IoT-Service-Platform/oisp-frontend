@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 'use strict';
-var httpContext = require('express-http-context'),
-    tracer = require('../../../lib/express-jaeger/').tracer,
+var contextProvider = require('../../../lib/context-provider').instance(),
+    expressJaeger = require('../../../lib/express-jaeger'),
+    tracer = expressJaeger.tracer,
     Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
     accounts = require('./accounts'),
@@ -61,8 +62,8 @@ var sequelize = new Sequelize(
 var origQueryFunc = sequelize.query;
 function patchQuery() {
     return function(sql, options) {
-        var initSpan = httpContext.get('initSpan');
-        var span = tracer.startSpan('postgres-call', { childOf: initSpan });
+        var routeSpan = contextProvider.get('routeSpan');
+        var span = tracer.startSpan('postgres-call', { childOf: routeSpan });
         return origQueryFunc.apply(this, arguments).then(
             result => {
                 span.finish();
