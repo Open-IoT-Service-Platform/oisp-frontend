@@ -10,6 +10,8 @@ var initTracer = function(serviceName) {
         },
         reporter: {
             logSpans: true,
+            agentHost: "jaeger",
+            agentPort: 6832
         },
     };
     const options = {
@@ -18,7 +20,7 @@ var initTracer = function(serviceName) {
                 console.log("INFO ", msg);
             },
             error(msg) {
-                console.log("ERROR", msg);
+                console.log("ERROR ", msg);
             },
         },
     };

@@ -61,10 +61,9 @@ appServer.set('env', ENV);
 appServer.set('port', api_port);
 appServer.disable('x-powered-by');
 appServer.enable('trust proxy');
-appServer.use(bodyParser.json({limit: config.api.bodySizeLimit}));
-appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeLimit}));
 appServer.use(favicon(__dirname + '/dashboard/public/favicon.png'));
-appServer.registerHttpContextAndStartTracing();
+appServer.use(contextProvider.middleware);
+appServer.startTracing();
 appServer.use(compress());
 if (config.api.forceSSL) {
     appServer.use(forceSSL);
@@ -74,7 +73,6 @@ if (config.api.forceSSL) {
 appServer.use('/ui/public', express.static('dashboard/public'));
 
 appServer.use(httpHeadersInjector.forwardedHeaders);
-appServer.use(contextProvider.middleware);
 appServer.use(bodyParser.json({limit: config.api.bodySizeLimit}));
 appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeLimit}));
 appServer.use(XSS());

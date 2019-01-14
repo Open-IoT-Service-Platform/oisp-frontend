@@ -1,8 +1,8 @@
-var httpContext = require('express-http-context'),
+var contextProvider = require('../../lib/context-provider').instance(),
     express = require('express'),
     tracer = require('./jaeger-tracer');
 
-var httpContextRegistered = false;
+var contextRegistered = false;
 
 var startRequest = function(req, res, next) {
     const span = tracer.startSpan('start-request');
@@ -12,8 +12,8 @@ var startRequest = function(req, res, next) {
     const middlewareSpan = tracer.startSpan('middleware', { childOf: span });
     const routeSpan = tracer.startSpan(req.path, { childOf: span });
     routeSpan.setTag(req.method);
-    httpContext.set('middlewareSpan', middlewareSpan);
-    httpContext.set('routeSpan', routeSpan);
+    contextProvider.set('middlewareSpan', middlewareSpan);
+    contextProvider.set('routeSpan', routeSpan);
     res.on('finish', function() {
         span.log({
             event: 'request finish'
@@ -34,10 +34,9 @@ var useOriginal = express.application.use,
     deleteOriginal = express.application.delete,
     allOriginal = express.application.all;
 
-express.application['registerHttpContextAndStartTracing'] = function() {
-    useOriginal.apply(this, ['/', httpContext.middleware]);
+express.application['startTracing'] = function() {
     useOriginal.apply(this, ['/', startRequest]);
-    httpContextRegistered = true;
+    contextRegistered = true;
 };
 
 var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName) {
@@ -49,7 +48,7 @@ var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName)
             var serviceName = middlewares[i].name;
             var spanTransform = function(service, name) {
                 return function(req, res, next) {
-                    const parentSpan = httpContext.get(parentSpanName);
+                    const parentSpan = contextProvider.get(parentSpanName);
                     const span = tracer.startSpan(name, {
                         childOf: parentSpan
                     });
@@ -65,7 +64,7 @@ var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName)
 
 var forkedRegister = function(original, method, parentSpanName) {
     return function() {
-        if (httpContextRegistered) {
+        if (contextRegistered) {
             var path = typeof arguments[0] === "string" ? arguments[0] : '/';
             var start = typeof arguments[0] === "string" ? 1 : 0;
             patchMiddlewares(arguments, start, method, parentSpanName);
