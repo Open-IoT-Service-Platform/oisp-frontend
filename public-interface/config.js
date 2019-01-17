@@ -22,13 +22,13 @@ var getOISPConfig = (function () {
 		return function () { return {}; };
 	}
 	var frontendConfig = JSON.parse(process.env.OISP_FRONTEND_CONFIG);
-	
+
 	var resolveConfig = function (config, stack) {
 		if (!stack) {
 			stack = ["OISP_FRONTEND_CONFIG"];
 		}
 		for (var property in config) {
-			if (typeof config[property] === "string" && 
+			if (typeof config[property] === "string" &&
 					(config[property].substring(0,2) === "@@" || config[property].substring(0,2) === "%%")) {
 				var configName = config[property].substring(2, config[property].length);
 				if (!process.env[configName]) {
@@ -46,9 +46,9 @@ var getOISPConfig = (function () {
 			}
 		}
 	};
-	
+
 	resolveConfig(frontendConfig);
-	
+
 	return function(configName) {
 			if (!frontendConfig[configName])
 				return {};
@@ -56,7 +56,7 @@ var getOISPConfig = (function () {
 				console.log(configName + " is set to: " + JSON.stringify(frontendConfig[configName]));
 				return frontendConfig[configName];
 			}
-		};	
+		};
 })();
 
 var postgres_config = getOISPConfig("postgresConfig"),
@@ -233,6 +233,14 @@ var config = {
     },
     interactionTokenGenerator: {
         permissionKey: dashboardSecurity_config.interaction_token_permision_key
+    },
+    jaeger : {
+        serviceName: 'frontend',
+        agentHost: process.env.DASHBOARD_SERVICE_HOST ? 'localhost' : 'jaeger',
+        agentPort: 6832,
+        logSpans: true,
+        samplerType: 'const',
+        samplerParam: 1
     }
 };
 
