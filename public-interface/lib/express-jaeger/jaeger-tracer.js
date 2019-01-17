@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-var initJaegerTracer = require("jaeger-client").initTracer;
+var initJaegerTracer = require('jaeger-client').initTracer,
+    jaegerConfig = require('./../../config').jaeger,
+    logger = require('./../../lib/logger').init();
 
 var initTracer = function(serviceName) {
     const config = {
-        serviceName: serviceName,
+        serviceName: jaegerConfig.serviceName,
         sampler: {
-            type: "const",
-            param: 1,
+            type: jaegerConfig.samplerType,
+            param: jaegerConfig.samplerParam,
         },
         reporter: {
-            logSpans: true,
-            agentHost: "jaeger",
-            agentPort: 6832
+            logSpans: jaegerConfig.logSpans,
+            agentHost: jaegerConfig.agentHost,
+            agentPort: jaegerConfig.agentPort,
         },
     };
     const options = {
         logger: {
             info(msg) {
-                console.log("INFO ", msg);
+                logger.info(msg);
             },
             error(msg) {
-                console.log("ERROR ", msg);
+                logger.error(msg);
             },
         },
     };
