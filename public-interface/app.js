@@ -98,7 +98,7 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     });
 }
 
-appServer.use('/v1', function (req, res, next) {
+appServer.use('/v1', function setUUID (req, res, next) {
     req.headers['x-iotkit-requestid'] = 'api:' + uuid.v4();
     contextProvider.instance().set('requestid', req.headers['x-iotkit-requestid']);
     next();

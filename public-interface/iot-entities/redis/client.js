@@ -18,7 +18,44 @@
 var config = require('../../config'),
     redis = require("redis"),
     logger = require('../../lib/logger').init(),
+    opentracing = require('opentracing'),
+    shimmer = require('shimmer'),
+    tracer = require('../../lib/express-jaeger').tracer,
+    contextProvider = require('../../lib/context-provider').instance(),
     client;
+
+
+// Patch redis client for jaeger support
+var wrapSend = function (original) {
+    return function wrappedSend(commandObj) {
+        var fatherSpan = contextProvider.get('routeSpan');
+        var span = tracer.startSpan('redis-call', { childOf: fatherSpan });
+        span.log({
+            event: 'redis command',
+            command: commandObj.command
+        });
+
+        var originalCb = commandObj.callback;
+        commandObj.callback = function (err, replies) {
+            if (err) {
+                span.log({
+                    event: 'redis command error',
+                    err: err,
+                    message: err.message,
+                    stack: err.stack
+                });
+                span.setTag(opentracing.Tags.ERROR, true);
+            }
+            span.finish();
+            if (originalCb)
+                originalCb(err, replies);
+        }
+
+        original.call(this, commandObj);
+    }
+}
+
+shimmer.wrap(redis.RedisClient.prototype, 'internal_send_command', wrapSend);
 
 exports.redisClient = function () {
     if(client){
@@ -27,7 +64,6 @@ exports.redisClient = function () {
     if (config.redis.port) {
         client = redis.createClient(config.redis.port, config.redis.host, {});
         client.auth(config.redis.password);
-
     } else {
         client = redis.createClient();
     }

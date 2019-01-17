@@ -15,8 +15,9 @@
  */
 'use strict';
 var contextProvider = require('../../../lib/context-provider').instance(),
-    expressJaeger = require('../../../lib/express-jaeger'),
-    tracer = expressJaeger.tracer,
+    opentracing = require('opentracing'),
+    tracer = require('../../../lib/express-jaeger').tracer,
+    shimmer = require('shimmer'),
     Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
     accounts = require('./accounts'),
@@ -59,24 +60,36 @@ var sequelize = new Sequelize(
     getSequelizeOptions()
 );
 
-var origQueryFunc = sequelize.query;
-function patchQuery() {
-    return function(sql, options) {
+// Patch sequelize.query for jaeger support
+var wrapQuery = function (original) {
+    return function wrappedQuery (sql, options) {
         var routeSpan = contextProvider.get('routeSpan');
         var span = tracer.startSpan('postgres-call', { childOf: routeSpan });
-        return origQueryFunc.apply(this, arguments).then(
+        span.log({
+            event: 'postgres query',
+            query: sql
+        });
+        return original.apply(this, arguments).then(
             result => {
                 span.finish();
                 return result;
             },
             err => {
+                span.setTag(opentracing.Tags.ERROR, true);
+                span.log({
+                    event: 'postgres query error',
+                    err: err,
+                    message: err.message,
+                    stack: err.stack
+                })
                 span.finish();
                 throw err;
             }
         );
     }
 }
-sequelize['query'] = patchQuery();
+
+shimmer.wrap(sequelize, 'query', wrapQuery);
 
 var Accounts = new accounts(sequelize, Sequelize);
 var Actuations = new actuations(sequelize, Sequelize);

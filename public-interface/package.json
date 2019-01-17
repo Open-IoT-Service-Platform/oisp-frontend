@@ -51,6 +51,7 @@
     "request": "^2.88.0",
     "sequelize": "^4.41.0",
     "serve-favicon": "^2.3.0",
+    "shimmer": "^1.2.0",
     "socket.io": "*",
     "underscore": "^1.9.1",
     "websocket": "^1.0.14",

@@ -1,4 +1,21 @@
+/**
+ * Copyright (c) 2019 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var contextProvider = require('../../lib/context-provider').instance(),
+    shimmer = require('shimmer'),
     express = require('express'),
     tracer = require('./jaeger-tracer');
 
@@ -11,13 +28,14 @@ var startRequest = function(req, res, next) {
     });
     const middlewareSpan = tracer.startSpan('middleware', { childOf: span });
     const routeSpan = tracer.startSpan(req.path, { childOf: span });
-    routeSpan.setTag(req.method);
+    routeSpan.setTag('METHOD', req.method);
     contextProvider.set('middlewareSpan', middlewareSpan);
     contextProvider.set('routeSpan', routeSpan);
     res.on('finish', function() {
         span.log({
             event: 'request finish'
         });
+        const routeSpan = contextProvider.get('routeSpan');
         middlewareSpan.finish();
         routeSpan.finish();
         span.finish();
@@ -25,18 +43,11 @@ var startRequest = function(req, res, next) {
     next();
 }
 
-// Override Express Server's register methods
-
-var useOriginal = express.application.use,
-    getOriginal = express.application.get,
-    putOriginal = express.application.put,
-    postOriginal = express.application.post,
-    deleteOriginal = express.application.delete,
-    allOriginal = express.application.all;
-
 express.application['startTracing'] = function() {
-    useOriginal.apply(this, ['/', startRequest]);
-    contextRegistered = true;
+    if (!contextRegistered) {
+        this.use('/', startRequest);
+        contextRegistered = true;
+    }
 };
 
 var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName) {
@@ -52,7 +63,7 @@ var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName)
                     const span = tracer.startSpan(name, {
                         childOf: parentSpan
                     });
-                    span.setTag(method.toUpperCase());
+                    span.setTag('METHOD', method.toUpperCase());
                     service(req, res, next);
                     span.finish();
                 };
@@ -62,29 +73,27 @@ var patchMiddlewares = function(middlewares, startIndex, method, parentSpanName)
     }
 }
 
-var forkedRegister = function(original, method, parentSpanName) {
-    return function() {
-        if (contextRegistered) {
-            var path = typeof arguments[0] === "string" ? arguments[0] : '/';
-            var start = typeof arguments[0] === "string" ? 1 : 0;
-            patchMiddlewares(arguments, start, method, parentSpanName);
-            original.apply(this, arguments);
-        } else {
-            original.apply(this, arguments);
-        }
-    }
+var forkedRegister = function(method, parentSpanName) {
+    return function(original) {
+        return function() {
+            if (contextRegistered) {
+                var path = typeof arguments[0] === "string" ? arguments[0] : '/';
+                var start = typeof arguments[0] === "string" ? 1 : 0;
+                patchMiddlewares(arguments, start, method, parentSpanName);
+                original.apply(this, arguments);
+            } else {
+                original.apply(this, arguments);
+            }
+        };
+    };
 }
 
-express.application['use'] = forkedRegister(useOriginal, 'use', 'middlewareSpan');
-
-express.application['get'] = forkedRegister(getOriginal, 'get', 'routeSpan');
-
-express.application['put'] = forkedRegister(putOriginal, 'put', 'routeSpan');
-
-express.application['post'] = forkedRegister(postOriginal, 'post', 'routeSpan');
-
-express.application['delete'] = forkedRegister(deleteOriginal, 'delete', 'routeSpan');
-
-express.application['all'] = forkedRegister(allOriginal, 'all', 'routeSpan');
+// Override Express Server's register functions
+shimmer.wrap(express.application, 'use', forkedRegister('use', 'middlewareSpan'));
+shimmer.wrap(express.application, 'get', forkedRegister('get', 'routeSpan'));
+shimmer.wrap(express.application, 'put', forkedRegister('put', 'routeSpan'));
+shimmer.wrap(express.application, 'post', forkedRegister('post', 'routeSpan'));
+shimmer.wrap(express.application, 'delete', forkedRegister('delete', 'routeSpan'));
+shimmer.wrap(express.application, 'all', forkedRegister('all', 'routeSpan'));
 
 module.exports = express;
