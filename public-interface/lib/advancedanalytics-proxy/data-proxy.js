@@ -24,6 +24,7 @@ var MQTTConnector = require('./../../lib/mqtt'),
     logger = require('../logger').init(),
     contextProvider = require('./../context-provider').instance(),
     tracer = require('./../express-jaeger').tracer,
+    spanContext = require('./../express-jaeger').spanContext,
     errBuilder  = require("../errorHandler").errBuilder,
     Metric = require('./Metric.data').init(util),
     responses = require('./utils/responses');
@@ -66,8 +67,8 @@ var buildICFALMessage = function(data) {
 };
 
 var createSpan = function(name) {
-    const routeSpan = contextProvider.get('routeSpan');
-    const span = tracer.startSpan(name, { childOf: routeSpan });
+    const fatherSpan = contextProvider.get(spanContext.parent);
+    const span = tracer.startSpan(name, { childOf: fatherSpan.span });
     return span;
 }
 
@@ -198,9 +199,9 @@ module.exports = function(config) {
         logger.debug("data-proxy. dataInquiry, options: " + JSON.stringify(options));
 
         request(options, function (err, res) {
-            try {
-                span.finish();
+            span.finish();
 
+            try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
                     logger.debug("data-proxy. dataInquiry, Got Response from AA API: " + res.body);
                     callback(null, JSON.parse(res.body));
@@ -256,9 +257,9 @@ module.exports = function(config) {
         logger.debug("data-proxy. dataInquiryAdvanced, options: " + JSON.stringify(options));
 
         request(options, function(err, res){
-            try {
-                span.finish();
+            span.finish();
 
+            try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
                     logger.debug("data-proxy. dataInquiryAdvanced, Got Response from AA API: " + JSON.stringify(res.body));
                     callback(null, JSON.parse(res.body));

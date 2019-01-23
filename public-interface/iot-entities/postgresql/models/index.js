@@ -17,6 +17,7 @@
 var contextProvider = require('../../../lib/context-provider').instance(),
     opentracing = require('opentracing'),
     tracer = require('../../../lib/express-jaeger').tracer,
+    spanContext = require('../../../lib/express-jaeger').spanContext,
     shimmer = require('shimmer'),
     Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
@@ -63,8 +64,11 @@ var sequelize = new Sequelize(
 // Patch sequelize.query for jaeger support
 var wrapQuery = function (original) {
     return function wrappedQuery (sql, options) {
-        var routeSpan = contextProvider.get('routeSpan');
-        var span = tracer.startSpan('postgres-call', { childOf: routeSpan });
+        var fatherSpan = contextProvider.get(spanContext.parent);
+        // Track if request coming from express
+        if (!fatherSpan)
+            fatherSpan = {};
+        var span = tracer.startSpan('postgres-call', { childOf: fatherSpan.span });
         span.log({
             event: 'postgres query',
             query: sql

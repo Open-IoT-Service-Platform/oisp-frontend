@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-var express = require('./traced-express'),
+var express = require('./traced-express').express,
+    spanContext = require('./traced-express').spanContext,
     tracer = require('./jaeger-tracer');
 
 module.exports = {
     express: express,
     tracer: tracer,
+    spanContext: spanContext
 };

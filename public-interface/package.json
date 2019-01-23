@@ -34,6 +34,7 @@
     "jaeger-client": "^3.13.0",
     "jsjws": "^5.0.2",
     "kafka-node": "^3.0.1",
+    "methods": "^1.1.2",
     "moment": ">=2.5.1",
     "mqtt": "^2.18.8",
     "node-uuid": "^1.4.1",
