@@ -21,6 +21,7 @@ var config = require('../../config'),
     opentracing = require('opentracing'),
     shimmer = require('shimmer'),
     tracer = require('../../lib/express-jaeger').tracer,
+    spanContext = require('../../lib/express-jaeger').spanContext,
     contextProvider = require('../../lib/context-provider').instance(),
     client;
 
@@ -28,8 +29,11 @@ var config = require('../../config'),
 // Patch redis client for jaeger support
 var wrapSend = function (original) {
     return function wrappedSend(commandObj) {
-        var fatherSpan = contextProvider.get('routeSpan');
-        var span = tracer.startSpan('redis-call', { childOf: fatherSpan });
+        var fatherSpan = contextProvider.get(spanContext.parent);
+        // Track if request coming from express
+        if (!fatherSpan)
+            fatherSpan = {};
+        var span = tracer.startSpan('redis-call', { childOf: fatherSpan.span });
         span.log({
             event: 'redis command',
             command: commandObj.command
