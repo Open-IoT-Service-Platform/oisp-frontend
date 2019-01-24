@@ -21,6 +21,7 @@ var contextProvider = require('../../../lib/context-provider').instance(),
     shimmer = require('shimmer'),
     Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
+    jaegerConfig = require('../../../config').jaeger,
     accounts = require('./accounts'),
     settings = require('./settings'),
     userAccounts = require('./userAccounts'),
@@ -93,7 +94,9 @@ var wrapQuery = function (original) {
     }
 }
 
-shimmer.wrap(sequelize, 'query', wrapQuery);
+if (jaegerConfig.tracing) {
+    shimmer.wrap(sequelize, 'query', wrapQuery);
+}
 
 var Accounts = new accounts(sequelize, Sequelize);
 var Actuations = new actuations(sequelize, Sequelize);

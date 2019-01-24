@@ -50,7 +50,7 @@ var getOISPConfig = (function () {
 	resolveConfig(frontendConfig);
 
 	return function(configName) {
-			if (!frontendConfig[configName])
+			if (!frontendConfig[configName] && frontendConfig[configName] !== false)
 				return {};
 			else {
 				console.log(configName + " is set to: " + JSON.stringify(frontendConfig[configName]));
@@ -70,6 +70,7 @@ var postgres_config = getOISPConfig("postgresConfig"),
 	gateway_config = getOISPConfig("gatewayConfig"),
 	dashboardSecurity_config = getOISPConfig("dashboardSecurityConfig")
 	kafka_config = getOISPConfig("kafkaConfig"),
+	jaeger_enabled = getOISPConfig("jaegerTracing"),
     winston = require('winston');
 
 var config = {
@@ -239,8 +240,9 @@ var config = {
         agentHost: process.env.DASHBOARD_SERVICE_HOST ? 'localhost' : 'jaeger',
         agentPort: 6832,
         logSpans: true,
-        samplerType: 'const',
-        samplerParam: 1
+        samplerType: 'probabilistic',
+        samplerParam: 0.1,
+		tracing: jaeger_enabled
     }
 };
 

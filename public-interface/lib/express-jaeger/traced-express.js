@@ -19,6 +19,7 @@ var contextProvider = require('./../../lib/context-provider').instance(),
     express = require('express'),
     opentracing = require('opentracing'),
     tracer = require('./jaeger-tracer'),
+    jaegerConfig = require('./../../config').jaeger,
     methods = require('methods').concat('use', 'route', 'param', 'all');
 
 const spanContext = {
@@ -54,26 +55,35 @@ var startRequest = function(req, res, next) {
     contextProvider.set(spanContext.root, rootSpan);
     contextProvider.set(spanContext.parent, parentSpan);
 
-    res.on('finish', function() {
+    // res.end is always called after message is done
+    const originalEnd = res.end;
+    res.end = function(...args) {
+        res.end = originalEnd;
+        const returned = res.end.call(this, ...args);
+
         const lastActive = contextProvider.get(spanContext.active);
         if (lastActive) {
             lastActive.finish();
-            contextProvider.set(spanContext.active);
+            contextProvider.set(spanContext.active, null);
         }
         const lastParent = contextProvider.get(spanContext.parent);
-        lastParent.span.finish();
+        if (lastParent) {
+            lastParent.span.finish();
+            contextProvider.set(spanContext.parent, null);
+        }
         contextProvider.set(spanContext.parent, null);
         rootSpan.log({ event: 'request finish' });
         rootSpan.setTag(opentracing.Tags.HTTP_STATUS_CODE, res.statusCode);
         if (res.statusCode >= 400)
             rootSpan.setTag(opentracing.Tags.ERROR, true);
         rootSpan.finish();
-    });
-    next();
+    }
+
+    return next();
 }
 
 express.application['startTracing'] = function() {
-    if (!contextRegistered) {
+    if (!contextRegistered && jaegerConfig.tracing) {
         this.use('/', startRequest);
         contextRegistered = true;
     }
@@ -95,8 +105,7 @@ var patchMiddlewares = function(middlewares, startIndex, method) {
                     var parentSpan = contextProvider.get(spanContext.parent);
                     if (!parentSpan) {
                         // untracked middlewares after request gets handled
-                        service(req,res, next);
-                        return;
+                        return service(req,res, next);
                     }
                     // check if middlewares our routes have ended
                     var index = middlewareMethods.indexOf(method);
@@ -120,7 +129,7 @@ var patchMiddlewares = function(middlewares, startIndex, method) {
                     });
                     span.setTag('METHOD', method.toUpperCase());
                     contextProvider.set(spanContext.active, span);
-                    service(req, res, next);
+                    return service(req, res, next);
                 };
             };
             middlewares[i] = spanTransform(funcToCall, serviceName);
@@ -143,10 +152,12 @@ var wrapRegister = function(method) {
     };
 }
 
-// Override Express Server's register functions
-methods.forEach((method) => {
-    shimmer.wrap(express.application, method, wrapRegister(method));
-});
+if (jaegerConfig.tracing) {
+    // Override Express Server's register functions
+    methods.forEach((method) => {
+        shimmer.wrap(express.application, method, wrapRegister(method));
+    });
+}
 
 module.exports = {
     express: express,
