@@ -16,6 +16,7 @@
 
 'use strict';
 var config = require('../../config'),
+    jaegerConfig = config.jaeger,
     redis = require("redis"),
     logger = require('../../lib/logger').init(),
     opentracing = require('opentracing'),
@@ -59,7 +60,9 @@ var wrapSend = function (original) {
     }
 }
 
-shimmer.wrap(redis.RedisClient.prototype, 'internal_send_command', wrapSend);
+if (jaegerConfig.tracing) {
+    shimmer.wrap(redis.RedisClient.prototype, 'internal_send_command', wrapSend);
+}
 
 exports.redisClient = function () {
     if(client){

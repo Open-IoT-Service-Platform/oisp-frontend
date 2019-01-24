@@ -25,6 +25,8 @@ var MQTTConnector = require('./../../lib/mqtt'),
     contextProvider = require('./../context-provider').instance(),
     tracer = require('./../express-jaeger').tracer,
     spanContext = require('./../express-jaeger').spanContext,
+    opentracing = require('opentracing'),
+    jaegerConfig = require('./../../config').jaeger,
     errBuilder  = require("../errorHandler").errBuilder,
     Metric = require('./Metric.data').init(util),
     responses = require('./utils/responses');
@@ -67,9 +69,24 @@ var buildICFALMessage = function(data) {
 };
 
 var createSpan = function(name) {
-    const fatherSpan = contextProvider.get(spanContext.parent);
+    if (!jaegerConfig.tracing)
+        return null;
+    var fatherSpan = contextProvider.get(spanContext.parent);
+    if (!fatherSpan) {
+        // something is wrong
+        logger.warn('Span must be dropped due to no father is present');
+        rootSpan = contextProvider.get(spanContext.root);
+        if (rootSpan)
+            rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
+        return null;
+    }
     const span = tracer.startSpan(name, { childOf: fatherSpan.span });
     return span;
+}
+
+var finishSpan = function(span) {
+    if (span)
+        span.finish();
 }
 
 module.exports = function(config) {
@@ -107,7 +124,7 @@ module.exports = function(config) {
          */
         connector.publish(options.topic, options.message);
 
-        span.finish();
+        finishSpan(span);
 
         callback(null);
     };
@@ -130,7 +147,7 @@ module.exports = function(config) {
         };
         logger.debug("Calling proxy to submit data");
         request(options, function(err, res) {
-            span.finish();
+            finishSpan(span);
 
             logger.debug("END Calling proxy to submit data");
             if (!err) {
@@ -161,7 +178,7 @@ module.exports = function(config) {
                     messages: message
                 }
             ], function (err, data) {
-                span.finish();
+                finishSpan(span);
 
                 if (err) {
                     logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(err));
@@ -172,7 +189,7 @@ module.exports = function(config) {
                 }
             });
         } catch(exception) {
-            span.finish();
+            finishSpan(span);
 
             logger.error("Exception occured when forwarding observation to Kafka: " + exception);
             callback(errBuilder.build(errBuilder.Errors.Data.SubmissionError));
@@ -199,7 +216,7 @@ module.exports = function(config) {
         logger.debug("data-proxy. dataInquiry, options: " + JSON.stringify(options));
 
         request(options, function (err, res) {
-            span.finish();
+            finishSpan(span);
 
             try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
@@ -257,7 +274,7 @@ module.exports = function(config) {
         logger.debug("data-proxy. dataInquiryAdvanced, options: " + JSON.stringify(options));
 
         request(options, function(err, res){
-            span.finish();
+            finishSpan(span);
 
             try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
@@ -308,7 +325,7 @@ module.exports = function(config) {
         logger.debug("data-proxy. report, options: " + JSON.stringify(options));
 
         request(options, function (err, res) {
-            span.finish();
+            finishSpan(span);
 
             if (!err && (res.statusCode === responses.Success.OK)) {
                 logger.debug("data-proxy. report, Got Response from AA API: " + JSON.stringify(res.body));
@@ -352,7 +369,7 @@ module.exports = function(config) {
         logger.debug("data-proxy. getFirstAndLastMeasurement, options: " + JSON.stringify(options));
 
         request(options, function (err, res) {
-            span.finish();
+            finishSpan(span);
 
             if (!err && res.statusCode === responses.Success.OK) {
                 logger.debug("data-proxy. getFirstAndLastMeasurement, Got Response from AA API: " + JSON.stringify(res.body));
