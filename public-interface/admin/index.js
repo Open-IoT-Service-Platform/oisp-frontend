@@ -22,6 +22,7 @@
 var addUser = require('./addUser');
 var removeTestUser = require('./removeTestUser');
 var ResetDB = require('./resetDB');
+var CreateDB = require('./createDB');
 var command = process.argv[2];
 
 switch (command) {
@@ -39,6 +40,10 @@ switch (command) {
             console.log("Database reset");
         });
         break;
+    case 'createDB':
+       var databaseCreater = new CreateDB();
+       databaseCreater.create();
+       break;
     default:
         console.log ("Command : ", command , " not supported ");
 }
