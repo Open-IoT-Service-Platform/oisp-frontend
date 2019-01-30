@@ -73,6 +73,34 @@ var postgres_config = getOISPConfig("postgresConfig"),
 	jaeger_enabled = getOISPConfig("jaegerTracing"),
     winston = require('winston');
 
+// Get replica information from the postgres config,
+// Done this way to avoid compatibility problems with other services
+var	postgresReadReplicas = [],
+	postgresWriteConf = {};
+
+if (postgres_config.readReplicas) {
+	postgresReadReplicas = postgres_config.readReplicas;
+} else if (postgres_config.readHostname) {
+	postgresReadReplicas.push({
+		host: postgres_config.readHostname,
+		port: postgres_config.readPort,
+		username: postgres_config.readUsername,
+		password: postgres_config.readPassword
+	});
+} else {
+	// Use default db config as read
+	postgresReadReplicas.push({});
+}
+
+if (postgres_config.writeHostname) {
+	postgresWriteConf = {
+		host: postgres_config.writeHostname,
+		port: postgres_config.writePort,
+		username: postgres_config.writeUsername,
+		password: postgres_config.writePassword,
+	};
+}
+
 var config = {
     api: {
         forceSSL: true,
@@ -139,6 +167,10 @@ var config = {
             host: postgres_config.hostname,
             port: postgres_config.port,
             dialect: 'postgres',
+			replication: {
+				read: postgresReadReplicas,
+				write: postgresWriteConf
+			},
             pool: {
                 max: 12,
                 min: 0,
