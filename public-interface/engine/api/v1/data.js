@@ -42,9 +42,9 @@ exports.collectData = function(options, resultCallback) {
     // Needed checks:
     // For user and device:
     // 1a) Device does not have components => Component.NotFound
-    // 1b) Component not fitting to the device => Component.NotFound
-    // 1c) Only Some of the Components fitting to device or dataType does not fit to value
-    //     => PartiallyDataProcessed
+    // 1b) dataType does not fit to value => InvalidData
+    // 1c) Component not fitting to the device => Component.NotFound
+    // 1d) Only Some of the Components fitting to device => PartiallyDataProcessed
     // For device only:
     // 2a) Device not sending with own ID => Not.Authorized
     // For user only:
@@ -56,11 +56,11 @@ exports.collectData = function(options, resultCallback) {
             // If token is not a device token, check account/device relationship
             // For a device token, this is part of the token info
             function preCheck(type) {
-                if (type === secConfig.tokenTypes.user) { //3a
+                if (type === secConfig.tokenTypes.user) { //Case 3a
                     return Devices.belongsToAccount(deviceId, accountId)
                         .catch(() => Promise.reject(errBuilder.build(
                             errBuilder.Errors.Generic.NotAuthorized)))
-                } else if (identity !== deviceId) { // case 2a
+                } else if (identity !== deviceId) { //Case 2a
                     return Promise.reject()
                         .catch(() => Promise.reject(errBuilder.build(
                             errBuilder.Errors.Generic.NotAuthorized)))
@@ -69,6 +69,7 @@ exports.collectData = function(options, resultCallback) {
             }
             preCheck(options.type)
                 .then((test) => {
+                    var err;
                     var foundComponents = [];
                     var filteredData = data.data.filter(item => {
                         var cmp = filteredComponents.find(cmp => cmp.cid === item.componentId);
@@ -80,10 +81,16 @@ exports.collectData = function(options, resultCallback) {
                             item.dataType = cmp.componentType.dataType;
                             return true;
                         } else {
+                            err = errBuilder.build(
+                                errBuilder.Errors.Data.InvalidData,
+                                "Invalid data value(" + item.value + ") for the component("
+                                    + cmp.cid + ") with type: " + cmp.componentType.dataType);
                             return false;
                         }
                     });
-                    if (foundComponents.length > 0) { //Case 1b
+                    if (err) { //Case 1b
+                        resultCallback(err);
+                    } else if (foundComponents.length > 0) { //Case 1c
                         // this message get to this point by REST API, we need to forward it to MQTT channel for future consumption
                         data.domainId = accountId;
                         data.gatewayId = identity;
@@ -98,7 +105,7 @@ exports.collectData = function(options, resultCallback) {
                         logger.debug("Data to Send: " + JSON.stringify(data));
                         submitData(data, function(err) {
                             if (!err) {
-                                if (foundComponents.length !== dataLength) {
+                                if (foundComponents.length !== dataLength) { //Case 1d
                                     err = errBuilder.build(
                                         errBuilder.Errors.Data.PartialDataProcessed,
                                         "Only the following components could be sent: " + JSON.stringify(foundComponents));
@@ -107,7 +114,7 @@ exports.collectData = function(options, resultCallback) {
                             resultCallback(err);
                         });
 
-                    } else { //1b
+                    } else { //1c
                         // None of the components is registered for the device
                         resultCallback(errBuilder.build(errBuilder.Errors.Device.Component.NotFound));
                     }

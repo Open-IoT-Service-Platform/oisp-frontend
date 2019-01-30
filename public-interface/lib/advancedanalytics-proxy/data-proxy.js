@@ -75,7 +75,7 @@ var createSpan = function(name) {
     if (!fatherSpan) {
         // something is wrong
         logger.warn('Span must be dropped due to no father is present');
-        rootSpan = contextProvider.get(spanContext.root);
+        var rootSpan = contextProvider.get(spanContext.root);
         if (rootSpan)
             rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
         return null;

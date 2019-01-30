@@ -20,7 +20,7 @@
 var validator = function(dataType, value) {
 
     var numberValidator = function(value) {
-        if (value.match(/^[-]?[0-9]+\.?[0-9]*$/)) {
+        if (value.match(/[-+]?(\d*\.?\d+|\d+\.?\d*)([eE][-+]?\d+)?$/)) {
             return true;
         }
         return false;
