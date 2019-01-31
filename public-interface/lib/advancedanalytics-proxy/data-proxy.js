@@ -22,7 +22,7 @@ var MQTTConnector = require('./../../lib/mqtt'),
     request = require('request'),
     util = require('../dateUtil'),
     logger = require('../logger').init(),
-    contextProvider = require('./../context-provider').instance(),
+    contextProvider = require('./../context-provider'),
     tracer = require('./../express-jaeger').tracer,
     spanContext = require('./../express-jaeger').spanContext,
     opentracing = require('opentracing'),
@@ -69,13 +69,14 @@ var buildICFALMessage = function(data) {
 };
 
 var createSpan = function(name) {
+    const context = contextProvider.instance();
     if (!jaegerConfig.tracing)
         return null;
-    var fatherSpan = contextProvider.get(spanContext.parent);
+    var fatherSpan = context.get(spanContext.parent);
     if (!fatherSpan) {
         // something is wrong
         logger.warn('Span must be dropped due to no father is present');
-        var rootSpan = contextProvider.get(spanContext.root);
+        var rootSpan = context.get(spanContext.root);
         if (rootSpan)
             rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
         return null;
@@ -130,6 +131,7 @@ module.exports = function(config) {
     };
 
     this.submitDataREST = function(data, callback) {
+        const context = contextProvider.instance();
         const span = createSpan('submitDataRest');
 
         var dataMetric = new Metric();
@@ -140,7 +142,7 @@ module.exports = function(config) {
             method: 'POST',
 
             headers: {
-                'x-iotkit-requestid': contextProvider.get('requestid'),
+                'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(message)
@@ -197,6 +199,7 @@ module.exports = function(config) {
     };
 
     this.dataInquiry = function(data, callback){
+        const context = contextProvider.instance();
         const span = createSpan('dataInquiry');
 
         var dataInquiryMessage = buildDIMessage(data);
@@ -208,7 +211,7 @@ module.exports = function(config) {
             url: config.url + '/v1/accounts/' + data.domainId + '/dataInquiry',
             method: 'POST',
             headers: {
-                'x-iotkit-requestid': contextProvider.get('requestid'),
+                'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(dataInquiryMessage)
@@ -255,6 +258,7 @@ module.exports = function(config) {
     };
 
     this.dataInquiryAdvanced = function(data, callback) {
+        const context = contextProvider.instance();
         const span = createSpan('dataInquiryAdvanced');
 
         var accountId = data.accountId;
@@ -266,7 +270,7 @@ module.exports = function(config) {
             url: config.url + '/v1/accounts/' + accountId + '/dataInquiry/advanced',
             method: 'POST',
             headers: {
-                'x-iotkit-requestid': contextProvider.get('requestid'),
+                'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(advancedDataInquiryMessage)
@@ -306,6 +310,7 @@ module.exports = function(config) {
     };
 
     this.report = function(data, callback) {
+        const context = contextProvider.instance();
         const span = createSpan('dataReport');
 
         var domainId = data.domainId;
@@ -317,7 +322,7 @@ module.exports = function(config) {
             url: config.url + '/v1/accounts/' + domainId + '/report',
             method: 'POST',
             headers: {
-                'x-iotkit-requestid': contextProvider.get('requestid'),
+                'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(aggregatedReportMessage)
@@ -350,6 +355,7 @@ module.exports = function(config) {
     };
 
     this.getFirstAndLastMeasurement = function(data, callback) {
+        const context = contextProvider.instance();
         span.createSpan('getFirstAndLastMeasurement');
 
         var domainId = data.domainId;
@@ -361,7 +367,7 @@ module.exports = function(config) {
             url: config.url + '/v1/accounts/' + domainId + '/inquiryComponentFirstAndLast',
             method: 'POST',
             headers: {
-                'x-iotkit-requestid': contextProvider.get('requestid'),
+                'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(inquiryComponentFirstAndLastMessage)
