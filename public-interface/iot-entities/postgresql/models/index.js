@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 'use strict';
-var contextProvider = require('../../../lib/context-provider').instance(),
+var contextProvider = require('../../../lib/context-provider'),
     opentracing = require('opentracing'),
     tracer = require('../../../lib/express-jaeger').tracer,
     spanContext = require('../../../lib/express-jaeger').spanContext,
@@ -65,7 +65,8 @@ var sequelize = new Sequelize(
 // Patch sequelize.query for jaeger support
 var wrapQuery = function (original) {
     return function wrappedQuery (sql, options) {
-        var fatherSpan = contextProvider.get(spanContext.parent);
+        const context = contextProvider.instance();
+        var fatherSpan = context.get(spanContext.parent);
         // Track if request coming from express
         if (!fatherSpan)
             fatherSpan = {};
