@@ -97,6 +97,7 @@ exports.collectData = function(options, resultCallback) {
                         data.deviceId = deviceId;
                         data.systemOn = Date.now();
                         data.data = filteredData;
+                        data.hasBinary = options.hasBinary;
                         var submitData = proxy.submitDataKafka;
                         if (config.drsProxy.ingestion === 'REST') {
                             submitData = proxy.submitDataREST;
@@ -209,10 +210,10 @@ exports.search = function(accountId, searchRequest, resultCallback) {
                     delete searchRequest.targetFilter;
                     logger.debug("search Request: " + JSON.stringify(searchRequest));
                     if (Object.keys(componentsWithDataType).length > 0) {
-                        proxy.dataInquiry(searchRequest, function(err, result) {
+                        proxy.dataInquiry(searchRequest, function(err, result, isBinary) {
                             if (!err) {
                                 var response = new DataInquiryResponse(result, deviceLookUp, searchRequest.queryMeasureLocation);
-                                resultCallback(null, response);
+                                resultCallback(null, response, isBinary);
                             } else if (result) {
                                 resultCallback(err, result);
                             } else {
@@ -303,9 +304,9 @@ exports.searchAdvanced = function (accountId, searchRequest, resultCallback) {
             delete searchRequest.componentIds;
             delete searchRequest.devCompAttributeFilter;
 
-            proxy.dataInquiryAdvanced(searchRequest, function (err, result) {
+            proxy.dataInquiryAdvanced(searchRequest, function (err, result, isBinary) {
                 if (!err) {
-                    resultCallback(null, result);
+                    resultCallback(null, result, isBinary);
                 } else if (result) {
                     resultCallback(err, result);
                 } else {

@@ -22,6 +22,7 @@
   "dependencies": {
     "async": "*",
     "body-parser": "^1.13.1",
+    "cbor": "^4.1.5",
     "compression": "^1.5.0",
     "continuation-local-storage": "^3.2.1",
     "ejs": "^2.5.5",
