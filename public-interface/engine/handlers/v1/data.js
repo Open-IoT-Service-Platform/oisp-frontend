@@ -18,6 +18,7 @@
 var data = require('../../api/v1/data'),
     errBuilder = require('../../../lib/errorHandler/index').errBuilder,
     httpStatuses = require('../../res/httpStatuses');
+const cbor = require('cbor');
 
 exports.usage = function(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -33,6 +34,16 @@ exports.collectData = function (req, res, next) {
         identity: req.identity,
         type: req.tokenInfo.payload.type
     };
+
+    // copy binaryValues back to body.data
+    options.hasBinary = false;
+    if (req.binaryValues !== undefined) {
+        req.binaryValues.forEach((item) => {
+            req.body.data[item.index].bValue = item.value;
+        });
+        delete req.binaryValues;
+        options.hasBinary = true;
+    }
 
     data.collectData(options, function(err) {
         if (!err) {
@@ -97,8 +108,14 @@ exports.searchData = function(req, res, next) {
             });
             break;
         default:
-            data.search(req.params.accountId, searchRequest, function(err, results) {
+            data.search(req.params.accountId, searchRequest, function(err, results, isBinary) {
                 if (!err) {
+                    if (isBinary) {
+                        res.setHeader('Content-Type', 'application/cbor');
+                        results = cbor.encode(results);
+                    } else {
+                        res.setHeader('Content-Type', 'application/json');
+                    }
                     res.status(httpStatuses.OK.code).send(results);
                 } else if (err in httpStatuses) {
                     if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
@@ -153,8 +170,14 @@ exports.aggregatedReport = function(req, res, next) {
 exports.searchDataAdvanced = function(req, res, next) {
     var searchRequest = req.body;
 
-    data.searchAdvanced(req.params.accountId, searchRequest, function(err, results) {
+    data.searchAdvanced(req.params.accountId, searchRequest, function(err, results, isBinary) {
         if (!err) {
+            if (isBinary) {
+                res.setHeader('Content-Type', 'application/cbor');
+                results = cbor.encode(results);
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+            }
             res.status(httpStatuses.OK.code).send(results);
         } else if (err in httpStatuses) {
             if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {

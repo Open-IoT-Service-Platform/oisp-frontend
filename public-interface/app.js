@@ -40,6 +40,7 @@ var http = require('http'),
     systemUsers = require('./lib/dp-users/systemUsers'),
     forceSSL = require('express-force-ssl'),
     heartBeat = require('./lib/heartbeat');
+    const cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
     appServer = express(),
@@ -73,7 +74,9 @@ if (config.api.forceSSL) {
 appServer.use('/ui/public', express.static('dashboard/public'));
 
 appServer.use(httpHeadersInjector.forwardedHeaders);
-appServer.use(bodyParser.json({limit: config.api.bodySizeLimit}));
+appServer.use(bodyParser.raw({limit: config.api.bodySizeLimit, type: "application/cbor"}));
+appServer.use(cbor.parseCborBody);
+appServer.use(bodyParser.json({limit: config.api.bodySizeLimit, type: "application/json"}));
 appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeLimit}));
 appServer.use(XSS());
 

@@ -41,6 +41,9 @@ Metric.prototype.dataAsRoot = function (value) {
     if (value.attributes) {
         dataTemporal.attributes = value.attributes;
     }
+    if (value.dataType === "ByteArray" && value.bValue !== undefined) {
+        dataTemporal.bValue = value.bValue;
+    }
     this.data.push(dataTemporal);
 };
 Metric.prototype.dataAsArray = function (msg) {

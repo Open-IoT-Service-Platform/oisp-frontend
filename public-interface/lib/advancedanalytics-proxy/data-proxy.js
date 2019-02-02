@@ -30,6 +30,7 @@ var MQTTConnector = require('./../../lib/mqtt'),
     errBuilder  = require("../errorHandler").errBuilder,
     Metric = require('./Metric.data').init(util),
     responses = require('./utils/responses');
+const cbor = require('cbor');
 
 var buildDIMessage = function(data) {
     var times = util.extractFromAndTo(data);
@@ -137,15 +138,24 @@ module.exports = function(config) {
         var dataMetric = new Metric();
         var message = dataMetric.prepareDataIngestionMsg(data);
 
+        var body;
+        var contentType;
+        if (data.hasBinary) {
+            body = cbor.encode(message);
+            contentType = "application/cbor";
+        } else {
+            body = JSON.stringify(message);
+            contentType = "application/json";
+        }
         var options = {
             url: config.dataUrl + '/v1/accounts/' + data.domainId + '/dataSubmission',
             method: 'POST',
 
             headers: {
                 'x-iotkit-requestid': context.get('requestid'),
-                'Content-Type': 'application/json'
+                'Content-Type': contentType
             },
-            body: JSON.stringify(message)
+            body: body
         };
         logger.debug("Calling proxy to submit data");
         request(options, function(err, res) {
@@ -214,17 +224,24 @@ module.exports = function(config) {
                 'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(dataInquiryMessage)
+            body: JSON.stringify(dataInquiryMessage),
+            encoding: null
         };
         logger.debug("data-proxy. dataInquiry, options: " + JSON.stringify(options));
 
         request(options, function (err, res) {
             finishSpan(span);
-
+            var isBinary = (res.headers["content-type"] === "application/cbor");
             try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
-                    logger.debug("data-proxy. dataInquiry, Got Response from AA API: " + res.body);
-                    callback(null, JSON.parse(res.body));
+                    var returnedBody = null;
+                    if (isBinary) {
+                        returnedBody = cbor.decode(res.body);
+
+                    } else {
+                        returnedBody = JSON.parse(res.body.toString());
+                    }
+                    callback(null, returnedBody, isBinary);
                 } else if (!err && (res.statusCode === responses.Success.NoContent)) {
                     logger.warn("data-proxy. dataInquiry, Got No-content Response from AA API");
                     callback(null, {"components": []});
@@ -240,7 +257,7 @@ module.exports = function(config) {
                     callback({message: 'error receiving data'});
                 }
             } catch (e) {
-                logger.error("data-proxy. dataInquiry, Could not parse AA response " + res.body + " as JSON.");
+                logger.error("data-proxy. dataInquiry, Could not parse AA response " + e);
                 callback({message: 'Could not parse AA response'});
             }
         });
@@ -273,6 +290,7 @@ module.exports = function(config) {
                 'x-iotkit-requestid': context.get('requestid'),
                 'Content-Type': 'application/json'
             },
+            encoding: null,
             body: JSON.stringify(advancedDataInquiryMessage)
         };
         logger.debug("data-proxy. dataInquiryAdvanced, options: " + JSON.stringify(options));
@@ -283,7 +301,15 @@ module.exports = function(config) {
             try {
                 if (!err && (res.statusCode === responses.Success.OK)) {
                     logger.debug("data-proxy. dataInquiryAdvanced, Got Response from AA API: " + JSON.stringify(res.body));
-                    callback(null, JSON.parse(res.body));
+                    var isBinary = (res.headers["content-type"] === "application/cbor");
+
+                    var returnedBody = null;
+                    if (isBinary) {
+                        returnedBody = cbor.decode(res.body);
+                    } else {
+                        returnedBody = JSON.parse(res.body.toString());
+                    }
+                    callback(null, returnedBody, isBinary);
                 } else if (!err && (res.statusCode === responses.Errors.BadRequest)) {
                     logger.warn("data-proxy. dataInquiryAdvanced, Got Bad Request Response from AA API : " + res.body);
                     var message = prepareErrorMessage(res);
@@ -306,6 +332,7 @@ module.exports = function(config) {
                 logger.error("data-proxy. dataInquiryAdvanced, Could not parse AA response " + res.body + " as JSON.");
                 callback({message: 'Could not parse AA response'});
             }
+
         });
     };
 
