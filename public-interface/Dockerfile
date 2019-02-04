@@ -14,4 +14,7 @@ ADD . /app
 ENV TERM xterm
 RUN node_modules/grunt-cli/bin/grunt build-api
 
+RUN adduser -D nodeuser
+USER nodeuser
+
 EXPOSE 4001
