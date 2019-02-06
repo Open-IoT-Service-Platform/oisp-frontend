@@ -39,6 +39,11 @@ ResetDB.prototype.reset = function(cb){
 	.then(function() {
         return systemUsers.create();
 	})
+	.catch(err => {
+		console.error('Can not reset postgres DB');
+		console.error(err);
+		process.exit(1);
+	})
 	.finally(function() {
 		models.sequelize.close();
 		tracer.close();
