@@ -16,15 +16,23 @@
 
 'use strict';
 var ProfileModalInstanceCtrl = function($scope,
-                                 $modalInstance,
-                                 usersService,
-                                 flash,
-                                 $timeout,
-                                 $window) {
-
+    $modalInstance,
+    usersService,
+    flash,
+    $timeout,
+    $window) {
 
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
+    };
+
+    var parseError = function (data) {
+        var userCannotBeRemovedError = 2421;
+        if (data && data.code === userCannotBeRemovedError) {
+            flash.to('alert-1').error = $scope.i18n.auth.delete_user_only_admin_error;
+        } else {
+            flash.to('alert-1').error = $scope.i18n.auth.delete_user_error;
+        }
     };
 
     $scope.deleteUser = function () {
@@ -39,22 +47,13 @@ var ProfileModalInstanceCtrl = function($scope,
             parseError(data);
         });
     };
-
-    var parseError = function (data) {
-        var userCannotBeRemovedError = 2421;
-        if (data && data.code === userCannotBeRemovedError) {
-            flash.to('alert-1').error = $scope.i18n.auth.delete_user_only_admin_error;
-        } else {
-            flash.to('alert-1').error = $scope.i18n.auth.delete_user_error;
-        }
-    };
 };
 
 iotController.controller('profileCtrl', function($scope,
-                                                 $window,
-                                                 usersService,
-                                                 loginService,
-                                                 $modal) {
+    $window,
+    usersService,
+    loginService,
+    $modal) {
 
     // If the user is already logged in, redirect
     loginService.currentUser(

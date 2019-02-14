@@ -51,24 +51,28 @@ exports.collectData = function(options, resultCallback) {
     // 3a) Device does not belong to one of the accounts of the user => NotAuthorized
     //
     Component.findComponentsAndTypesForDevice(deviceId, function(errGetComponents, filteredComponents) {
-        if (!errGetComponents && filteredComponents
-            && filteredComponents.length > 0) { //Case 1a
+        if (!errGetComponents && filteredComponents && filteredComponents.length > 0) { //Case 1a
             // If token is not a device token, check account/device relationship
             // For a device token, this is part of the token info
-            function preCheck(type) {
+            var preCheck = function(type) {
                 if (type === secConfig.tokenTypes.user) { //Case 3a
                     return Devices.belongsToAccount(deviceId, accountId)
                         .catch(() => Promise.reject(errBuilder.build(
-                            errBuilder.Errors.Generic.NotAuthorized)))
+                            errBuilder.Errors.Generic.NotAuthorized)));
                 } else if (identity !== deviceId) { //Case 2a
                     return Promise.reject()
                         .catch(() => Promise.reject(errBuilder.build(
-                            errBuilder.Errors.Generic.NotAuthorized)))
+                            errBuilder.Errors.Generic.NotAuthorized)));
                 }
-                else return Promise.resolve("test")
-            }
+                else {
+                    return Promise.resolve("test");
+                }
+            };
+
             preCheck(options.type)
+                /*jshint -W098 */
                 .then((test) => {
+                /*jshint +W098 */
                     var err;
                     var foundComponents = [];
                     var filteredData = data.data.filter(item => {
@@ -83,8 +87,8 @@ exports.collectData = function(options, resultCallback) {
                         } else {
                             err = errBuilder.build(
                                 errBuilder.Errors.Data.InvalidData,
-                                "Invalid data value(" + item.value + ") for the component("
-                                    + cmp.cid + ") with type: " + cmp.componentType.dataType);
+                                "Invalid data value(" + item.value + ") for the component(" +
+                                    cmp.cid + ") with type: " + cmp.componentType.dataType);
                             return false;
                         }
                     });

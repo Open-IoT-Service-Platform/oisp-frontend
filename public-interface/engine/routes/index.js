@@ -46,12 +46,12 @@ var routes =  {
 };
 
 module.exports = {
-        cors: cors,
-        routes: routes,
-        register : function(app) {
-            Object.keys(routes).forEach(function (key) {
-                var route = routes[key];
-                route.register(app);
-            });
-        }
+    cors: cors,
+    routes: routes,
+    register : function(app) {
+        Object.keys(routes).forEach(function (key) {
+            var route = routes[key];
+            route.register(app);
+        });
+    }
 };

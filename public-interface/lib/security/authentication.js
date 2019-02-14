@@ -17,10 +17,10 @@
 'use strict';
 var express = require('../express-jaeger').express,
     passport = require('passport'),
-    _localStrategy = require('passport-local').Strategy,
-    _facebookStrategy = require('passport-facebook').Strategy,
-    _googleStrategy = require('passport-google-oauth').OAuth2Strategy,
-    _githubStrategy = require('passport-github').Strategy,
+    LocalStrategy = require('passport-local').Strategy,
+    FacebookStrategy = require('passport-facebook').Strategy,
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy,
+    GithubStrategy = require('passport-github').Strategy,
     https = require('https'),
     user = require('../../engine/api/v1/users'),
     authorization = require('./authorization'),
@@ -71,7 +71,7 @@ var verifyUser = function (username, password, emailVerificationRequired, done) 
                                     .finally(function () {
                                         done(null, false);
                                     });
-                                    done(null, false);
+                                done(null, false);
                             });
                     });
             });
@@ -101,78 +101,78 @@ var handleCallback = function (email, provider, done) {
 
 var configureFacebookStrategy = function (config) {
     if (socialLoginProvider.isFacebookAvailable()) {
-        var strategy = new _facebookStrategy({
-                clientID: config.facebook.clientID,
-                clientSecret: config.facebook.clientSecret,
-                callbackURL: config.facebook.callbackURL
-            },
+        var strategy = new FacebookStrategy({
+            clientID: config.facebook.clientID,
+            clientSecret: config.facebook.clientSecret,
+            callbackURL: config.facebook.callbackURL
+        },
 
-            // handle facebook callback
-            function (token, refreshToken, profile, done) {
-                handleCallback(profile.emails[0].value, 'Facebook', done);
-            });
+        // handle facebook callback
+        function (token, refreshToken, profile, done) {
+            handleCallback(profile.emails[0].value, 'Facebook', done);
+        });
         passport.use(strategy);
     }
 };
 
 var configureGoogleStrategy = function (config) {
     if (socialLoginProvider.isGoogleAvailable()) {
-        var strategy =  new _googleStrategy({
-                clientID: config.google.clientID,
-                clientSecret: config.google.clientSecret,
-                callbackURL: config.google.callbackURL
-            },
+        var strategy =  new GoogleStrategy({
+            clientID: config.google.clientID,
+            clientSecret: config.google.clientSecret,
+            callbackURL: config.google.callbackURL
+        },
 
-            // handle google callback
-            function (accessToken, refreshToken, profile, done) {
-                handleCallback(profile.emails[0].value, 'Google', done);
-            });
+        // handle google callback
+        function (accessToken, refreshToken, profile, done) {
+            handleCallback(profile.emails[0].value, 'Google', done);
+        });
         passport.use(strategy);
     }
 };
 
 var configureGithubStrategy = function (config) {
     if (socialLoginProvider.isGithubAvailable()) {
-        var strategy = new _githubStrategy({
-                clientID: config.github.clientID,
-                clientSecret: config.github.clientSecret,
-                callbackURL: config.github.callbackURL
-            },
+        var strategy = new GithubStrategy({
+            clientID: config.github.clientID,
+            clientSecret: config.github.clientSecret,
+            callbackURL: config.github.callbackURL
+        },
 
-            // handle github callback
-            function (accessToken, refreshToken, profile, done) {
-                //pasport-github doesn't include user email on the profile, we need to get it
-                var options = {
-                    hostname: 'api.github.com',
-                    path: '/user/emails',
-                    method: 'GET',
-                    headers: {
-                        'User-Agent': 'nodejs',
-                        Authorization: 'token ' + accessToken
-                    }
-                };
-                https.get(options, function (res) {
-                    if (res.statusCode === 200) {
-                        var data = '';
-                        res.on('data', function (chunk) {
-                            data += chunk;
-                        }).on('end', function () {
-                            var emails = JSON.parse(data);
-                            handleCallback(emails[0].email, 'Github', done);
-                        });
-                    } else {
-                        done(res.statusText);
-                    }
-                })
-                    .on('error', function (e) {
-                        done(e);
+        // handle github callback
+        function (accessToken, refreshToken, profile, done) {
+            //pasport-github doesn't include user email on the profile, we need to get it
+            var options = {
+                hostname: 'api.github.com',
+                path: '/user/emails',
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'nodejs',
+                    Authorization: 'token ' + accessToken
+                }
+            };
+            https.get(options, function (res) {
+                if (res.statusCode === 200) {
+                    var data = '';
+                    res.on('data', function (chunk) {
+                        data += chunk;
+                    }).on('end', function () {
+                        var emails = JSON.parse(data);
+                        handleCallback(emails[0].email, 'Github', done);
                     });
-            });
+                } else {
+                    done(res.statusText);
+                }
+            })
+                .on('error', function (e) {
+                    done(e);
+                });
+        });
         passport.use(strategy);
     }
 };
 
-var localStrategy = new _localStrategy(
+var localStrategy = new LocalStrategy(
     function (username, password, done) {
         verifyUser(username, password, true, done);
     }

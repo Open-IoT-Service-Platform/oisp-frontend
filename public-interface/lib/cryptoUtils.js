@@ -21,15 +21,15 @@ var crypto = require('crypto'),
 
 module.exports = {
     hash: function(password, salt) {
-            // salt is passed in by verify to hash a password using a previously stored salt
-            salt = salt || crypto.randomBytes(32).toString('base64');
-            var hashed = crypto.pbkdf2Sync(password, salt, 20000, 32,'sha1').toString('base64');
-            // store the method, algorithm, iterations and keylength with the hashed password
-            // this allows for backward compatibility when we implemented new hashing schemes
-            // salt is stored in a separate column
-            return {salt: salt,
-                    password: "pbkdf2::SHA1::20000::32:" + hashed
-                    };
+        // salt is passed in by verify to hash a password using a previously stored salt
+        salt = salt || crypto.randomBytes(32).toString('base64');
+        var hashed = crypto.pbkdf2Sync(password, salt, 20000, 32,'sha1').toString('base64');
+        // store the method, algorithm, iterations and keylength with the hashed password
+        // this allows for backward compatibility when we implemented new hashing schemes
+        // salt is stored in a separate column
+        return {salt: salt,
+            password: "pbkdf2::SHA1::20000::32:" + hashed
+        };
     },
     hashData: function(data){
         var hash = crypto.createHash('sha1');
@@ -44,9 +44,9 @@ module.exports = {
         var aCode = null;
         try {
             aCode = crypto.randomBytes(length)
-                            .toString('base64')
-                            .replace(/(\+)*(=)*(\/)*/g,'')
-                            .substring(0, length);
+                .toString('base64')
+                .replace(/(\+)*(=)*(\/)*/g,'')
+                .substring(0, length);
             logger.debug('Generated ' + length + ' bytes of random data.');
         } catch (ex) {
             logger.error('Have not enough entropy to generate act Code ' + ex);

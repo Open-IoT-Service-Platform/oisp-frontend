@@ -45,7 +45,7 @@ exports.getActivationCode = function (domId, resultCallback) {
 var generateGlobalActivationCode = function(accId, resultCallback) {
     account.refreshActivationCode(accId, function(err, account){ // find by public id
         if (!err && account) {
-             resultCallback(null, {id: account.activation_code, expire: account.activation_code_expire_date});
+            resultCallback(null, {id: account.activation_code, expire: account.activation_code_expire_date});
         } else {
             logger.error("Not Possible to refresh Auth Code " + JSON.stringify(err));
             resultCallback(errBuilder.build(errBuilder.Errors.Account.SavingError));

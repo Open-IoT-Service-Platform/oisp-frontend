@@ -19,58 +19,58 @@ var settingTypes = ['global', 'dashboard', 'favorite'];
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('settings', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4
-            },
-            userId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            type: {
-                type: DataTypes.ENUM(settingTypes),
-                allowNull: false,
-                validate: {
-                    isIn: [settingTypes]
-                }
-            },
-            accountId: {
-                type: DataTypes.UUID
-            },
-            public: {
-                type: DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            },
-            default: {
-                type: DataTypes.BOOLEAN,
-                defaultValue: false
-            },
-            name: {
-                type: DataTypes.STRING(255)
-            },
-            value: {
-                type: DataTypes.JSON,
-                allowNull: false
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
+        },
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        type: {
+            type: DataTypes.ENUM(settingTypes),
+            allowNull: false,
+            validate: {
+                isIn: [settingTypes]
             }
-
-        }, {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'settings_user_index',
-                    method: 'BTREE',
-                    fields: ['userId']
-                },
-                {
-                    name: 'settings_account_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                }
-            ],
-            schema: 'dashboard'
+        },
+        accountId: {
+            type: DataTypes.UUID
+        },
+        public: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        default: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        name: {
+            type: DataTypes.STRING(255)
+        },
+        value: {
+            type: DataTypes.JSON,
+            allowNull: false
         }
+
+    }, {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'settings_user_index',
+                method: 'BTREE',
+                fields: ['userId']
+            },
+            {
+                name: 'settings_account_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            }
+        ],
+        schema: 'dashboard'
+    }
     );
 };

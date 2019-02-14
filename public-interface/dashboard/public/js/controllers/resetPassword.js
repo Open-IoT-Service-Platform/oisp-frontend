@@ -19,11 +19,11 @@
 /* global getServicesConfig */
 
 iotController.controller('ResetPasswordCtrl', function($scope,
-                                               $rootScope,
-                                               $window,
-                                               $routeParams,
-                                               usersService,
-                                               loginService) {
+    $rootScope,
+    $window,
+    $routeParams,
+    usersService,
+    loginService) {
 
     $scope.invalidPassword = false;
     // If the user is already logged in, redirect

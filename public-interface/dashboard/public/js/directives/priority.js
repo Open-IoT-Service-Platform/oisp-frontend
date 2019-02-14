@@ -18,10 +18,10 @@
 iotDirectives.directive('priorityLevel', function(){
     return {
         scope : {
-                 title:'@',
-                 model:'&',
-                 values: '='
-                },
+            title:'@',
+            model:'&',
+            values: '='
+        },
         restrict: "E",
         templateUrl: 'public/partials/directives/periodSelector.html',
         transclude: true

@@ -228,16 +228,16 @@ exports.getAlerts = function (params, resultCallback) {
 
 exports.deleteAlerts = function (params, resultCallback) {
 
-        Alert.deleteAlerts(params.accountId, params.status, function (err, result) {
-            resultCallback(err, result);
-        });
+    Alert.deleteAlerts(params.accountId, params.status, function (err, result) {
+        resultCallback(err, result);
+    });
 };
 
 exports.deleteAlert = function (params, resultCallback) {
 
-        Alert.deleteByExternalId(params.accountId, params.alertId, function (err, result) {
-            resultCallback(err, result);
-        });
+    Alert.deleteByExternalId(params.accountId, params.alertId, function (err, result) {
+        resultCallback(err, result);
+    });
 };
 
 exports.getAlert = function (params, resultCallback) {

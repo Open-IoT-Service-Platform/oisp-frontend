@@ -16,11 +16,11 @@
 
 'use strict';
 iotController.controller('termsAndConditionsCtrl', function($scope,
-                                               $rootScope,
-                                               $window,
-                                               $routeParams,
-                                               usersService,
-                                               loginService) {
+    $rootScope,
+    $window,
+    $routeParams,
+    usersService,
+    loginService) {
 
     $scope.termsAndConditions = function(){
         $('#termsAndConditionModal').appendTo("body");

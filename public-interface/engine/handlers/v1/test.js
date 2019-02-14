@@ -26,7 +26,7 @@ var users = require('../../api/v1/users'),
     recaptcha = require('../../../lib/security/recaptcha');
 
 var isTestAccount = function (email) {
-  return recaptcha.checkIfTestEmail(email);
+    return recaptcha.checkIfTestEmail(email);
 };
 
 var isSecretKeyValid = function (secretKey) {

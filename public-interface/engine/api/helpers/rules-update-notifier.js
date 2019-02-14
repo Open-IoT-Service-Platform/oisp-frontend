@@ -33,7 +33,7 @@ var send = function() {
             ], function (err) {
                 if (err) {
                     logger.error("Error when sending rules-update message to Kafka: " + JSON.stringify(err));
-                } 
+                }
             });
         } catch(exception) {
             logger.error("Exception occured when sending rules-update message to Kafka: " + exception);
@@ -45,10 +45,10 @@ var send = function() {
                     if ( noSyncRules && noSyncRules.length > 0 ){
                         send();
                     }
-                })
-        }, 1000)
+                });
+        }, 1000);
     }
-}
+};
 
 exports.notify = function () {
     if ( syncCheckTimer != null ) {
@@ -73,15 +73,17 @@ exports.notify = function () {
         }
 
         kafkaProducer.on('ready', function() {
+            /*jshint -W098 */
             kafkaProducer.createTopics([config.drsProxy.kafka.topicsRuleEngine], false, function (err, data) {
                 if (!err) {
-                    send()
+                    send();
                 }
                 else {
-                    console.log("Cannot create "+config.drsProxy.kafka.topicsRuleEngine + " topic "+err)
+                    console.log("Cannot create "+config.drsProxy.kafka.topicsRuleEngine + " topic "+err);
                 }
             });
-        })
+            /*jshint +W098 */
+        });
     }
     else {
         send();

@@ -20,8 +20,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     users = postgresProvider.users,
     mailer = require('../../../lib/mailer'),
     errBuilder = require("../../../lib/errorHandler/index").errBuilder,
-    logger = require('../../../lib/logger').init(),
-    Q = require('q');
+    logger = require('../../../lib/logger').init();
 
 exports.getInvites = function (accountId, resultCallback) {
     invites.all(accountId, resultCallback);
@@ -145,7 +144,7 @@ exports.updateInviteStatus = function (inviteId, accept, userId, resultCallback)
                                         throw errBuilder.Errors.Invite.DeleteError;
                                     });
                             }
-                    });
+                        });
                 })
                 .then(function (invite) {
                     return postgresProvider.commit(transaction)

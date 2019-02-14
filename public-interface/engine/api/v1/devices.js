@@ -372,34 +372,34 @@ exports.addComponents = function(deviceId, components, accountId) {
     types = Object.keys(types);
 
     return postgresProvider.startTransaction()
-            .then(function(transaction) {
-                return Device.addComponents(components, deviceId, accountId, transaction)
-                    .then (function (updatedDevice) {
-                        if (!deviceManager.isDeviceActive(updatedDevice)) {
-                            throw errBuilder.Errors.Device.Component.DeviceNotActive;
-                        }
-                    })
-                    .then(function() {
-                        return postgresProvider.commit(transaction)
-                            .then(function() {
-                                var response = components;
-                                if (!arrayReceived) {
-                                    response = components[0];
-                                }
-                                return Q.resolve(response);
-                            });
-                    })
-                    .catch(function(err) {
-                        logger.warn("devices.addComponents - unable to add component for device: " + deviceId + "error: " + JSON.stringify(err));
-                        return postgresProvider.rollback(transaction)
-                            .then(function(){
-                                var errMsg = errBuilder.Errors.Device.Component.AddingError;
-                                if (err && err.code) {
-                                    errMsg = errBuilder.build(err);
-                                }
-                                throw errMsg;
-                            });
-                    });
+        .then(function(transaction) {
+            return Device.addComponents(components, deviceId, accountId, transaction)
+                .then (function (updatedDevice) {
+                    if (!deviceManager.isDeviceActive(updatedDevice)) {
+                        throw errBuilder.Errors.Device.Component.DeviceNotActive;
+                    }
+                })
+                .then(function() {
+                    return postgresProvider.commit(transaction)
+                        .then(function() {
+                            var response = components;
+                            if (!arrayReceived) {
+                                response = components[0];
+                            }
+                            return Q.resolve(response);
+                        });
+                })
+                .catch(function(err) {
+                    logger.warn("devices.addComponents - unable to add component for device: " + deviceId + "error: " + JSON.stringify(err));
+                    return postgresProvider.rollback(transaction)
+                        .then(function(){
+                            var errMsg = errBuilder.Errors.Device.Component.AddingError;
+                            if (err && err.code) {
+                                errMsg = errBuilder.build(err);
+                            }
+                            throw errMsg;
+                        });
+                });
         });
 };
 

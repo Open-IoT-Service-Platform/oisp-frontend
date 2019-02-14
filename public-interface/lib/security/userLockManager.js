@@ -40,12 +40,12 @@ var increaseLoginLockPeriod = function (email, period, loginFails) {
     return Q.Promise(function (resolve, reject) {
         userLocks.increaseLoginLockPeriod(email, period, loginFails, maxUnsuccessfulLoginAttempts,
             function increaseResult(err) {
-            if (!err) {
-                resolve();
-            } else {
-                reject(err || 'Error during modify login lock period');
-            }
-        });
+                if (!err) {
+                    resolve();
+                } else {
+                    reject(err || 'Error during modify login lock period');
+                }
+            });
     });
 };
 

@@ -19,40 +19,40 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('commands', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4,
-                allowNull: false
-            },
-            complexCommandId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            componentId: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            transport: {
-                type: DataTypes.ENUM('mqtt', 'ws'),
-                allowNull: false
-            },
-            parameters: {
-                type: DataTypes.JSON,
-                allowNull: false
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4,
+            allowNull: false
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'commands_componentId_index',
-                    method: 'BTREE',
-                    fields: ['componentId']
-                }
-            ],
-            schema: 'dashboard'
+        complexCommandId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        componentId: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        transport: {
+            type: DataTypes.ENUM('mqtt', 'ws'),
+            allowNull: false
+        },
+        parameters: {
+            type: DataTypes.JSON,
+            allowNull: false
         }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'commands_componentId_index',
+                method: 'BTREE',
+                fields: ['componentId']
+            }
+        ],
+        schema: 'dashboard'
+    }
     );
 };

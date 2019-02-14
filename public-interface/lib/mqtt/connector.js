@@ -65,14 +65,14 @@ function Broker(conf, logger) {
     me.connect = function (done) {
         var retries = 0;
         try {
-           if ((me.client instanceof mqtt.MqttClient) === false) {
-               if (me.secure === false) {
-                   me.logger.info("Non Secure Connection to "+ me.host + ":" + me.port);
-                   me.client = mqtt.createClient(me.port, me.host, me.credential);
-               } else {
-                   me.logger.info("Trying with Secure Connection to" + me.host + ":" + me.port);
-                   me.logger.debug("with " + JSON.stringify(me.credential));
-                   me.client = mqtt.createSecureClient(me.port, me.host, me.credential);
+            if ((me.client instanceof mqtt.MqttClient) === false) {
+                if (me.secure === false) {
+                    me.logger.info("Non Secure Connection to "+ me.host + ":" + me.port);
+                    me.client = mqtt.createClient(me.port, me.host, me.credential);
+                } else {
+                    me.logger.info("Trying with Secure Connection to" + me.host + ":" + me.port);
+                    me.logger.debug("with " + JSON.stringify(me.credential));
+                    me.client = mqtt.createSecureClient(me.port, me.host, me.credential);
                 }
             }
         } catch(e) {
@@ -109,16 +109,16 @@ function Broker(conf, logger) {
     };
     me.attach = function (topic, handler) {
         me.messageHandler.push({"t": topic,
-                                "h": handler});
+            "h": handler});
     };
     function tryPattern(pattern, text) {
         var a = new RegExp(pattern);
         return a.test(text);
     }
     me.dettach = function (topic) {
-       me.messageHandler = me.messageHandler.filter(function (obj) {
-                                                    return !tryPattern(obj.t, topic);
-                            });
+        me.messageHandler = me.messageHandler.filter(function (obj) {
+            return !tryPattern(obj.t, topic);
+        });
     };
     me.onMessage = function (topic, message) {
         var i,
@@ -148,9 +148,9 @@ function Broker(conf, logger) {
                 var topicAsPattern = granted[0].topic.replace(/\+/g, "[^<>]*");
                 me.logger.debug("grant " + topicAsPattern);
                 me.attach(topicAsPattern, handler);
-               if (toCallBack) {
+                if (toCallBack) {
                     toCallBack();
-               }
+                }
             });
         }
         if (!me.connected()) {
@@ -204,7 +204,7 @@ function Broker(conf, logger) {
                     me.logger.error(err);
                     if (callback) {
                         callback(err);
-                     }
+                    }
                 }
             });
         } else {

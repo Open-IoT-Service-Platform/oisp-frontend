@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var {Pool, Client} = require('pg'),
+var {Client} = require('pg'),
     config = require('../config'),
     tracer = require('../lib/express-jaeger').tracer,
     models = require('../iot-entities/postgresql/models'),
@@ -32,33 +32,33 @@ CreateDB.prototype.create = function(){
     });
     const query = {text: 'CREATE DATABASE ' +
                          config.postgres.database + ';'
-                  }
+    };
     client.connect()
         .then(function() {
             console.log("Connected to postgres");
             return client.query(query);
         })
-	.then(() => {
+        .then(() => {
 	    return models.initSchema();
-	})
-	.then(function() {
+        })
+        .then(function() {
             return systemUsers.create();
-	})
+        })
     	.then(function() {
             return models.sequelize.close();
-	})
-	.then(() => {
+        })
+        .then(() => {
 	    return tracer.close();
-	})
-	.then(() => {
+        })
+        .then(() => {
 	    console.log('Database created succesfully');
 	    return client.end();
-	})
+        })
         .catch(err => {
             console.error('Can not create postgres DB');
             console.error(err);
             process.exit(1);
         });
-}
+};
 
 module.exports = CreateDB;

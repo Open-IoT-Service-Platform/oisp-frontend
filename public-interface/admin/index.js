@@ -20,30 +20,30 @@
 "use strict";
 
 var addUser = require('./addUser');
-var removeTestUser = require('./removeTestUser');
+var RemoveTestUser = require('./removeTestUser');
 var ResetDB = require('./resetDB');
 var CreateDB = require('./createDB');
 var command = process.argv[2];
 
 switch (command) {
-    case 'addUser':
-        var arg = process.argv.slice(3);
-        addUser.apply(null, arg);
-        break;
-    case 'removeTestUser':
-        var removeTestUserCommand = new removeTestUser();
-        removeTestUserCommand.remove();
-        break;
-    case 'resetDB':
-        var databaseResetter = new ResetDB();
-        databaseResetter.reset(function(){
-            console.log("Database reset");
-        });
-        break;
-    case 'createDB':
-       var databaseCreater = new CreateDB();
-       databaseCreater.create();
-       break;
-    default:
-        console.log ("Command : ", command , " not supported ");
+case 'addUser':
+    var arg = process.argv.slice(3);
+    addUser.apply(null, arg);
+    break;
+case 'removeTestUser':
+    var removeTestUserCommand = new RemoveTestUser();
+    removeTestUserCommand.remove();
+    break;
+case 'resetDB':
+    var databaseResetter = new ResetDB();
+    databaseResetter.reset(function(){
+        console.log("Database reset");
+    });
+    break;
+case 'createDB':
+    var databaseCreater = new CreateDB();
+    databaseCreater.create();
+    break;
+default:
+    console.log ("Command : ", command , " not supported ");
 }

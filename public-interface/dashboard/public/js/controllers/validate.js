@@ -16,11 +16,11 @@
 
 'use strict';
 iotController.controller('ValidateUserCtrl', function($scope,
-                                                      $rootScope,
-                                                      $window,
-                                                      $routeParams,
-                                                      $timeout,
-                                                      usersService) {
+    $rootScope,
+    $window,
+    $routeParams,
+    $timeout,
+    usersService) {
 
     $scope.cancel = function(){
         if($scope.currentUser){

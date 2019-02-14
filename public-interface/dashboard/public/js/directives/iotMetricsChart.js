@@ -182,7 +182,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
         };
 
         function computeRawDataForSeries(series){
-            if(series == null) return;
+            if(series == null) {return;}
 
             scope[attributes.rawData].length = 0;
 
@@ -200,7 +200,147 @@ iotApp.directive('iotMetricsChart', function(componentsService){
 
                     scope[attributes.rawData].push(data);
                 });
-            })
+            });
+        }
+
+        var mGraph = {
+            preview:  {},
+            hoverDetail: {},
+            legend: {},
+            order: {},
+            highlighter:{},
+            xAxis:{},
+            yAxis:{}
+        };
+
+        function rickshawChart() {
+            $("#chartElement").empty();
+            $("#preview").empty();
+            $(".y_axis").empty();
+            $(attributes.legendSelector).empty();
+
+            if(!chartSeries ||
+                chartSeries.length <= 0 ||
+                !chartHeight ||
+                !renderType){
+                return;
+            }
+
+            Rickshaw.namespace('Rickshaw.Graph.Renderer.UnstackedArea');
+            Rickshaw.Graph.Renderer.UnstackedArea = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Area, {
+                name: 'unstackedarea',
+                defaults: function($super) {
+                    return Rickshaw.extend($super(), {
+                        unstack: true,
+                        fill: false,
+                        stroke: false
+                    });
+                }
+            } );
+
+            var axisWidth = scope["scales"].length * 55;
+            var chartWidth = angular.element(".chart-display").parent().width() - axisWidth - 50;
+
+            angular.element(".chart-y-axis").css("width", axisWidth);
+            angular.element(".chart-display").css("width", chartWidth);
+
+            mGraph.main = new Rickshaw.Graph( {
+                element: angular.element("#chartElement")[0],
+                height: 500, //chartHeight ,
+                renderer: renderType,
+                interpolation: 'linear',
+                series: chartSeries,
+                min: 'auto'
+            } );
+
+            if(attributes.showPreview){
+                mGraph.preview = new Rickshaw.Graph.RangeSlider.Preview( {
+                    graph: mGraph.main,
+                    element: angular.element("#preview")[0],
+                    renderer: renderType,
+                    height: 50
+                });
+            }
+
+            var defaultFormatter = function(n) {
+                return n;
+            };
+
+            mGraph.hoverDetail = new Rickshaw.Graph.HoverDetail( {
+                graph:  mGraph.main,
+                hideXLegend: true,
+                formatter: function(series, x, y) {
+                    var rawDateStr = new Date(x *1000).toString();
+                    var date = rawDateStr.replace("GMT","");
+                    var timezoneStrPos = date.indexOf("(");
+                    date = '<span class="date">' + date.slice(0, timezoneStrPos-1) +'</span>';
+
+                    var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
+
+                    var formatter = series.yFormatter || defaultFormatter;
+                    return swatch + "value: " + formatter(y) + '<br>' + date;
+                }
+            });
+
+            mGraph.legend = new Rickshaw.Graph.Legend( {
+                graph: mGraph.main,
+                element: legend
+
+            } );
+
+            mGraph.shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+                graph:  mGraph.main,
+                legend:  mGraph.legend
+            } );
+
+            mGraph.order = new Rickshaw.Graph.Behavior.Series.Order( {
+                graph: mGraph.main,
+                legend: mGraph.legend
+            } );
+
+            mGraph.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight( {
+                graph: mGraph.main,
+                legend: mGraph.legend
+            } );
+
+            mGraph.xAxis = new Rickshaw.Graph.Axis.Time( {
+                graph: mGraph.main,
+                timeFixture: new Rickshaw.Fixtures.Time()
+            } );
+
+            mGraph.xAxis.render();
+
+
+            setTimeout(function () {
+                if(scope["scales"] && angular.isArray(scope["scales"])){
+                    var grid = true;
+                    scope["scales"].forEach(function(scale){
+                        mGraph.yAxis = new Rickshaw.Graph.Axis.Y.Scaled( {
+                            element: angular.element('[id="' + scale.unit + '"]')[0],
+                            orientation: 'left',
+                            graph: mGraph.main,
+                            scale : scale.scale,
+                            axisText: scale.unit,
+                            axisColor: scale.color.yAxis,
+                            ticks: 10,
+                            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                            grid: grid
+                        });
+
+                        mGraph.yAxis.render();
+                        grid=false;
+                    });
+                    var order = 0;
+                    scope["scales"].forEach(function(scale){
+                        angular.element('[id="' + scale.unit + '"]')[0].style.right = ((order * 55)) + 'px';
+                        order ++;
+                    });
+                }
+
+            }, 200);
+
+            mGraph.main.configure({renderer: renderType});
+            mGraph.main.render();
         }
 
         function renderChart(data){
@@ -223,7 +363,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                 }
                 //generate chart data
 
-                computeRawDataForSeries(data.series)
+                computeRawDataForSeries(data.series);
 
                 var dataFrom = parseInt(data.from);
                 var dataTo = parseInt(data.to);
@@ -371,7 +511,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
 
                     /* Disabling the fake series being pushed to series.
                        This fixes the bug of real time graph.
-                       Keep the code until the use of fakeSeries is discovered. 
+                       Keep the code until the use of fakeSeries is discovered.
                      */
                     // series.push(fakeSeries);
                     chartSeries = series;
@@ -379,147 +519,6 @@ iotApp.directive('iotMetricsChart', function(componentsService){
 
                 rickshawChart();
             });
-        }
-
-        var mGraph = {
-            preview:  {},
-            hoverDetail: {},
-            legend: {},
-            order: {},
-            highlighter:{},
-            xAxis:{},
-            yAxis:{}
-
-        };
-
-        function rickshawChart (){
-            $("#chartElement").empty();
-            $("#preview").empty();
-            $(".y_axis").empty();
-            $(attributes.legendSelector).empty();
-
-            if(!chartSeries ||
-                chartSeries.length <= 0 ||
-                !chartHeight ||
-                !renderType){
-                return;
-            }
-
-            Rickshaw.namespace('Rickshaw.Graph.Renderer.UnstackedArea');
-            Rickshaw.Graph.Renderer.UnstackedArea = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Area, {
-                name: 'unstackedarea',
-                defaults: function($super) {
-                    return Rickshaw.extend($super(), {
-                        unstack: true,
-                        fill: false,
-                        stroke: false
-                    });
-                }
-            } );
-
-            var axisWidth = scope["scales"].length * 55;
-            var chartWidth = angular.element(".chart-display").parent().width() - axisWidth - 50;
-
-            angular.element(".chart-y-axis").css("width", axisWidth);
-            angular.element(".chart-display").css("width", chartWidth);
-
-            mGraph.main = new Rickshaw.Graph( {
-                element: angular.element("#chartElement")[0],
-                height: 500, //chartHeight ,
-                renderer: renderType,
-                interpolation: 'linear',
-                series: chartSeries,
-                min: 'auto'
-            } );
-
-            if(attributes.showPreview){
-                mGraph.preview = new Rickshaw.Graph.RangeSlider.Preview( {
-                    graph: mGraph.main,
-                    element: angular.element("#preview")[0],
-                    renderer: renderType,
-                    height: 50
-                });
-            }
-
-            var defaultFormatter = function(n) {
-                return n;
-            };
-            
-            mGraph.hoverDetail = new Rickshaw.Graph.HoverDetail( {
-                graph:  mGraph.main,
-                hideXLegend: true,
-                formatter: function(series, x, y) {
-                    var rawDateStr = new Date(x *1000).toString();
-                    var date = rawDateStr.replace("GMT","");
-                    var timezoneStrPos = date.indexOf("(");
-                    date = '<span class="date">' + date.slice(0, timezoneStrPos-1) +'</span>';
-
-                    var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-
-                    var formatter = series.yFormatter || defaultFormatter;
-                    return swatch + "value: " + formatter(y) + '<br>' + date;
-                }
-            });
-
-            mGraph.legend = new Rickshaw.Graph.Legend( {
-                graph: mGraph.main,
-                element: legend
-
-            } );
-
-            mGraph.shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
-                graph:  mGraph.main,
-                legend:  mGraph.legend
-            } );
-
-            mGraph.order = new Rickshaw.Graph.Behavior.Series.Order( {
-                graph: mGraph.main,
-                legend: mGraph.legend
-            } );
-
-            mGraph.highlighter = new Rickshaw.Graph.Behavior.Series.Highlight( {
-                graph: mGraph.main,
-                legend: mGraph.legend
-            } );
-
-            mGraph.xAxis = new Rickshaw.Graph.Axis.Time( {
-                graph: mGraph.main,
-                timeFixture: new Rickshaw.Fixtures.Time()
-            } );
-
-            mGraph.xAxis.render();
-
-
-            setTimeout(function () {
-                if(scope["scales"] && angular.isArray(scope["scales"])){
-                    var grid = true;
-                    scope["scales"].forEach(function(scale){
-                        mGraph.yAxis = new Rickshaw.Graph.Axis.Y.Scaled( {
-                            element: angular.element('[id="' + scale.unit + '"]')[0],
-                            orientation: 'left',
-                            graph: mGraph.main,
-                            scale : scale.scale,
-                            axisText: scale.unit,
-                            axisColor: scale.color.yAxis,
-                            ticks: 10,
-                            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
-                            grid: grid
-                        });
-
-                        mGraph.yAxis.render();
-                        grid=false;
-                    });
-                    var order = 0;
-                    scope["scales"].forEach(function(scale){
-                        angular.element('[id="' + scale.unit + '"]')[0].style.right = ((order * 55)) + 'px';
-                        order ++;
-                    });
-                }
-
-            }, 200);
-
-            mGraph.main.configure({renderer: renderType});
-            mGraph.main.render();
         }
 
         scope.refreshChart = function(){
@@ -540,7 +539,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
         });
 
         scope.$watch(attributes.series, function(value){
-            computeRawDataForSeries(value)
+            computeRawDataForSeries(value);
             if(mGraph.main){
                 value.forEach(function(newSerie) {
                     if(newSerie.points.length === 0) {

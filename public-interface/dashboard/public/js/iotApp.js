@@ -20,22 +20,22 @@
 
 // Declare app level module which depends on filters, and services
 var iotApp = angular.module('iotApp', ['iotDirectives',
-                                       'iotServices',
-                                       'iotController',
-                                       'ngRoute',
-                                       'ngI18n',
-                                       'ngTable',
-                                       'ipCookie',
-                                       'snap',
-                                       'angularCharts',
-                                       'ui.bootstrap',
-                                       'bootstrap-tagsinput',
-                                       'ngProgress',
-                                       'mgo-angular-wizard',
-                                       'angular-flash.service',
-                                       'angular-flash.flash-alert-directive',
-                                       'angular-intro',
-                                       'vcRecaptcha'])
+    'iotServices',
+    'iotController',
+    'ngRoute',
+    'ngI18n',
+    'ngTable',
+    'ipCookie',
+    'snap',
+    'angularCharts',
+    'ui.bootstrap',
+    'bootstrap-tagsinput',
+    'ngProgress',
+    'mgo-angular-wizard',
+    'angular-flash.service',
+    'angular-flash.flash-alert-directive',
+    'angular-intro',
+    'vcRecaptcha'])
     .config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
         $routeProvider.when('/board',
             {
@@ -201,11 +201,11 @@ var iotApp = angular.module('iotApp', ['iotDirectives',
     }]);
 
 var iotAppLogin = angular.module('iotAppLogin', ['iotController',
-                                                 'iotServices',
-                                                 'ngI18n',
-                                                 'ngRoute',
-                                                 'vcRecaptcha',
-                                                 'ipCookie'])
+    'iotServices',
+    'ngI18n',
+    'ngRoute',
+    'vcRecaptcha',
+    'ipCookie'])
     .config(['$routeProvider', '$httpProvider', function($routeProvider, $httpProvider) {
         $routeProvider.when('/login',
             {
@@ -301,17 +301,17 @@ var iotAppLogin = angular.module('iotAppLogin', ['iotController',
     }]);
 
 iotAppLogin.value('ngI18nConfig', {
-                    defaultLocale: 'en',
-                    supportedLocales: ['en'],
-                    basePath: 'public/locale',
-                    cache: true
-   });
+    defaultLocale: 'en',
+    supportedLocales: ['en'],
+    basePath: 'public/locale',
+    cache: true
+});
 iotApp.value('ngI18nConfig', {
     defaultLocale: 'en',
     supportedLocales: ['en'],
     basePath: 'public/locale',
     cache: true
-    });
+});
 
 var rawHtmlFilter = ['$sce', function($sce){
     return function(val){

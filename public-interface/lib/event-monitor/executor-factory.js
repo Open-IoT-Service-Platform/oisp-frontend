@@ -21,29 +21,29 @@ var fs = require("fs"),
 
 module.exports = function() {
     return {
-            buildExecutors: function(pathToExecutors, done){
-                var executorCollection = {};
-                logger.info("Reading available providers from: " + pathToExecutors);
-                fs.readdir(pathToExecutors, function (err, files) {
-                    if (err && files) {
-                        logger.info("Executor Factory - an error ocurred: " + JSON.stringify(err));
-                        done();
-                    }
-                    else {
-                        files.forEach(function(file) {
-                            var fname = file.slice(0, file.indexOf(".js"));
-                            var executorType = fname.split("-")[1] || "";
-                            if (executorType) {
-                                var executorClass = require(pathToExecutors + file);
-                                if (executorClass) {
-                                    executorCollection[executorType] = executorClass;
-                                }
+        buildExecutors: function(pathToExecutors, done){
+            var executorCollection = {};
+            logger.info("Reading available providers from: " + pathToExecutors);
+            fs.readdir(pathToExecutors, function (err, files) {
+                if (err && files) {
+                    logger.info("Executor Factory - an error ocurred: " + JSON.stringify(err));
+                    done();
+                }
+                else {
+                    files.forEach(function(file) {
+                        var fname = file.slice(0, file.indexOf(".js"));
+                        var executorType = fname.split("-")[1] || "";
+                        if (executorType) {
+                            var executorClass = require(pathToExecutors + file);
+                            if (executorClass) {
+                                executorCollection[executorType] = executorClass;
                             }
-                        });
-                        done(executorCollection);
-                    }
-                });
-                return executorCollection;
-            }
+                        }
+                    });
+                    done(executorCollection);
+                }
+            });
+            return executorCollection;
+        }
     };
 };

@@ -96,7 +96,7 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
 };
 
 exports.findByDimensionAndAccount = function (dimension, accountId, t) {
-	var query = {
+    var query = {
 	        where: {
 	            $or: [
 	                {

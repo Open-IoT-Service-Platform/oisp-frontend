@@ -145,11 +145,11 @@ var limit = function (req, res, next) {
             return false;
         }
     };
-    
-	// Skip checking if rate limits are disabled
-	if (config.rateLimit == 'limitless') {
-		next();
-	} else if (req.identity) {
+
+    // Skip checking if rate limits are disabled
+    if (config.rateLimit === 'limitless') {
+        next();
+    } else if (req.identity) {
         // If flow passed authorization, correct path should exist on the list
         routesConfig.some(checkRouteConfigRow);
     } else {

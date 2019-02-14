@@ -37,18 +37,18 @@ iotServices.factory('googleCaptchaService', ['$http', function($http) {
                     method: 'GET',
                     url: API_URL
                 })
-                .success(function (data, status) {
-                    if(data.captchaPublicKey) {
-                        googleCaptchaPublicKey = data.captchaPublicKey;
-                    }
-                    googleCaptchaService.loadGoogleCaptcha(function(){
+                    .success(function (data, status) {
+                        if(data.captchaPublicKey) {
+                            googleCaptchaPublicKey = data.captchaPublicKey;
+                        }
+                        googleCaptchaService.loadGoogleCaptcha(function(){
                         // Remote Google Captcha now loaded
 
-                        successCallback(data, status);
+                            successCallback(data, status);
+                        });
+                    }).error(function (data, status) {
+                        errorCallback(data, status);
                     });
-                }).error(function (data, status) {
-                    errorCallback(data, status);
-                });
             } else {
                 successCallback({
                     captchaPublicKey : googleCaptchaPublicKey

@@ -239,7 +239,7 @@ var deviceInterpreter = function (lookUpTable, inverseLookUpTable) {
             });
             entity.attributes = attributesObject;
         } else {
-           entity.attributes = {};
+            entity.attributes = {};
         }
     };
 
@@ -515,7 +515,7 @@ var rulesInterpreter = function (lookUpTable, inverseLookUpTable) {
         },
         toDb: function (entity) {
             if (entity) {
-               createRelations(entity);
+                createRelations(entity);
             }
             return helper.translate(lookUpTable, entity, helper.removeDbId);
         },

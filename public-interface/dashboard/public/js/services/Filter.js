@@ -41,15 +41,15 @@ iotServices.factory('Filter', [function() {
     }
     Filter.prototype = {
         setName: function (name) {
-           if (angular.isArray(name)) {
-              this.devices.name.value = name[0];
-              return;
-           } else if (name){
-               this.devices.name.value = name;
-           }
+            if (angular.isArray(name)) {
+                this.devices.name.value = name[0];
+                return;
+            } else if (name){
+                this.devices.name.value = name;
+            }
         },
         getName: function(){
-          return this.devices.name.value;
+            return this.devices.name.value;
         },
         setTags: function (tags) {
             if (angular.isArray(tags)) {
@@ -57,7 +57,7 @@ iotServices.factory('Filter', [function() {
             }
         },
         getTags: function () {
-           return this.devices.tags.value;
+            return this.devices.tags.value;
         },
         setDeviceId: function (dids) {
             var i,l;
@@ -77,8 +77,8 @@ iotServices.factory('Filter', [function() {
              */
             var me = this;
             var didChosed = Object.keys(me.chart.devices).filter(function(deviceId){
-                        return me.chart.devices[deviceId];
-                });
+                return me.chart.devices[deviceId];
+            });
             return didChosed;
         }
     };

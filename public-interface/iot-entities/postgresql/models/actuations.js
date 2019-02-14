@@ -18,38 +18,38 @@
 
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('actuations', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                allowNull: false,
-                defaultValue: DataTypes.UUIDV4
-            },
-            componentId: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            transport: {
-                type: DataTypes.ENUM('mqtt', 'ws'),
-                allowNull: false
-            },
-            parameters: {
-                type: DataTypes.JSON
-            },
-            command: {
-                type: DataTypes.STRING(255)
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'actuations_componentId_index',
-                    method: 'BTREE',
-                    fields: ['componentId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        componentId: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        transport: {
+            type: DataTypes.ENUM('mqtt', 'ws'),
+            allowNull: false
+        },
+        parameters: {
+            type: DataTypes.JSON
+        },
+        command: {
+            type: DataTypes.STRING(255)
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'actuations_componentId_index',
+                method: 'BTREE',
+                fields: ['componentId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };
 

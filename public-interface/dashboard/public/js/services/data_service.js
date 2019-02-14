@@ -32,7 +32,7 @@ iotServices.factory('dataService', ['$http','sessionService', function($http, se
 
     return {
         search: function(filters, canceler, successCallback, errorCallback){
-          return sessionService.addAccountIdPrefix(PATH + '/search')
+            return sessionService.addAccountIdPrefix(PATH + '/search')
                 .then(function(url) {
                     var promise = $http({
                         method: 'POST',

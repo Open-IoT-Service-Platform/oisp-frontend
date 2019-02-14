@@ -19,34 +19,34 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('complexCommands', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4,
-                allowNull: false
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: false,
-                unique: 'command_account_name_index'
-            },
-            name: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-                unique: 'command_account_name_index'
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4,
+            allowNull: false
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'complexCommands_accountId_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                }
-            ],
-            schema: 'dashboard'
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            unique: 'command_account_name_index'
+        },
+        name: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            unique: 'command_account_name_index'
         }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'complexCommands_accountId_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            }
+        ],
+        schema: 'dashboard'
+    }
     );
 };

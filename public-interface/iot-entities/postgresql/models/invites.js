@@ -19,37 +19,37 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('invites', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: false,
-                unique: 'invites_email_account_index'
-            },
-            email: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-                unique: 'invites_email_account_index'
-            }
-        }, {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'invites_account_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                },
-                {
-                    name: 'invites_email_index',
-                    method: 'BTREE',
-                    fields: ['email']
-                }
-            ],
-            schema: 'dashboard'
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
+        },
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            unique: 'invites_email_account_index'
+        },
+        email: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            unique: 'invites_email_account_index'
         }
+    }, {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'invites_account_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            },
+            {
+                name: 'invites_email_index',
+                method: 'BTREE',
+                fields: ['email']
+            }
+        ],
+        schema: 'dashboard'
+    }
     );
 };

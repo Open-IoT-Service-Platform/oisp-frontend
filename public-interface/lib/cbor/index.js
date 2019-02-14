@@ -48,7 +48,7 @@ var parseCborBody = function(req, res, next) {
         }
     }
     next();
-}
+};
 
 module.exports = {
     parseCborBody: parseCborBody

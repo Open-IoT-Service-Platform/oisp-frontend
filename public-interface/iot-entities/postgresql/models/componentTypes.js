@@ -19,82 +19,82 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('componentTypes', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                allowNull: false,
-                defaultValue: DataTypes.UUIDV4
-            },
-            componentTypeId: {
-                type: DataTypes.STRING(385),
-                allowNull: false,
-                unique: 'componentTypeId_accountId_unique'
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: true,
-                unique: 'componentTypeId_accountId_unique'
-            },
-            dimension: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            default: {
-                type: DataTypes.BOOLEAN,
-                allowNull: false,
-                defaultValue: false
-            },
-            display: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            format: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            measureunit: {
-                type: DataTypes.STRING(255),
-                allowNull: true
-            },
-            version: {
-                type: DataTypes.STRING(128),
-                allowNull: false
-            },
-            type: {
-                type: DataTypes.ENUM('actuator', 'sensor'),
-                allowNull: false
-            },
-            dataType: {
-                type: DataTypes.STRING(50),
-                allowNull: false
-            },
-            command: {
-                type: DataTypes.JSON
-            },
-            icon: {
-                type: DataTypes.STRING(50)
-            },
-            min : {
-                type: DataTypes.DECIMAL,
-                allowNull: true
-            },
-            max : {
-                type: DataTypes.DECIMAL,
-                allowNull: true
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'componentTypes_accountId_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                }
-            ],
-            schema: 'dashboard'
+        componentTypeId: {
+            type: DataTypes.STRING(385),
+            allowNull: false,
+            unique: 'componentTypeId_accountId_unique'
+        },
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: true,
+            unique: 'componentTypeId_accountId_unique'
+        },
+        dimension: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        default: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        display: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        format: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        measureunit: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
+        version: {
+            type: DataTypes.STRING(128),
+            allowNull: false
+        },
+        type: {
+            type: DataTypes.ENUM('actuator', 'sensor'),
+            allowNull: false
+        },
+        dataType: {
+            type: DataTypes.STRING(50),
+            allowNull: false
+        },
+        command: {
+            type: DataTypes.JSON
+        },
+        icon: {
+            type: DataTypes.STRING(50)
+        },
+        min : {
+            type: DataTypes.DECIMAL,
+            allowNull: true
+        },
+        max : {
+            type: DataTypes.DECIMAL,
+            allowNull: true
         }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'componentTypes_accountId_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            }
+        ],
+        schema: 'dashboard'
+    }
     );
 };
 

@@ -16,24 +16,24 @@
 
 'use strict';
 iotServices.factory('pollerService', function() {
-        var defaultPollingTime = 10000;
-        var polls = {};
+    var defaultPollingTime = 10000;
+    var polls = {};
 
-        return {
-            startPolling: function(serviceName, service, pollingTime) {
-                // Check to make sure poller doesn't already exist
-                if (!polls[serviceName]) {
-                    var poller = function() {
-                        service();
-                    };
-                    poller();
-                    polls[serviceName] = setInterval(poller, pollingTime || defaultPollingTime);
-                }
-            },
-            stopPolling: function(serviceName) {
-                clearInterval(polls[serviceName]);
-                delete polls[serviceName];
+    return {
+        startPolling: function(serviceName, service, pollingTime) {
+            // Check to make sure poller doesn't already exist
+            if (!polls[serviceName]) {
+                var poller = function() {
+                    service();
+                };
+                poller();
+                polls[serviceName] = setInterval(poller, pollingTime || defaultPollingTime);
             }
-        };
-    });
+        },
+        stopPolling: function(serviceName) {
+            clearInterval(polls[serviceName]);
+            delete polls[serviceName];
+        }
+    };
+});
 

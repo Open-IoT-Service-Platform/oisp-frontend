@@ -18,11 +18,11 @@
 
 'use strict';
 iotController.controller('CustomTimeModalCtrl', function (  $scope,
-                                                       $window,
-                                                       $timeout,
-                                                       $modalInstance,
-                                                       currentFilter,
-                                                       dataService) {
+    $window,
+    $timeout,
+    $modalInstance,
+    currentFilter,
+    dataService) {
 
     var now = new Date();
     $scope.dates = {

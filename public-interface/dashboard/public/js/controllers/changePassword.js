@@ -16,9 +16,9 @@
 
 'use strict';
 iotController.controller('changePasswordCtrl', function($scope,
-                                               $window,
-                                               usersService,
-                                               loginService) {
+    $window,
+    usersService,
+    loginService) {
 
     // If the user is already logged in, redirect
     loginService.currentUser(

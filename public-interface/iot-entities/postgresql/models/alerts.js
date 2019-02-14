@@ -18,85 +18,85 @@
 
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('alerts', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                allowNull: false,
-                defaultValue: DataTypes.UUIDV4
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            externalId: {
-                type: DataTypes.STRING(40),
-                allowNull: false
-            },
-            deviceId: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            reset: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-            triggered: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-            dashboardAlertReceivedOn: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-            dashboardObservationReceivedOn: {
-                type: DataTypes.DATE,
-                allowNull: true
-            },
-            status: {
-                type: DataTypes.ENUM('New', 'Open', 'closed'),
-                allowNull: false
-            },
-            ruleName: {
-                type: DataTypes.STRING(255)
-            },
-            priority: {
-                type: DataTypes.ENUM('High', 'Low', 'Medium')
-            },
-            naturalLangAlert: {
-                type: DataTypes.TEXT
-            },
-            conditions: {
-                type: DataTypes.JSON
-            },
-            resetType: {
-                type: DataTypes.ENUM('Automatic', 'Manual')
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'alerts_accountId_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                },
-                {
-                    name: 'alerts_ruleExternalId_index',
-                    method: 'BTREE',
-                    fields: ['externalId']
-                },
-                {
-                    name: 'alerts_deviceId_index',
-                    method: 'BTREE',
-                    fields: ['deviceId']
-                },
-                {
-                    name: 'alerts_status_index',
-                    method: 'BTREE',
-                    fields: ['status']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        externalId: {
+            type: DataTypes.STRING(40),
+            allowNull: false
+        },
+        deviceId: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        reset: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        triggered: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        dashboardAlertReceivedOn: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        dashboardObservationReceivedOn: {
+            type: DataTypes.DATE,
+            allowNull: true
+        },
+        status: {
+            type: DataTypes.ENUM('New', 'Open', 'closed'),
+            allowNull: false
+        },
+        ruleName: {
+            type: DataTypes.STRING(255)
+        },
+        priority: {
+            type: DataTypes.ENUM('High', 'Low', 'Medium')
+        },
+        naturalLangAlert: {
+            type: DataTypes.TEXT
+        },
+        conditions: {
+            type: DataTypes.JSON
+        },
+        resetType: {
+            type: DataTypes.ENUM('Automatic', 'Manual')
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'alerts_accountId_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            },
+            {
+                name: 'alerts_ruleExternalId_index',
+                method: 'BTREE',
+                fields: ['externalId']
+            },
+            {
+                name: 'alerts_deviceId_index',
+                method: 'BTREE',
+                fields: ['deviceId']
+            },
+            {
+                name: 'alerts_status_index',
+                method: 'BTREE',
+                fields: ['status']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

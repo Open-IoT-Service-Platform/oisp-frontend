@@ -72,11 +72,11 @@ iotServices.factory('loginService', ['$http', function($http){
                 method: 'GET',
                 url: '/ui/auth/social/config'
             })
-            .success(function (data, status) {
-                successCallback(data, status);
-            }).error(function (data, status) {
-                errorCallback(data, status);
-            });
+                .success(function (data, status) {
+                    successCallback(data, status);
+                }).error(function (data, status) {
+                    errorCallback(data, status);
+                });
         }
     };
 }

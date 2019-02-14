@@ -143,7 +143,7 @@ var isUserRemovable = function (userData) {
                     });
             }
         });
-    };
+};
 
 module.exports = {
     isUserRemovable: isUserRemovable

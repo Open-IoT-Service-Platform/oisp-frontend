@@ -19,67 +19,67 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('accounts', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4
-            },
-            name: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            healthTimePeriod: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            exec_interval: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            base_line_exec_interval: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            cd_model_frequency: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            cd_execution_frequency: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            data_retention: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                validate: {
-                    min: 0
-                }
-            },
-            activation_code: {
-                type: DataTypes.CHAR(8)
-            },
-            activation_code_expire_date: DataTypes.DATE,
-            settings: DataTypes.JSON,
-            attrs: DataTypes.JSON
-        }, {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            schema: 'dashboard'
-        }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
+        },
+        name: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        healthTimePeriod: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        exec_interval: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        base_line_exec_interval: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        cd_model_frequency: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        cd_execution_frequency: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        data_retention: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        activation_code: {
+            type: DataTypes.CHAR(8)
+        },
+        activation_code_expire_date: DataTypes.DATE,
+        settings: DataTypes.JSON,
+        attrs: DataTypes.JSON
+    }, {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        schema: 'dashboard'
+    }
     );
 };

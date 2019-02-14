@@ -19,26 +19,26 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('alert_comments', {
-            //alertId: added by Alerts.hasMany(...) relation specification in index.js
-            text: {
-                type: DataTypes.TEXT,
-                allowNull: false
-            },
-            user: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            }
+        //alertId: added by Alerts.hasMany(...) relation specification in index.js
+        text: {
+            type: DataTypes.TEXT,
+            allowNull: false
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'alert_comments_alertId',
-                    method: 'BTREE',
-                    fields: ['alertId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        user: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'alert_comments_alertId',
+                method: 'BTREE',
+                fields: ['alertId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

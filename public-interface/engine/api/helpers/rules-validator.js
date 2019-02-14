@@ -166,8 +166,8 @@ var validateAllowedOperatorsWhichAcceptNonNumericMeasures = function (rule, erro
     });
     base.forEach(function (c) {
         if (!(['Equal', 'Not Equal', 'Like'].some(function (o) {
-                return o === c.operator;
-            }))) {
+            return o === c.operator;
+        }))) {
             errors.push(errorList.Errors.Rule.Validation.NonNumericMeasures.InvalidOperator.code);
         }
     });
@@ -180,8 +180,8 @@ var validateAllowedOperatorsWhichAcceptNumericMeasures = function (rule, errors)
     });
     base.forEach(function (c) {
         if (!(['>', '>=', '<', '<=', 'Equal', 'Not Equal', 'Between', 'Not Between'].some(function (o) {
-                return o === c.operator;
-            }))) {
+            return o === c.operator;
+        }))) {
             errors.push(errorList.Errors.Rule.Validation.NumericMeasures.InvalidOperator.code);
         }
     });

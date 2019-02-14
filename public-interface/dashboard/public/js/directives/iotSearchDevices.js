@@ -50,7 +50,7 @@ iotApp.directive('iotSearchDevices', function (devicesService, sessionService, $
 
             //fetching the device to which tooltip belongs
             var device = scope.searchResult.devices.find(function (element) {
-               return element.deviceId === deviceId;
+                return element.deviceId === deviceId;
             });
 
             //constructing the info about device as a tooltip's content

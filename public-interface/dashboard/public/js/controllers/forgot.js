@@ -19,10 +19,10 @@
 /* global getServicesConfig */
 
 iotController.controller('ForgotCtrl', function($scope,
-                                               $rootScope,
-                                               $window,
-                                               usersService,
-                                               loginService) {
+    $rootScope,
+    $window,
+    usersService,
+    loginService) {
 
     // If the user is already logged in, redirect
     loginService.currentUser(

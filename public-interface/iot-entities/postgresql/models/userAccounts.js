@@ -19,15 +19,15 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('user_accounts', {
-            role: {
-                type: DataTypes.ENUM('admin', 'user'),
-                allowNull: false
-            }
-
-        }, {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            schema: 'dashboard'
+        role: {
+            type: DataTypes.ENUM('admin', 'user'),
+            allowNull: false
         }
+
+    }, {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        schema: 'dashboard'
+    }
     );
 };

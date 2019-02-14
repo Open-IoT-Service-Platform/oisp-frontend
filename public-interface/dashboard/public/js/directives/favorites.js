@@ -17,12 +17,12 @@
 'use strict';
 
 var FavoriteEditModalInstanceCtrl = function($scope,
-                                             $modalInstance,
-                                             $route,
-                                             currentFavorites,
-                                             currentSelection,
-                                             usersService,
-                                             sessionService) {
+    $modalInstance,
+    $route,
+    currentFavorites,
+    currentSelection,
+    usersService,
+    sessionService) {
     $scope.favorite = {
         public: false
     };
@@ -85,12 +85,12 @@ var FavoriteEditModalInstanceCtrl = function($scope,
 };
 
 var FavoriteModalInstanceCtrl = function ($scope,
-                                          $modalInstance,
-                                          currentFilters,
-                                          currentFavorites,
-                                          currentSelection,
-                                          usersService,
-                                          sessionService) {
+    $modalInstance,
+    currentFilters,
+    currentFavorites,
+    currentSelection,
+    usersService,
+    sessionService) {
     $scope.favorite = {
         public: false,
         value: currentFilters
@@ -127,17 +127,17 @@ var FavoriteModalInstanceCtrl = function ($scope,
         if($scope.updating){
             usersService.updateUserSetting(sessionService.getCurrentAccount().id, 'favorite',
                 $scope.favorite.id, $scope.favorite, function () {
-                $modalInstance.close($scope.favorite);
-            }, function (data) {
-                $scope.error = data;
-            });
+                    $modalInstance.close($scope.favorite);
+                }, function (data) {
+                    $scope.error = data;
+                });
         } else {
             usersService.addUserSettings(sessionService.getCurrentAccount().id, 'favorite',
                 $scope.favorite, function () {
-                $modalInstance.close($scope.favorite);
-            }, function (data) {
-                $scope.error = data;
-            });
+                    $modalInstance.close($scope.favorite);
+                }, function (data) {
+                    $scope.error = data;
+                });
         }
     };
     $scope.cancel = function () {

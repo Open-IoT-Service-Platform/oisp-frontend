@@ -18,37 +18,37 @@
 
 var path = require('path'),
     templatesDir = path.resolve(__dirname, '..', 'templates'),
-    emailTemplates = require('email-templates'),
+    EmailTemplates = require('email-templates'),
     nodemailer = require('nodemailer'),
     config = require('../config'),
     logger = require('./logger').init();
 
 var sendMail = function (templateName, params, smtpConfig) {
-	params.footer = config.mail.footer;
-	var transport = nodemailer.createTransport(smtpConfig);
-	const emailTemplate = new emailTemplates({ 
-		views: { 
-			root: templatesDir,
-			options: {
-				extension: 'ejs'
-			},
-			locals: params
-		},
-		// set path for automatic css inlining for the templates
-		juice: true,
-		juiceResources: {
-			preserveImportant: true,
-			webResources: {
-				relativeTo: templatesDir + '/' + templateName
-			}
-		},
-		message: {
-			from: config.mail.from
-		},
-		transport: transport,
-	});
-	
-	var shouldBeBlocked = false;
+    params.footer = config.mail.footer;
+    var transport = nodemailer.createTransport(smtpConfig);
+    const emailTemplate = new EmailTemplates({
+        views: {
+            root: templatesDir,
+            options: {
+                extension: 'ejs'
+            },
+            locals: params
+        },
+        // set path for automatic css inlining for the templates
+        juice: true,
+        juiceResources: {
+            preserveImportant: true,
+            webResources: {
+                relativeTo: templatesDir + '/' + templateName
+            }
+        },
+        message: {
+            from: config.mail.from
+        },
+        transport: transport,
+    });
+
+    var shouldBeBlocked = false;
     config.mail.blockedDomains.some(function(blockedDomain) {
         if(params.email.indexOf(blockedDomain) > 0) {
             shouldBeBlocked = true;
@@ -67,29 +67,29 @@ var sendMail = function (templateName, params, smtpConfig) {
     } else {
         logger.info('Sending email to: ' + params.email);
     }
-	
-	emailTemplate.send({
-		template: templateName,
-		// html and text gets rendered automatically so 
-		// it does not have to be set in messages
-		message: {
-			to: params.email,
-			subject: params.subject || templateName,
-			attachments: params.attachments || {}
-		}
-	}).then(res => {
-		logger.info(JSON.stringify(res.originalMessage));
-		if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
+
+    emailTemplate.send({
+        template: templateName,
+        // html and text gets rendered automatically so
+        // it does not have to be set in messages
+        message: {
+            to: params.email,
+            subject: params.subject || templateName,
+            attachments: params.attachments || {}
+        }
+    }).then(res => {
+        logger.info(JSON.stringify(res.originalMessage));
+        if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
             logger.info('Preview URL: ' + JSON.stringify(nodemailer.getTestMessageUrl(res)));
         }
-	}).catch(err => {
-		logger.error('mailer. send, error sending the mail: ' + JSON.stringify(err));
-	})
-}
+    }).catch(err => {
+        logger.error('mailer. send, error sending the mail: ' + JSON.stringify(err));
+    });
+};
 
 module.exports = {
     send: function(templateName, params) {
-        
+
         if (process.env.TEST && (process.env.TEST.toLowerCase().indexOf("1") !== -1)) {
             nodemailer.createTestAccount(function(err, account) {
                 if (err) {
@@ -99,22 +99,22 @@ module.exports = {
                     var smtpConfig = {};
 
                     smtpConfig.host = account.smtp.host;
-                    smtpConfig.port = account.smtp.port,
-                    smtpConfig.secure = account.smtp.secure,
+                    smtpConfig.port = account.smtp.port;
+                    smtpConfig.secure = account.smtp.secure;
                     smtpConfig.auth =  {
                         user: account.user,
                         pass: account.pass
-                    }
+                    };
 
-                    // sendMail(templateName, params, smtpConfig) TODO : next step 
-                    sendMail(templateName, params, config.mail.smtp)
+                    // sendMail(templateName, params, smtpConfig) TODO : next step
+                    sendMail(templateName, params, config.mail.smtp);
 
                 }
             });
         }
         else {
-            sendMail(templateName, params, config.mail.smtp)
+            sendMail(templateName, params, config.mail.smtp);
         }
-        
+
     }
 };

@@ -29,18 +29,18 @@ var ConfirmChangeRuleStatusModalInstanceCtrl = function($scope, $modalInstance, 
 };
 
 iotController.controller('ListRulesCtrl', function($scope,
-                                                   $rootScope,
-                                                   $location,
-                                                   $filter,
-                                                   $modal,
-                                                   $q,
-                                                   ngTableParams,
-                                                   rulesService,
-                                                   sessionService,
-                                                   orderingService,
-                                                   filteringService,
-                                                   ngProgress,
-                                                   utilityService) {
+    $rootScope,
+    $location,
+    $filter,
+    $modal,
+    $q,
+    ngTableParams,
+    rulesService,
+    sessionService,
+    orderingService,
+    filteringService,
+    ngProgress,
+    utilityService) {
 
 
     var i18n = $scope.$parent.i18n;
@@ -66,15 +66,15 @@ iotController.controller('ListRulesCtrl', function($scope,
     $scope.error = null;
     $scope.priorityLevel = utilityService.convertToNgOption(i18n.rules.priority_level);
 
-   $scope.getTitlePriority = function(prioridad)  {
-       var p = utilityService.getObjectKey(prioridad,
-                                          $scope.priorityLevel,
-                                          "name");
-       return p.name;
-   };
-   $scope.isPriorityHigh = function (priority) {
+    $scope.getTitlePriority = function(prioridad)  {
+        var p = utilityService.getObjectKey(prioridad,
+            $scope.priorityLevel,
+            "name");
+        return p.name;
+    };
+    $scope.isPriorityHigh = function (priority) {
         return (priority === "High");
-   };
+    };
     $scope.isPriorityLow = function (priority) {
         return (priority === "Low");
     };

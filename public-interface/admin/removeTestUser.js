@@ -20,7 +20,6 @@
  * In order to call removeTestUser script use following command: node ../admin/index.js removeTestUser
  */
 var postgresProvider = require('../iot-entities/postgresql'),
-    config = require('../config'),
     user = postgresProvider.users,
     logger = require('../lib/logger').init(),
     async = require('async'),
@@ -47,16 +46,6 @@ var getTestUsers = function(resultCallback) {
     }, startFromDate);
 };
 
-var removeAccounts = function(accounts, resultCallback) {
-    async.series(accounts.map(function(id){
-        return function(parallelCallback) {
-            removeAccount(id, parallelCallback);
-        };
-    }), function(err) {
-        resultCallback(err);
-    });
-};
-
 var removeAccount = function(accountId, resultCallback) {
     logger.info('Removing account: ' + accountId);
     account.delete(accountId, function(err) {
@@ -67,6 +56,16 @@ var removeAccount = function(accountId, resultCallback) {
             logger.error('Unable to remove account - ' + accountId + ' - ' + err );
             resultCallback(null, err);
         }
+    });
+};
+
+var removeAccounts = function(accounts, resultCallback) {
+    async.series(accounts.map(function(id){
+        return function(parallelCallback) {
+            removeAccount(id, parallelCallback);
+        };
+    }), function(err) {
+        resultCallback(err);
     });
 };
 
@@ -85,38 +84,38 @@ module.exports = function() {
     this.remove = function() {
         logger.info('Removing test\'s users start.');
         getTestUsers(function(err, result) {
-           if(!err) {
-               var usersToRemove = result;
-               if(!usersToRemove || usersToRemove.length === 0) {
-                   logger.info('No test\'s users found in DB.');
-                   process.exit(1);
-               } else {
-                   async.series(usersToRemove.map(function (user) {
-                       return function (parallelCallback) {
-                           if (user.accounts) {
-                               removeAccounts(Object.keys(user.accounts), function (err, resultsWithError) {
-                                   //Errors are put into resultsWithError array in order to do not break next async calls
-                                   if (!resultsWithError) {
-                                       removeUser(user, parallelCallback);
-                                   } else {
-                                       logger.info('Unable to remove user accounts, - ' + user.email + ' will not be removed');
-                                       parallelCallback();
-                                   }
-                               });
-                           } else {
-                               logger.info('No accounts found for user - ' + user.email);
-                               removeUser(user, parallelCallback);
-                           }
-                       };
-                   }), function () {
-                       logger.info('Done.');
-                       process.exit(1);
-                   });
-               }
-           } else{
-               logger.error('Unable to get list of test\'s users from DB - ' + err);
-               process.exit(1);
-           }
+            if(!err) {
+                var usersToRemove = result;
+                if(!usersToRemove || usersToRemove.length === 0) {
+                    logger.info('No test\'s users found in DB.');
+                    process.exit(1);
+                } else {
+                    async.series(usersToRemove.map(function (user) {
+                        return function (parallelCallback) {
+                            if (user.accounts) {
+                                removeAccounts(Object.keys(user.accounts), function (err, resultsWithError) {
+                                    //Errors are put into resultsWithError array in order to do not break next async calls
+                                    if (!resultsWithError) {
+                                        removeUser(user, parallelCallback);
+                                    } else {
+                                        logger.info('Unable to remove user accounts, - ' + user.email + ' will not be removed');
+                                        parallelCallback();
+                                    }
+                                });
+                            } else {
+                                logger.info('No accounts found for user - ' + user.email);
+                                removeUser(user, parallelCallback);
+                            }
+                        };
+                    }), function () {
+                        logger.info('Done.');
+                        process.exit(1);
+                    });
+                }
+            } else{
+                logger.error('Unable to get list of test\'s users from DB - ' + err);
+                process.exit(1);
+            }
         });
     };
 };

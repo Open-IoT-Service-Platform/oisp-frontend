@@ -20,49 +20,49 @@ iotServices.factory('controlService', ['$http', 'sessionService', function($http
     return {
         sendAction: function(actions, successCallback, errorCallback){
             return sessionService.addAccountIdPrefix('/control')
-            .then(function(url) {
-                return $http({
-                    method: 'POST',
-                    url: url,
-                    data: actions
-                })
-                    .success(successCallback)
-                    .error(errorCallback);
-            });
+                .then(function(url) {
+                    return $http({
+                        method: 'POST',
+                        url: url,
+                        data: actions
+                    })
+                        .success(successCallback)
+                        .error(errorCallback);
+                });
         },
         saveAction: function (actions, componentName, successCallback, errorCallback) {
             return sessionService.addAccountIdPrefix('/control/commands/'+componentName)
-            .then(function(url) {
-                return $http({
-                    method: 'POST',
-                    url: url,
-                    data: actions
-                })
-                    .success(successCallback)
-                    .error(errorCallback);
-            });
+                .then(function(url) {
+                    return $http({
+                        method: 'POST',
+                        url: url,
+                        data: actions
+                    })
+                        .success(successCallback)
+                        .error(errorCallback);
+                });
         },
         getComplexCommands: function(successCallback, errorCallback) {
             return sessionService.addAccountIdPrefix('/control/commands')
-            .then(function(url) {
-                return $http({
-                    method: 'GET',
-                    url: url
-                })
-                    .success(successCallback)
-                    .error(errorCallback);
-            });
+                .then(function(url) {
+                    return $http({
+                        method: 'GET',
+                        url: url
+                    })
+                        .success(successCallback)
+                        .error(errorCallback);
+                });
         },
         deleteAction: function (id, successCallback, errorCallback) {
             return sessionService.addAccountIdPrefix('/control/commands/'+id)
-            .then(function(url) {
-                return $http({
-                    method: 'DELETE',
-                    url: url
-                })
-                    .success(successCallback)
-                    .error(errorCallback);
-            });
+                .then(function(url) {
+                    return $http({
+                        method: 'DELETE',
+                        url: url
+                    })
+                        .success(successCallback)
+                        .error(errorCallback);
+                });
         }
     };
 }]);

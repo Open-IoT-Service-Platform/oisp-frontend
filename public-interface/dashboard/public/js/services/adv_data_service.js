@@ -19,18 +19,18 @@ iotServices.factory('advDataService', ['$http','sessionService', 'utilityService
     return {
         searchAdvanced: function (filters, successCallback, errorCallback) {
             sessionService.addAccountIdPrefix("/data/search/advanced")
-            .then(function(url){
-                $http({
-                    method: 'POST',
-                    url: url,
-                    data: filters
-                })
-                    .success(function (data) {
-                        successCallback(data);
-                    }).error(function (data, status) {
-                        errorCallback(data, status);
-                    });
-            });
+                .then(function(url){
+                    $http({
+                        method: 'POST',
+                        url: url,
+                        data: filters
+                    })
+                        .success(function (data) {
+                            successCallback(data);
+                        }).error(function (data, status) {
+                            errorCallback(data, status);
+                        });
+                });
         }
     };
 }

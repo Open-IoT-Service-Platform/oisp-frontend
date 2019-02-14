@@ -23,7 +23,7 @@ iotApp.directive('requiredRole', function(){
             scope.$root.currentAccount &&
             scope.$root.currentUser.accounts[scope.$root.currentAccount.id] &&
             scope.$root.currentUser.accounts[scope.$root.currentAccount.id].role === attrs.requiredRole
-            ){
+        ){
             element.show();
         } else {
             element.hide();

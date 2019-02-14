@@ -120,10 +120,12 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
                             };
                             commandsMessages.push(message);
                         })
+                        /*jshint -W098 */
                         .catch(function (err) {
                             logger.error('actuationAlerts - unable to get information about connection status for device - ' + device.deviceId +
                             '. Alert actuation command will not be send.');
                         });
+                    /*jshint +W098 */
                 });
         });
 
@@ -149,14 +151,14 @@ var addCommandsToActuationActions = function (accountId, rule) {
     var allCommandsForAction = rule.actions.map(function (action) {
         if (action.type === ACTUATION_TYPE) {
             return Q.all(action.target.map(function (commandId) {
-                    return Q.nfcall(ComplexCommand.findByAccountAndId, accountId, commandId)
-                        .then(function success(complexCommand) {
-                            return parseComplexCommandToActuationMessage(accountId, complexCommand)
-                                .then(function parsed(message) {
-                                    messages = messages.concat(message);
-                                });
-                        });
-                }))
+                return Q.nfcall(ComplexCommand.findByAccountAndId, accountId, commandId)
+                    .then(function success(complexCommand) {
+                        return parseComplexCommandToActuationMessage(accountId, complexCommand)
+                            .then(function parsed(message) {
+                                messages = messages.concat(message);
+                            });
+                    });
+            }))
                 .then(function commandsFound() {
                     action.messages = messages.slice();
                     messages.length = 0;

@@ -16,47 +16,47 @@
 
 'use strict';
 iotServices.factory('usersService', ['$http', 'utilityService','sessionService', function($http,
-                                                                         utilityService, sessionService) {
+    utilityService, sessionService) {
 
     var _data = {
-            user : null,
-            userList : []
-        };
+        user : null,
+        userList : []
+    };
 
     return {
         getUsers: function(successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/users')
-            .then(function(url) {
-                $http({
-                    method: 'GET',
-                    url: url,
-                    params: {
-                        "_": utilityService.timeStamp()
-                    }
-                }).success(function (data, status) {
-                    _data.userList = data;
-                    if (successCallback) {
-                        successCallback(data, status);
-                    }
-                }).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'GET',
+                        url: url,
+                        params: {
+                            "_": utilityService.timeStamp()
+                        }
+                    }).success(function (data, status) {
+                        _data.userList = data;
+                        if (successCallback) {
+                            successCallback(data, status);
+                        }
+                    }).error(errorCallback);
+                });
         },
         getUser: function(userId, successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/users/' + userId)
-            .then(function(url) {
-                $http({
-                    method: 'GET',
-                    url: url
-                }).success(successCallback).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'GET',
+                        url: url
+                    }).success(successCallback).error(errorCallback);
+                });
         },
         addUser: function(user, successCallback, errorCallback){
 
-                $http({
-                    method: 'POST',
-                    url: '/users',
-                    data: user
-                }).success(successCallback).error(errorCallback);
+            $http({
+                method: 'POST',
+                url: '/users',
+                data: user
+            }).success(successCallback).error(errorCallback);
 
         },
         requestVerifyMail: function(data, successCallback, errorCallback){
@@ -67,11 +67,11 @@ iotServices.factory('usersService', ['$http', 'utilityService','sessionService',
             }).success(successCallback).error(errorCallback);
         },
         updateUser: function(user, successCallback, errorCallback){
-                $http({
-                    method: 'PUT',
-                    url: '/v1/api/users/' + user.id,
-                    data: user
-                }).success(successCallback).error(errorCallback);
+            $http({
+                method: 'PUT',
+                url: '/v1/api/users/' + user.id,
+                data: user
+            }).success(successCallback).error(errorCallback);
         },
         updateUserAccounts: function(user, successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/users/' + user.id)

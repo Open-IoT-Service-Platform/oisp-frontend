@@ -22,30 +22,32 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         dirs: {
             jshint: 'buildscripts/jshint',
+            eslint: 'buildscripts/eslint',
             jsfiles: ['Gruntfile.js',
                 'app.js',
+                'admin/*.js',
+                'config/*.js',
                 'dashboard/routes/*.js',
                 'dashboard/public/js/**/*.js',
                 'iot-entities/**/*.js',
                 'engine/**/*.js',
                 'lib/**/*.js',
-		'doc/api/*.js'],
+		        'doc/api/*.js'],
             codeCoverageExclude: [
                 "**/iot-entities/*","**/iot-entities/postgresql/*",
                 "**/iot-entities/redis/*",
                 "**/iot-entities/postgresql/models/*",
                 "**/lib/json-gate/**"]
         },
-
         jshint: {
             options: {
                 jshintrc: '<%= dirs.jshint %>/config.json',
-                ignores: ['iot-entities/redis/*.js', 'lib/entropizer/*.js' ]
+                ignores: ['lib/entropizer/*.js' ]
             },
             local: {
                 src: ['<%= dirs.jsfiles %>'],
                 options: {
-                    force: true
+                    force: false
                 }
             },
             teamcity: {
@@ -54,6 +56,16 @@ module.exports = function (grunt) {
                     force: true,
                     reporter: require('jshint-teamcity')
                 }
+            }
+        },
+        eslint: {
+            local: {
+                options: {
+                    configFile: '<%= dirs.eslint %>/config.json',
+                    ignorePattern: [ 'lib/entropizer/*.js' ],
+                    quiet: true
+                },
+                src: ['<%= dirs.jsfiles %>'],
             }
         },
         karma: {
@@ -222,9 +234,9 @@ module.exports = function (grunt) {
                 src:['.tmp']
             }
         },
-		bumpup: {
-			setters: {
-				version: function (old) {
+        bumpup: {
+            setters: {
+                version: function (old) {
                     var ret = old;
                     if (buildID !== 'local') {
                         var ver = old.split(".");
@@ -236,12 +248,12 @@ module.exports = function (grunt) {
                     }
                     return ret;
                 },
-				date: function () {
-					return new Date().toISOString();
-				}
-			},
-			file: '../build/package.json'
-		},
+                date: function () {
+                    return new Date().toISOString();
+                }
+            },
+            file: '../build/package.json'
+        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> ' + buildID + ' */\n',
@@ -313,6 +325,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -323,6 +336,7 @@ module.exports = function (grunt) {
 
     // Default task(s).
     grunt.registerTask('default', [
+        'eslint:local',
         'jshint:local',
         'karma:local',
         'mocha_istanbul:local',
@@ -331,12 +345,13 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('validate', [
+        'eslint:local',
         'jshint:local'
     ]);
 
     grunt.registerTask('run_test', [
         'mocha_istanbul:local_without_coverage',
-	'shell:test'
+	    'shell:test'
     ]);
 
     grunt.registerTask('teamcity_codevalidation', [
@@ -351,17 +366,19 @@ module.exports = function (grunt) {
         'build',
         'compress:teamcity'
     ]);
- 
+
     grunt.registerTask('debugPackaging', [
         'bumpup',
-	'clean:build',
-	'copy:build',
-	'copy:deploy',
-	'compress:teamcity',
+        'clean:build',
+        'copy:build',
+        'copy:deploy',
+        'compress:teamcity',
         'clean:tmp'
     ]);
 
     grunt.registerTask('build', 'Creates build dir with distributable and uglified code', [
+        'eslint:local',
+        'jshint:local',
         'clean:build',
         'shell:build',
         'copy',
@@ -378,6 +395,12 @@ module.exports = function (grunt) {
         'filerev',
         'usemin'
     ]);
-    grunt.registerTask('clean-api',[ 'shell:clean' ]);
-    grunt.registerTask('build-api',[ 'shell:build' ]);
+
+    grunt.registerTask('clean-api', ['shell:clean']);
+
+    grunt.registerTask('build-api', [
+        'eslint:local',
+        'jshint:local'
+        'shell:build'
+    ]);
 };

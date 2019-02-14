@@ -23,8 +23,8 @@ iotServices.factory('utilityService',  function() {
     return {
         "timeStamp" : timeIntamp,
         "noneCacheConfig" : function () {
-                return {params: {'_': timeIntamp()}};
-            },
+            return {params: {'_': timeIntamp()}};
+        },
         "addToList": function addTo (toAdd, list) {
             var l = list.length;
             for (var i = 0; i < l; ++i) {
@@ -62,8 +62,8 @@ iotServices.factory('utilityService',  function() {
                 var value = dataArray[i];
                 var key = Object.keys(value)[0] ;
                 a.push({'id': i,
-                        'text': value[key],
-                        'key': key
+                    'text': value[key],
+                    'key': key
                 });
             }
             return a;
@@ -110,22 +110,22 @@ iotServices.factory('utilityService',  function() {
             {"w": "Weeks"}*/
             var total = 0;
             switch(id) {
-                case 's':
-                    total = 1;
-                    break;
-                case 'm':
-                    total = 60;
-                    break;
-                case 'h':
-                    total = 3600;
-                    break;
-                case 'd':
-                    total = 86400;
-                    break;
-                case 'w':
-                    total = 604800;
-                    break;
-               }
+            case 's':
+                total = 1;
+                break;
+            case 'm':
+                total = 60;
+                break;
+            case 'h':
+                total = 3600;
+                break;
+            case 'd':
+                total = 86400;
+                break;
+            case 'w':
+                total = 604800;
+                break;
+            }
             return total * num;
         },
         getObjectKey: function  (key, list, prop) {
@@ -136,9 +136,9 @@ iotServices.factory('utilityService',  function() {
                     a = o;
                     break;
                 }
-                }
+            }
             return a;
-         }
+        }
 
     };
 });
