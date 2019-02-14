@@ -71,19 +71,27 @@ var buildICFALMessage = function(data) {
 
 function createSpan(name) {
     const context = contextProvider.instance();
-    if (!jaegerConfig.tracing)
-    {return null;}
+    if (!jaegerConfig.tracing) {
+        return null;
+    }
     var fatherSpan = context.get(spanContext.parent);
     if (!fatherSpan) {
         // something is wrong
         logger.warn('Span must be dropped due to no father is present');
         var rootSpan = context.get(spanContext.root);
-        if (rootSpan)
-        {rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);}
+        if (rootSpan) {
+            rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
+        }
         return null;
     }
     const span = tracer.startSpan(name, { childOf: fatherSpan.span });
     return span;
+}
+
+function injectSpanContext(span, format, carrier) {
+    if (span) {
+        tracer.inject(span.context(), format, carrier);
+    }
 }
 
 function finishSpan(span) {
@@ -127,12 +135,15 @@ module.exports = function(config) {
 
     this.submitDataMQTT = function(data, callback){
         const span = createSpan('submitDataMQTT');
+        var spanContext = {};
+        injectSpanContext(span, opentracing.FORMAT_TEXT_MAP, spanContext);
 
         var dataMetric = new Metric();
 
         var options = {
             topic: 'server/metric/' + data.domainId + "/" + data.gatewayId,
-            message: dataMetric.prepareDataIngestionMsg(data)
+            message: dataMetric.prepareDataIngestionMsg(data),
+            headers: spanContext
         };
         /**
          * Since this msg is already process by health metrics, it is set the forwarded message.
@@ -170,6 +181,9 @@ module.exports = function(config) {
             },
             body: body
         };
+
+        injectSpanContext(span, opentracing.FORMAT_HTTP_HEADERS, options.headers);
+
         logger.debug("Calling proxy to submit data");
         request(options, function(err, res) {
             finishSpan(span);
@@ -191,6 +205,8 @@ module.exports = function(config) {
 
     this.submitDataKafka = function(data, callback){
         const span = createSpan('submitDataKafka');
+        var spanContext = {};
+        injectSpanContext(span, opentracing.FORMAT_TEXT_MAP, spanContext);
 
         try {
             var dataMetric = new Metric(),
@@ -200,7 +216,8 @@ module.exports = function(config) {
             kafkaProducer.send([
                 {
                     topic: metricsTopic,
-                    messages: message
+                    messages: message,
+                    headers: spanContext
                 }
             ], function (err, data) {
                 finishSpan(span);
@@ -240,8 +257,10 @@ module.exports = function(config) {
             body: JSON.stringify(dataInquiryMessage),
             encoding: null
         };
-        logger.debug("data-proxy. dataInquiry, options: " + JSON.stringify(options));
 
+        injectSpanContext(span, opentracing.FORMAT_HTTP_HEADERS, options.headers);
+
+        logger.debug("data-proxy. dataInquiry, options: " + JSON.stringify(options));
         request(options, function (err, res) {
             finishSpan(span);
             var isBinary = (res.headers["content-type"] === "application/cbor");
@@ -295,8 +314,10 @@ module.exports = function(config) {
             encoding: null,
             body: JSON.stringify(advancedDataInquiryMessage)
         };
-        logger.debug("data-proxy. dataInquiryAdvanced, options: " + JSON.stringify(options));
 
+        injectSpanContext(span, opentracing.FORMAT_HTTP_HEADERS, options.headers);
+
+        logger.debug("data-proxy. dataInquiryAdvanced, options: " + JSON.stringify(options));
         request(options, function(err, res){
             finishSpan(span);
 
@@ -356,8 +377,10 @@ module.exports = function(config) {
             },
             body: JSON.stringify(aggregatedReportMessage)
         };
-        logger.debug("data-proxy. report, options: " + JSON.stringify(options));
 
+        injectSpanContext(span, opentracing.FORMAT_HTTP_HEADERS, options.headers);
+
+        logger.debug("data-proxy. report, options: " + JSON.stringify(options));
         request(options, function (err, res) {
             finishSpan(span);
 
@@ -401,8 +424,10 @@ module.exports = function(config) {
             },
             body: JSON.stringify(inquiryComponentFirstAndLastMessage)
         };
-        logger.debug("data-proxy. getFirstAndLastMeasurement, options: " + JSON.stringify(options));
 
+        injectSpanContext(span, opentracing.FORMAT_HTTP_HEADERS, options.headers);
+
+        logger.debug("data-proxy. getFirstAndLastMeasurement, options: " + JSON.stringify(options));
         request(options, function (err, res) {
             finishSpan(span);
 

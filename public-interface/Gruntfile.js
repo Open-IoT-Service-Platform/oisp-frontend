@@ -400,7 +400,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build-api', [
         'eslint:local',
-        'jshint:local'
+        'jshint:local',
         'shell:build'
     ]);
 };
