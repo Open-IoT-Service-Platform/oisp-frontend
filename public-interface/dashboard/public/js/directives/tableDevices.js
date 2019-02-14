@@ -30,7 +30,6 @@ var ConfirmRemoveDeviceModalInstanceCtrl = function ($scope, $modalInstance, dev
 
 iotApp.directive('tableDevices', function (devicesService, $q, ngTableParams, $modal, $routeParams) {
 
-
     function getListDevicesProperties(type) {
         var listDevicesConfigs = {
             "default": {count: 10, counts: [], templateUrl: "public/partials/directives/tableDevices.html"},
@@ -40,6 +39,27 @@ iotApp.directive('tableDevices', function (devicesService, $q, ngTableParams, $m
             return listDevicesConfigs[type];
         }
         return listDevicesConfigs["default"];
+    }
+
+    function isEmpty(obj) {
+        if (obj == null) {
+            return true;
+        }
+
+        if (obj.length > 0) {
+            return false;
+        }
+        if (obj.length === 0) {
+            return true;
+        }
+
+        for (var key in obj) {
+            if (hasOwnProperty.call(obj, key)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     function link(scope, element, attr) {
@@ -156,18 +176,18 @@ iotApp.directive('tableDevices', function (devicesService, $q, ngTableParams, $m
             removeDeviceModalInstance.result.then(function () {
                 var deviceIndex = scope.listDevices.devices.indexOf(device);
                 devicesService.deleteDevice(device.deviceId, function () {
-                        scope.listDevices.devices.splice(deviceIndex, 1);
-                        scope.tableDevices.reload();
-                    },
-                    function (data, status) {
-                        var message;
-                        if (data && data.message) {
-                            message = data.message;
-                        } else {
-                            message = 'An unexpected error happened';
-                        }
-                        scope.error = 'Could not delete device: ' + status + ' ' + message;
-                    });
+                    scope.listDevices.devices.splice(deviceIndex, 1);
+                    scope.tableDevices.reload();
+                },
+                function (data, status) {
+                    var message;
+                    if (data && data.message) {
+                        message = data.message;
+                    } else {
+                        message = 'An unexpected error happened';
+                    }
+                    scope.error = 'Could not delete device: ' + status + ' ' + message;
+                });
             }, function () {
 
             });
@@ -177,27 +197,6 @@ iotApp.directive('tableDevices', function (devicesService, $q, ngTableParams, $m
         scope.reload = function () {
             scope.tableDevices.reload();
         };
-
-        function isEmpty(obj) {
-            if (obj == null) {
-                return true;
-            }
-
-            if (obj.length > 0) {
-                return false;
-            }
-            if (obj.length === 0) {
-                return true;
-            }
-
-            for (var key in obj) {
-                if (hasOwnProperty.call(obj, key)) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
 
     }
 

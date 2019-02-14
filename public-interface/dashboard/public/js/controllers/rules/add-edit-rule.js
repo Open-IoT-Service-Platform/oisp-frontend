@@ -17,22 +17,22 @@
 'use strict';
 
 iotController.controller('AddEditRuleCtrl', function($scope,
-                                                    $routeParams,
-                                                    rulesService,
-                                                    Rule,
-                                                    Filter,
-                                                    Error,
-                                                    Catalog,
-                                                    $location,
-                                                    utilityService,
-                                                    usersService,
-                                                    devicesService,
-                                                    componentsService,
-                                                    sessionService,
-                                                    WizardHandler,
-                                                    flash,
-                                                    controlService
-                                                    ) {
+    $routeParams,
+    rulesService,
+    Rule,
+    Filter,
+    Error,
+    Catalog,
+    $location,
+    utilityService,
+    usersService,
+    devicesService,
+    componentsService,
+    sessionService,
+    WizardHandler,
+    flash,
+    controlService
+) {
 
     var i18n = $scope.$parent.i18n;
 
@@ -116,8 +116,8 @@ iotController.controller('AddEditRuleCtrl', function($scope,
         return $scope.tags;
     };
     $scope.wizard = {
-            name : "addEditRules"
-        };
+        name : "addEditRules"
+    };
     $scope.priorityLevel = utilityService.convertToNgOption(i18n.rules.priority_level);
     $scope.notificationTypes = utilityService.convertToNgOption(i18n.rules.notification_types);
     $scope.resetType =  utilityService.convertToNgOption(i18n.rules.reset_option);
@@ -156,7 +156,7 @@ iotController.controller('AddEditRuleCtrl', function($scope,
                 errMsg = $scope.Errors.getMessageByCode(errData.errors.pop());
             }
         } else {
-           errMsg = $scope.Errors.getMessageByCode(errData.code);
+            errMsg = $scope.Errors.getMessageByCode(errData.code);
 
         }
 
@@ -177,9 +177,9 @@ iotController.controller('AddEditRuleCtrl', function($scope,
         this.operator = null;
         this.values = [];
         this.multiple = {
-                operator: [],
-                values:[]
-            };
+            operator: [],
+            values:[]
+        };
         this.timeLimit = null;
         this.period = null;
         this.baselineMinimalInstances = null;
@@ -207,35 +207,81 @@ iotController.controller('AddEditRuleCtrl', function($scope,
             return;
         }
         switch (type) {
-            case 'mail':
-                if ($scope.notifications.emailNotifications.length === 0) {
-                    $scope.notifications.emailNotifications.push({
-                        "type": 'mail',
-                        "target": []
-                    });
-                }
-                break;
-            case 'http':
-                $scope.notifications.httpNotifications.push({
-                    "type": 'http',
-                    "target": [],
-                    "http_headers": {}
+        case 'mail':
+            if ($scope.notifications.emailNotifications.length === 0) {
+                $scope.notifications.emailNotifications.push({
+                    "type": 'mail',
+                    "target": []
                 });
-                $scope.notifications.httpVisibility.push(true);
-                break;
-            case 'actuation':
-                if ($scope.actuationsListFiltered.length > 0) {
-                    $scope.notifications.actuationNotifications.push({
-                        "type": 'actuation',
-                        "target": []
-                    });
-                    $scope.notifications.actuationVisibility.push(true);
-                } else {
-                    flash.to('alert-1').error = $scope.i18n.rules.no_actuations_defined;
-                }
-                break;
+            }
+            break;
+        case 'http':
+            $scope.notifications.httpNotifications.push({
+                "type": 'http',
+                "target": [],
+                "http_headers": {}
+            });
+            $scope.notifications.httpVisibility.push(true);
+            break;
+        case 'actuation':
+            if ($scope.actuationsListFiltered.length > 0) {
+                $scope.notifications.actuationNotifications.push({
+                    "type": 'actuation',
+                    "target": []
+                });
+                $scope.notifications.actuationVisibility.push(true);
+            } else {
+                flash.to('alert-1').error = $scope.i18n.rules.no_actuations_defined;
+            }
+            break;
         }
     };
+
+    function filterMailSelected  () {
+        $scope.userListFilter = $scope.userList.filter (function (obje) {
+            return !($scope.rule.isMailAtAction(obje.email));
+        });
+    }
+
+    function isActuationInUse(actuation) {
+        for (var i = 0; i < $scope.notifications.actuationNotifications.length; i++) {
+            if ($scope.notifications.actuationNotifications[i].target[0] === actuation.id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function filterActuationsSelected() {
+        $scope.actuationsListFiltered = $scope.actuationsList.filter(function (actuation) {
+            return !isActuationInUse(actuation);
+        });
+    }
+
+    function getObjectKey (key, list, prop) {
+        var a, l = list.length;
+        for (var i=0; i < l;++i){
+            var o =list[i];
+            if (o[prop] === key) {
+                a = o;
+                break;
+            }
+        }
+        return a;
+    }
+
+    function getComponentDefinition(type) {
+        var ret = null;
+        for (var i = 0; i < $scope.catalogComponents.length; i++) {
+            if ($scope.catalogComponents[i].id === type) {
+                ret = $scope.catalogComponents[i];
+                break;
+            }
+        }
+
+        return ret;
+    }
+
     $scope.removeEmailNotification = function () {
         var emailNotificationsLength = $scope.notifications.emailNotifications[0].target.length;
         for(var i = 0; i < emailNotificationsLength; i++) {
@@ -284,13 +330,13 @@ iotController.controller('AddEditRuleCtrl', function($scope,
     };
     var applySurrogate = $scope.chosen.applyForAll;
     $scope.condition = {
-            operator: null,
-            value: null,
-            valueRight: null,
-            ruleCondition: null,
-            forLast: null,
-            ruleComponent: null,
-            stdInstances: 10 //Default 10
+        operator: null,
+        value: null,
+        valueRight: null,
+        ruleCondition: null,
+        forLast: null,
+        ruleComponent: null,
+        stdInstances: 10 //Default 10
     };
     $scope.components = [];
     $scope.searchResult = {
@@ -442,11 +488,11 @@ iotController.controller('AddEditRuleCtrl', function($scope,
         var values = [];
         var type = "Regular";
         for (var i = 0; i < l ; ++i) {
-           var ob = $scope.chosen.conditionSequence[i];
+            var ob = $scope.chosen.conditionSequence[i];
             var da = {
-                        type: ob.type.key,
-                        values: ob.values
-                    };
+                type: ob.type.key,
+                values: ob.values
+            };
 
             da.component = {
                 dataType: ob.catalog.dataType,
@@ -518,27 +564,6 @@ iotController.controller('AddEditRuleCtrl', function($scope,
         $scope.rule.setPopulation($scope.population);
     }
 
-    function filterMailSelected  () {
-        $scope.userListFilter = $scope.userList.filter (function (obje) {
-            return !($scope.rule.isMailAtAction(obje.email));
-        });
-    }
-
-    function filterActuationsSelected() {
-        $scope.actuationsListFiltered = $scope.actuationsList.filter(function (actuation) {
-            return !isActuationInUse(actuation);
-        });
-    }
-
-    function isActuationInUse(actuation) {
-        for (var i = 0; i < $scope.notifications.actuationNotifications.length; i++) {
-            if ($scope.notifications.actuationNotifications[i].target[0] === actuation.id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     $scope.$watch('userList', function() {
         filterMailSelected();
     }, true);
@@ -559,9 +584,9 @@ iotController.controller('AddEditRuleCtrl', function($scope,
     function setDetailsOption () {
         filterMailSelected();
         $scope.chosen.priority = utilityService.getNgOptionFromAAkey($scope.rule.priority,
-                                                              $scope.priorityLevel);
+            $scope.priorityLevel);
         $scope.chosen.resetType = utilityService.getNgOptionFromAAkey($scope.rule.resetType,
-                                                               $scope.resetType);
+            $scope.resetType);
     }
     function setFiltersOption() {
         var s = $scope.rule.getPopulation();
@@ -574,17 +599,6 @@ iotController.controller('AddEditRuleCtrl', function($scope,
             applySurrogate = $scope.chosen.applyForAll;
         }
     }
-    function getObjectKey (key, list, prop) {
-        var a, l = list.length;
-        for (var i=0; i < l;++i){
-            var o =list[i];
-            if (o[prop] === key) {
-                a = o;
-                break;
-            }
-        }
-        return a;
-    }
 
     function addSecuences( l ){
         var li = $scope.chosen.conditionSequence.length;
@@ -592,18 +606,6 @@ iotController.controller('AddEditRuleCtrl', function($scope,
             $scope.addSequenceToRule();
         }
 
-    }
-
-    function getComponentDefinition(type) {
-        var ret = null;
-        for (var i = 0; i < $scope.catalogComponents.length; i++) {
-            if ($scope.catalogComponents[i].id === type) {
-                ret = $scope.catalogComponents[i];
-                break;
-            }
-        }
-
-        return ret;
     }
 
     function setNegative(val){
@@ -615,10 +617,10 @@ iotController.controller('AddEditRuleCtrl', function($scope,
     function setCondtionOption() {
         var obj = $scope.rule.getCondition();
 
-  
+
 
         $scope.chosen.conditionOperator = getObjectKey(obj.operator,
-                                                      $scope.conditionOperator, 'key');
+            $scope.conditionOperator, 'key');
         var length = obj.values.length;
         addSecuences(length);
 
@@ -667,8 +669,8 @@ iotController.controller('AddEditRuleCtrl', function($scope,
                 var r = utilityService.converFromSeconds(o.timeLimit);
                 $scope.chosen.conditionSequence[i].timeLimit = r.value;
                 $scope.chosen.conditionSequence[i].period = getObjectKey(r.key,
-                                                                         $scope.conditionPeriod,
-                                                                         'key');
+                    $scope.conditionPeriod,
+                    'key');
             }
 
             if($scope.chosen.conditionSequence[i].component) {

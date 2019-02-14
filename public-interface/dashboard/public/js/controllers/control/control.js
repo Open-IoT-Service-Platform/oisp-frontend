@@ -16,13 +16,19 @@
 
 'use strict';
 iotController.controller('controlCtrl', function($scope,
-                                                 $rootScope,
-                                                 $filter,
-                                                 $modal,
-                                                 $timeout,
-                                                 componentsService,
-                                                 controlService,
-                                                 sessionService){
+    $rootScope,
+    $filter,
+    $modal,
+    $timeout,
+    componentsService,
+    controlService,
+    sessionService){
+
+    var readyStatusName = 'ready';
+    var invalidStatusName = 'invalid';
+    var sentStatusName = 'sent';
+    var savedStatusName = 'saved';
+
     $scope.$parent.page = {
         menuSelected: "control",
         title: $rootScope.i18n.control.title
@@ -31,6 +37,16 @@ iotController.controller('controlCtrl', function($scope,
     $scope.complexCommands = [];
     $scope.complexActions = [];
     $scope.actionsList = [];
+
+    var errorHandler = function(data){
+        if(data.errors) {
+            $scope.errors = [data.errors];
+        } else {
+            $scope.errors = [];
+        }
+        $scope.pending = false;
+    };
+
     function loadComplexCommands() {
         controlService.getComplexCommands(function(commands) {
             $scope.complexCommands = commands;
@@ -47,9 +63,9 @@ iotController.controller('controlCtrl', function($scope,
     };
 
     $scope.$watch(sessionService.getCurrentAccount, function(data) {
-            if(data) {
-                loadComplexCommands();
-            }
+        if(data) {
+            loadComplexCommands();
+        }
     });
 
     $scope.filters = {
@@ -215,11 +231,6 @@ iotController.controller('controlCtrl', function($scope,
         $("#parameterValueSlider").focus();
     };
 
-    var readyStatusName = 'ready';
-    var invalidStatusName = 'invalid';
-    var sentStatusName = 'sent';
-    var savedStatusName = 'saved';
-
     function getStatus(component, parameterName, parameterValue){
         var result = invalidStatusName;
 
@@ -363,15 +374,6 @@ iotController.controller('controlCtrl', function($scope,
         return data;
     }
 
-    var errorHandler = function(data){
-        if(data.errors) {
-            $scope.errors = [data.errors];
-        } else {
-            $scope.errors = [];
-        }
-        $scope.pending = false;
-    };
-
     function sendActions(actions, complexActions){
         $scope.pending = true;
 
@@ -383,12 +385,6 @@ iotController.controller('controlCtrl', function($scope,
             });
             $scope.pending = false;
         }, errorHandler);
-    }
-
-    function saveActions(actions){
-        showSaveDialog(function(enteredName) {
-            return saveComplexCommandAs(enteredName, actions);
-        });
     }
 
     function saveComplexCommandAs(enteredName, actions) {
@@ -431,6 +427,12 @@ iotController.controller('controlCtrl', function($scope,
         }).result;
     }
 
+    function saveActions(actions){
+        showSaveDialog(function(enteredName) {
+            return saveComplexCommandAs(enteredName, actions);
+        });
+    }
+
     $scope.showComplexAction = function(action) {
         var complexCommand = $scope.complexCommands.filter(function (c) {
             return c.id === action.id;
@@ -449,7 +451,7 @@ iotController.controller('controlCtrl', function($scope,
 
     $scope.deleteComplexCommand = function(id) {
         return controlService.deleteAction(id, function() {
-           loadComplexCommands();
+            loadComplexCommands();
         }, function() {
             $scope.errors = [$scope.i18n.control.error_delete];
         });

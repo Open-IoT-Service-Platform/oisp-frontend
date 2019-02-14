@@ -83,35 +83,35 @@ function validateType(obj, schema, names, errors) {
     //console.log('***', names, 'validateType');
     if (schema.type !== undefined) {
         switch (getType(schema.type)) {
-            case 'string':
-                // simple type
-                if (!isOfType(obj, schema.type)) {
-                    throwInvalidType(names, obj, prettyType(schema.type), errors);
-                }
-                break;
-            case 'array':
-                // union type
-                for (var i = 0; i < schema.type.length; ++i) {
-                    switch (getType(schema.type[i])) {
-                        case 'string':
-                            // simple type (inside union type)
-                            if (isOfType(obj, schema.type[i])) {
-                                return; // success
-                            }
-                            break;
-                        case 'object':
-                            // schema (inside union type)
-                            try {
-                                return validateSchema(obj, schema.type[i], names, errors);
-                            } catch (err) {
-                                // validation failed
-                                // TOOD: consider propagating error message upwards
-                            }
-                            break;
+        case 'string':
+            // simple type
+            if (!isOfType(obj, schema.type)) {
+                throwInvalidType(names, obj, prettyType(schema.type), errors);
+            }
+            break;
+        case 'array':
+            // union type
+            for (var i = 0; i < schema.type.length; ++i) {
+                switch (getType(schema.type[i])) {
+                case 'string':
+                    // simple type (inside union type)
+                    if (isOfType(obj, schema.type[i])) {
+                        return; // success
                     }
+                    break;
+                case 'object':
+                    // schema (inside union type)
+                    try {
+                        return validateSchema(obj, schema.type[i], names, errors);
+                    } catch (err) {
+                        // validation failed
+                        // TOOD: consider propagating error message upwards
+                    }
+                    break;
                 }
-                throwInvalidType(names, obj, 'either ' + schema.type.map(prettyType).join(' or '), errors);
-                break;
+            }
+            throwInvalidType(names, obj, 'either ' + schema.type.map(prettyType).join(' or '), errors);
+            break;
         }
     }
 }
@@ -119,36 +119,36 @@ function validateType(obj, schema, names, errors) {
 function validateDisallow(obj, schema, names, errors) {
     if (schema.disallow !== undefined) {
         switch (getType(schema.disallow)) {
-            case 'string':
-                // simple type
-                if (isOfType(obj, schema.disallow)) {
-                    throwInvalidDisallow(names, obj, prettyType(schema.disallow), errors);
-                }
-                break;
-            case 'array':
-                // union type
-                for (var i = 0; i < schema.disallow.length; ++i) {
-                    switch (getType(schema.disallow[i])) {
-                        case 'string':
-                            // simple type (inside union type)
-                            if (isOfType(obj, schema.disallow[i])) {
-                                throwInvalidType(names, obj, 'neither ' + schema.disallow.map(prettyType).join(' nor '), errors);
-                            }
-                            break;
-                        case 'object':
-                            // schema (inside union type)
-                            try {
-                                validateSchema(obj, schema.disallow[i], names, errors);
-                            } catch (err) {
-                                // validation failed
-                                continue;
-                            }
-                            throwInvalidType(names, obj, 'neither ' + schema.disallow.map(prettyType).join(' nor '), errors);
-                            // TOOD: consider propagating error message upwards
-                            break;
+        case 'string':
+            // simple type
+            if (isOfType(obj, schema.disallow)) {
+                throwInvalidDisallow(names, obj, prettyType(schema.disallow), errors);
+            }
+            break;
+        case 'array':
+            // union type
+            for (var i = 0; i < schema.disallow.length; ++i) {
+                switch (getType(schema.disallow[i])) {
+                case 'string':
+                    // simple type (inside union type)
+                    if (isOfType(obj, schema.disallow[i])) {
+                        throwInvalidType(names, obj, 'neither ' + schema.disallow.map(prettyType).join(' nor '), errors);
                     }
+                    break;
+                case 'object':
+                    // schema (inside union type)
+                    try {
+                        validateSchema(obj, schema.disallow[i], names, errors);
+                    } catch (err) {
+                        // validation failed
+                        continue;
+                    }
+                    throwInvalidType(names, obj, 'neither ' + schema.disallow.map(prettyType).join(' nor '), errors);
+                    // TOOD: consider propagating error message upwards
+                    break;
                 }
-                break;
+            }
+            break;
         }
     }
 }
@@ -185,29 +185,29 @@ function validateArray(obj, schema, names, errors) {
 
     if (schema.items !== undefined) {
         switch (getType(schema.items)) {
-            case 'object':
-                // all the items in the array MUST be valid according to the schema
-                for (i = 0; i < obj.length; ++i) {
-                    obj[i] = validateSchema(obj[i], schema.items, names.concat(['[' + i + ']']), errors);
-                }
-                break;
-            case 'array':
-                // each position in the instance array MUST conform to the schema in the corresponding position for this array
-                var numChecks = Math.min(obj.length, schema.items.length);
-                for (i = 0; i < numChecks; ++i) {
-                    obj[i] = validateSchema(obj[i], schema.items[i], names.concat(['[' + i + ']']), errors);
-                }
-                if (obj.length > schema.items.length) {
-                    if (schema.additionalItems !== undefined) {
-                        if (schema.additionalItems === false) {
-                            throwInvalidAttributeValue(names, 'number of items', obj.length, 'at most ' + schema.items.length + ' - the length of schema items', errors);
-                        }
-                        for (; i < obj.length; ++i) {
-                            obj[i] = validateSchema(obj[i], schema.additionalItems, names.concat(['[' + i + ']']), errors);
-                        }
+        case 'object':
+            // all the items in the array MUST be valid according to the schema
+            for (i = 0; i < obj.length; ++i) {
+                obj[i] = validateSchema(obj[i], schema.items, names.concat(['[' + i + ']']), errors);
+            }
+            break;
+        case 'array':
+            // each position in the instance array MUST conform to the schema in the corresponding position for this array
+            var numChecks = Math.min(obj.length, schema.items.length);
+            for (i = 0; i < numChecks; ++i) {
+                obj[i] = validateSchema(obj[i], schema.items[i], names.concat(['[' + i + ']']), errors);
+            }
+            if (obj.length > schema.items.length) {
+                if (schema.additionalItems !== undefined) {
+                    if (schema.additionalItems === false) {
+                        throwInvalidAttributeValue(names, 'number of items', obj.length, 'at most ' + schema.items.length + ' - the length of schema items', errors);
+                    }
+                    for (; i < obj.length; ++i) {
+                        obj[i] = validateSchema(obj[i], schema.additionalItems, names.concat(['[' + i + ']']), errors);
                     }
                 }
-                break;
+            }
+            break;
         }
     }
 
@@ -291,30 +291,30 @@ function validateObject(obj, schema, names, errors) {
     if (schema.dependencies !== undefined) {
         for (property in schema.dependencies) {
             switch (getType(schema.dependencies[property])) {
-                case 'string':
-                    // simple dependency
-                    if (property in obj && !(schema.dependencies[property] in obj)) {
+            case 'string':
+                // simple dependency
+                if (property in obj && !(schema.dependencies[property] in obj)) {
+                    errors.push({
+                        property: getName(names.concat([schema.dependencies[property]])),
+                        message: ' is required by property \'' + property + '\''
+                    });
+                }
+                break;
+            case 'array':
+                // simple dependency tuple
+                for (var i = 0; i < schema.dependencies[property].length; ++i) {
+                    if (property in obj && !(schema.dependencies[property][i] in obj)) {
                         errors.push({
-                            property: getName(names.concat([schema.dependencies[property]])),
+                            property: getName(names.concat([schema.dependencies[property][i]])),
                             message: ' is required by property \'' + property + '\''
                         });
                     }
-                    break;
-                case 'array':
-                    // simple dependency tuple
-                    for (var i = 0; i < schema.dependencies[property].length; ++i) {
-                        if (property in obj && !(schema.dependencies[property][i] in obj)) {
-                            errors.push({
-                                property: getName(names.concat([schema.dependencies[property][i]])),
-                                message: ' is required by property \'' + property + '\''
-                            });
-                        }
-                    }
-                    break;
-                case 'object':
-                    // schema dependency
-                    validateSchema(obj, schema.dependencies[property], names.concat(['[dependencies.' + property + ']']), errors);
-                    break;
+                }
+                break;
+            case 'object':
+                // schema dependency
+                validateSchema(obj, schema.dependencies[property], names.concat(['[dependencies.' + property + ']']), errors);
+                break;
             }
         }
     }
@@ -387,13 +387,13 @@ function validateFormat(obj, schema, names, errors) {
 function validateItem(obj, schema, names, errors) {
     //console.log('***', names, 'validateItem');
     switch (getType(obj)) {
-        case 'number':
-        case 'integer':
-            validateNumber(obj, schema, names, errors);
-            break;
-        case 'string':
-            validateString(obj, schema, names, errors);
-            break;
+    case 'number':
+    case 'integer':
+        validateNumber(obj, schema, names, errors);
+        break;
+    case 'string':
+        validateString(obj, schema, names, errors);
+        break;
     }
 
     validateFormat(obj, schema, names, errors);
@@ -410,14 +410,14 @@ function validateSchema(obj, schema, names, errors) {
         validateEnum(obj, schema, names, errors);
 
         switch (getType(obj)) {
-            case 'object':
-                validateObject(obj, schema, names, errors);
-                break;
-            case 'array':
-                validateArray(obj, schema, names, errors);
-                break;
-            default:
-                validateItem(obj, schema, names, errors);
+        case 'object':
+            validateObject(obj, schema, names, errors);
+            break;
+        case 'array':
+            validateArray(obj, schema, names, errors);
+            break;
+        default:
+            validateItem(obj, schema, names, errors);
         }
     }
     return obj;

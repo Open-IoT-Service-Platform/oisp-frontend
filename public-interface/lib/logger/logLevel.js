@@ -17,29 +17,29 @@
 'use strict';
 
 exports.logLevels = {
-		levels: {
-			all: 5,
+    levels: {
+        all: 5,
 	        debug: 4,
 	        info: 3,
 	        warn: 2,
 	        error: 1,
 	        critical: 0
-		},
-		colors: {
-			all: 'magenta',
+    },
+    colors: {
+        all: 'magenta',
 		    debug: 'blue',
 		    info : 'green',
 		    warn : 'yellow',
 		    error: 'red',
 		    critical: 'red'
-		}
-}
+    }
+};
 
 
 exports.compareLevel = function(level1, level2) {
-  var rv = false;
-  if (this.logLevels.levels[level1] && this.logLevels.levels[level2]) {
-    rv = this.logLevels.levels[level1] <= this.logLevels.levels[level2];
-  }
-  return rv;
+    var rv = false;
+    if (this.logLevels.levels[level1] && this.logLevels.levels[level2]) {
+        rv = this.logLevels.levels[level1] <= this.logLevels.levels[level2];
+    }
+    return rv;
 };

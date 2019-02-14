@@ -10,11 +10,11 @@
     "eqnull": true,
     "browser": true,
     "unused": true,
-    "indent": false,
-    "node" : true,
+    "node": true,
     "esversion": 6,
     "globals": {
         "angular": true,
+        "confirm": true,
         "Rickshaw": true,
         "iotApp": true,
         "iotController": true,

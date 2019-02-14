@@ -26,10 +26,10 @@ iotApp.directive('dateSelector', function(){
 iotApp.directive('periodSelector', function(){
     return {
         scope : {
-                 title:'@',
-                 model:'&',
-                 values: '='
-                },
+            title:'@',
+            model:'&',
+            values: '='
+        },
         restrict: "E",
         templateUrl: 'public/partials/directives/periodSelector.html',
         replace: true,

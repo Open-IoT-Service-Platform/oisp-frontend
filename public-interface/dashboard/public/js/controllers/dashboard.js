@@ -17,8 +17,8 @@
 'use strict';
 
 iotController.controller('DashboardCtrl', function($scope, $location, $rootScope, $route, $window,
-                                                   loginService, pollerService, alertsService, usersService,
-                                                   invitesService, accountsService, sessionService) {
+    loginService, pollerService, alertsService, usersService,
+    invitesService, accountsService, sessionService) {
     $scope.snap_opts = {
         maxPosition: 150,
         minPosition: -150,

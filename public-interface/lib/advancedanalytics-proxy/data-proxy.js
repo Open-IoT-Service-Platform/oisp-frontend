@@ -69,26 +69,27 @@ var buildICFALMessage = function(data) {
     };
 };
 
-var createSpan = function(name) {
+function createSpan(name) {
     const context = contextProvider.instance();
     if (!jaegerConfig.tracing)
-        return null;
+    {return null;}
     var fatherSpan = context.get(spanContext.parent);
     if (!fatherSpan) {
         // something is wrong
         logger.warn('Span must be dropped due to no father is present');
         var rootSpan = context.get(spanContext.root);
         if (rootSpan)
-            rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
+        {rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);}
         return null;
     }
     const span = tracer.startSpan(name, { childOf: fatherSpan.span });
     return span;
 }
 
-var finishSpan = function(span) {
-    if (span)
+function finishSpan(span) {
+    if (span) {
         span.finish();
+    }
 }
 
 module.exports = function(config) {
@@ -96,6 +97,18 @@ module.exports = function(config) {
     var connector = new MQTTConnector.Broker(config.mqtt, logger);
 
     var kafkaClient, kafkaProducer;
+
+    var prepareErrorMessage = function (res) {
+        var body = JSON.parse(res.body);
+        var message = '';
+        if (body.errors) {
+            body.errors.forEach(function (error) {
+                message += error.errorMessage + '. ';
+            });
+        }
+        return message;
+    };
+
     if (config.ingestion === 'Kafka') {
         try {
             kafkaClient = new KafkaClient(config.kafka.hosts, config.kafka.username);
@@ -181,8 +194,8 @@ module.exports = function(config) {
 
         try {
             var dataMetric = new Metric(),
-            metricsTopic = 'metrics',
-            message = 'server/metric/' + data.domainId + "/" + data.gatewayId + "~@~" +JSON.stringify(dataMetric.prepareDataIngestionMsg(data));
+                metricsTopic = 'metrics',
+                message = 'server/metric/' + data.domainId + "/" + data.gatewayId + "~@~" +JSON.stringify(dataMetric.prepareDataIngestionMsg(data));
 
             kafkaProducer.send([
                 {
@@ -261,17 +274,6 @@ module.exports = function(config) {
                 callback({message: 'Could not parse AA response'});
             }
         });
-    };
-
-    var prepareErrorMessage = function (res) {
-        var body = JSON.parse(res.body);
-        var message = '';
-        if (body.errors) {
-            body.errors.forEach(function (error) {
-                message += error.errorMessage + '. ';
-            });
-        }
-        return message;
     };
 
     this.dataInquiryAdvanced = function(data, callback) {
@@ -383,7 +385,7 @@ module.exports = function(config) {
 
     this.getFirstAndLastMeasurement = function(data, callback) {
         const context = contextProvider.instance();
-        span.createSpan('getFirstAndLastMeasurement');
+        const span = createSpan('getFirstAndLastMeasurement');
 
         var domainId = data.domainId;
         delete data.domainId;

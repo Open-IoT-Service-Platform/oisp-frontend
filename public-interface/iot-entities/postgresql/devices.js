@@ -290,9 +290,9 @@ exports.getTotals = function (accountId, resultCallback) {
                             return devices.count({where: {lastVisit: { $not: null}, status: deviceStatus.active}})
                                 .then(function (currentDevicesCount) {
                                     resultCallback(null, deviceModelHelper.createTotalsResponse({activeDevices: activeDevicesCount,
-                                            createdDevices: createdDevicesCount,
-                                            allDevices: allDevicesCount,
-                                            currentDevices: currentDevicesCount})
+                                        createdDevices: createdDevicesCount,
+                                        allDevices: allDevicesCount,
+                                        currentDevices: currentDevicesCount})
                                     );
                                 });
                         });
@@ -463,21 +463,21 @@ exports.deleteComponent = function (deviceId, componentId, transaction) {
 };
 
 exports.belongsToAccount = function(deviceId, accountId) {
-  var filter = {
-    where: {
-      accountId: accountId,
-      id: deviceId
-    }
-  };
-  return devices.findOne(filter)
-  .then(function(result) {
-    return new Promise(function(resolve, reject) {
-      if (result !== undefined && result !== null) {
-        resolve();
-      }
-      else {
-        reject();
-      }
-    });
-  });
+    var filter = {
+        where: {
+            accountId: accountId,
+            id: deviceId
+        }
+    };
+    return devices.findOne(filter)
+        .then(function(result) {
+            return new Promise(function(resolve, reject) {
+                if (result !== undefined && result !== null) {
+                    resolve();
+                }
+                else {
+                    reject();
+                }
+            });
+        });
 };

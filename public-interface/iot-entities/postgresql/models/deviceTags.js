@@ -19,32 +19,32 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('device_tags', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                defaultValue: DataTypes.UUIDV4
-            },
-            deviceId: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-                unique: 'tag_device_unique'
-            },
-            value: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-                unique: 'tag_device_unique'
-            }
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'devicetags_deviceId_index',
-                    method: 'BTREE',
-                    fields: ['deviceId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        deviceId: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            unique: 'tag_device_unique'
+        },
+        value: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            unique: 'tag_device_unique'
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'devicetags_deviceId_index',
+                method: 'BTREE',
+                fields: ['deviceId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

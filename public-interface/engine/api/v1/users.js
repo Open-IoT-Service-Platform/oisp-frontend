@@ -142,22 +142,22 @@ function addNewUser(data, host) {
 
     return user.new(data, null)
         .then(function (result) {
-                if (!result) {
-                    throw errBuilder.Errors.Generic.InternalServerError;
-                }
+            if (!result) {
+                throw errBuilder.Errors.Generic.InternalServerError;
+            }
 
-                delete result.password;
-                delete result.salt;
+            delete result.password;
+            delete result.salt;
 
-                if (!data.provider) {
-                    return Q.nfcall(sendActivationEmail, host, data.email)
-                        .thenResolve(result)
-                        .catch(function () {
-                            throw errBuilder.Errors.User.CannotSendActivationEmail;
-                        });
-                } else {
-                    return Q.resolve(result);
-                }
+            if (!data.provider) {
+                return Q.nfcall(sendActivationEmail, host, data.email)
+                    .thenResolve(result)
+                    .catch(function () {
+                        throw errBuilder.Errors.User.CannotSendActivationEmail;
+                    });
+            } else {
+                return Q.resolve(result);
+            }
         })
         .catch(function (err) {
             var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
@@ -214,7 +214,7 @@ exports.updateUser = function (data, accountId) {
                             }
                         });
                 });
-    });
+        });
 };
 
 exports.canUserBeDeleted = function (userData) {
@@ -281,7 +281,7 @@ exports.deleteUser = function (userId) {
                                 throw errBuilder.build(errBuilder.Errors.User.NotFound);
                             }
                         });
-            });
+                });
         });
 };
 
@@ -485,13 +485,13 @@ exports.addUserSettings = function (userId, accountId, category, setting, result
             return Q.nfcall(userSettings.new, setting)
                 .then (function(result) {
                     resultCallback(null, result);
-            });
+                });
 
-    })
-    .catch(function(err) {
-        logger.error('addUserSettings - error during adding new setting: ' + JSON.stringify(err));
-        resultCallback(errBuilder.build(errBuilder.Errors.User.Setting.SavingError));
-    });
+        })
+        .catch(function(err) {
+            logger.error('addUserSettings - error during adding new setting: ' + JSON.stringify(err));
+            resultCallback(errBuilder.build(errBuilder.Errors.User.Setting.SavingError));
+        });
 };
 
 exports.updateUserSettings = function (userId, accountId, category, settingId, setting, resultCallback) {
@@ -506,13 +506,13 @@ exports.updateUserSettings = function (userId, accountId, category, settingId, s
                     return Q.nfcall(userSettings.update, settingId, setting)
                         .then (function(result) {
                             resultCallback(null, result);
-                    });
-            });
-    })
-    .catch(function (err) {
-        logger.error('addUserSettings - error during updating setting: ' + JSON.stringify(err));
-        resultCallback(errBuilder.build(errBuilder.Errors.User.Setting.SavingError));
-    });
+                        });
+                });
+        })
+        .catch(function (err) {
+            logger.error('addUserSettings - error during updating setting: ' + JSON.stringify(err));
+            resultCallback(errBuilder.build(errBuilder.Errors.User.Setting.SavingError));
+        });
 };
 
 exports.deleteUserSettings = function (userId, accountId, category, settingId, resultCallback) {

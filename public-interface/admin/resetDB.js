@@ -15,39 +15,42 @@
  */
 
 var models = require('../iot-entities/postgresql/models'),
-	systemUsers = require('../lib/dp-users/systemUsers'),
-	tracer = require('../lib/express-jaeger').tracer;
+    systemUsers = require('../lib/dp-users/systemUsers'),
+    tracer = require('../lib/express-jaeger').tracer;
 
 var ResetDB = function(){};
 
-ResetDB.prototype.reset = function(cb){
+/*jshint -W098 */
+/*globals requests: true */
+ResetDB.prototype.reset = function(cb) {
     models.sequelize.authenticate()
-	.then(function() {
+        .then(function() {
             var tables = [];
-	    var fn = function(model){
-		const tableData = models.sequelize.models[model].getTableName();
-		const tableName = '"' + tableData.schema + '"."' + tableData.tableName + '"';
-		return models.sequelize.query('TRUNCATE TABLE ' + tableName + ' CASCADE');
-	    }
+	        var fn = function(model){
+                const tableData = models.sequelize.models[model].getTableName();
+                const tableName = '"' + tableData.schema + '"."' + tableData.tableName + '"';
+                return models.sequelize.query('TRUNCATE TABLE ' + tableName + ' CASCADE');
+	        };
             requests = Object.keys(models.sequelize.models)
-		.map(fn);
+                .map(fn);
             return Promise.all(requests);
-	})
-	.then(() => {
-	    return models.initSchema();
-	})
-	.then(function() {
-        return systemUsers.create();
-	})
-	.catch(err => {
-		console.error('Can not reset postgres DB');
-		console.error(err);
-		process.exit(1);
-	})
-	.finally(function() {
-		models.sequelize.close();
-		tracer.close();
-	});
-}
+        })
+        .then(() => {
+	        return models.initSchema();
+        })
+        .then(function() {
+            return systemUsers.create();
+        })
+        .catch(err => {
+            console.error('Can not reset postgres DB');
+            console.error(err);
+            process.exit(1);
+        })
+        .finally(function() {
+            models.sequelize.close();
+            tracer.close();
+        });
+};
+/*jshint +W098 */
 
 module.exports = ResetDB;

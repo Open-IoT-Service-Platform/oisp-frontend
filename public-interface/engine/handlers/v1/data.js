@@ -76,57 +76,57 @@ exports.searchData = function(req, res, next) {
     var searchRequest = req.body;
     var output = req.query.output;
     switch(output){
-        case 'csv':
-            data.exportToCsv(req.params.accountId, searchRequest, function(err, results) {
-                if (!err && results.csv) {
-                    res.setHeader("Content-Type", "text/csv; charset=utf-8");
-                    res.status(httpStatuses.OK.code).send(results.csv);
-                } else if (err in httpStatuses) {
-                    if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
-                        res.status(httpStatuses[err].code).send(results);
-                    } else {
-                        res.status(httpStatuses[err].code).send();
-                    }
+    case 'csv':
+        data.exportToCsv(req.params.accountId, searchRequest, function(err, results) {
+            if (!err && results.csv) {
+                res.setHeader("Content-Type", "text/csv; charset=utf-8");
+                res.status(httpStatuses.OK.code).send(results.csv);
+            } else if (err in httpStatuses) {
+                if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
+                    res.status(httpStatuses[err].code).send(results);
                 } else {
-                    next(err);
+                    res.status(httpStatuses[err].code).send();
                 }
-            });
-            break;
-        case 'email':
-            data.sendByEmail(req.params.accountId, searchRequest, function(err, results) {
-                if (!err) {
-                    res.status(httpStatuses.OK.code).send();
-                } else if (err in httpStatuses) {
-                    if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
-                        res.status(httpStatuses[err].code).send(results);
-                    } else {
-                        res.status(httpStatuses[err].code).send();
-                    }
+            } else {
+                next(err);
+            }
+        });
+        break;
+    case 'email':
+        data.sendByEmail(req.params.accountId, searchRequest, function(err, results) {
+            if (!err) {
+                res.status(httpStatuses.OK.code).send();
+            } else if (err in httpStatuses) {
+                if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
+                    res.status(httpStatuses[err].code).send(results);
                 } else {
-                    next(err);
+                    res.status(httpStatuses[err].code).send();
                 }
-            });
-            break;
-        default:
-            data.search(req.params.accountId, searchRequest, function(err, results, isBinary) {
-                if (!err) {
-                    if (isBinary) {
-                        res.setHeader('Content-Type', 'application/cbor');
-                        results = cbor.encode(results);
-                    } else {
-                        res.setHeader('Content-Type', 'application/json');
-                    }
-                    res.status(httpStatuses.OK.code).send(results);
-                } else if (err in httpStatuses) {
-                    if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
-                        res.status(httpStatuses[err].code).send(results);
-                    } else {
-                        res.status(httpStatuses[err].code).send();
-                    }
+            } else {
+                next(err);
+            }
+        });
+        break;
+    default:
+        data.search(req.params.accountId, searchRequest, function(err, results, isBinary) {
+            if (!err) {
+                if (isBinary) {
+                    res.setHeader('Content-Type', 'application/cbor');
+                    results = cbor.encode(results);
                 } else {
-                    next(err);
+                    res.setHeader('Content-Type', 'application/json');
                 }
-            });
+                res.status(httpStatuses.OK.code).send(results);
+            } else if (err in httpStatuses) {
+                if(httpStatuses[err].code === errBuilder.Errors.Generic.InvalidRequest.code) {
+                    res.status(httpStatuses[err].code).send(results);
+                } else {
+                    res.status(httpStatuses[err].code).send();
+                }
+            } else {
+                next(err);
+            }
+        });
     }
 };
 

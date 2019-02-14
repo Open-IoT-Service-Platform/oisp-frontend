@@ -76,6 +76,7 @@
     "grunt-contrib-jshint": "^2.0.0",
     "grunt-contrib-nodeunit": "^2.0.0",
     "grunt-contrib-uglify": "^4.0.0",
+    "grunt-eslint": "^21.0.0",
     "grunt-exec": "^3.0.0",
     "grunt-filerev": "^2.3.1",
     "grunt-istanbul": "^0.8.0",

@@ -19,21 +19,38 @@
 /* global getServicesConfig */
 
 iotController.controller('LoginCtrl', function($scope,
-                                               $rootScope,
-                                               $window,
-                                               $routeParams,
-                                               usersService,
-                                               loginService,
-                                               sessionService,
-                                               vcRecaptchaService,
-                                               errorUtils,
-                                               googleCaptchaService
-    ) {
+    $rootScope,
+    $window,
+    $routeParams,
+    usersService,
+    loginService,
+    sessionService,
+    vcRecaptchaService,
+    errorUtils,
+    googleCaptchaService
+) {
 
 
     $scope.username_type = getServicesConfig("usernameType");
     $scope.verifyUserEmailAsString = "verifyUserEmail_"+getServicesConfig('verifyUserEmail').toString();
     $scope.wasActivationEmailResent = false;
+
+    function showResendActivationEmailMsg() {
+        if($scope.wasResentActivationEmail === false || $scope.wasResentActivationEmail === undefined) {
+            $scope.error = $rootScope.i18n.auth.email_not_verified;
+            $scope.showReverificationLink = true;
+        } else {
+            if($scope.wasSuccessInResending === true) {
+                $scope.error = $rootScope.i18n.auth.email_send;
+                $scope.showReverificationLink = false;
+            } else {
+                $scope.error = $rootScope.i18n.auth.email_send_error;
+                $scope.showReverificationLink = false;
+            }
+            $scope.wasResentActivationEmail = false;
+            $scope.wasSuccessInResending = false;
+        }
+    }
 
     $scope.getCurrentUser = function(login) {
         loginService.currentUser(
@@ -77,23 +94,6 @@ iotController.controller('LoginCtrl', function($scope,
         return $rootScope.i18n.auth.user_locked;
     }
 
-    function showResendActivationEmailMsg() {
-        if($scope.wasResentActivationEmail === false || $scope.wasResentActivationEmail === undefined) {
-            $scope.error = $rootScope.i18n.auth.email_not_verified;
-            $scope.showReverificationLink = true;
-        } else {
-            if($scope.wasSuccessInResending === true) {
-                $scope.error = $rootScope.i18n.auth.email_send;
-                $scope.showReverificationLink = false;
-            } else {
-                $scope.error = $rootScope.i18n.auth.email_send_error;
-                $scope.showReverificationLink = false;
-            }
-            $scope.wasResentActivationEmail = false;
-            $scope.wasSuccessInResending = false;
-        }
-    }
-
     var loginUser = function(user, login) {
         var ACCOUNT_LOCKED = 403;
         var RATE_LIMIT_EXHAUSTED = 429;
@@ -110,7 +110,7 @@ iotController.controller('LoginCtrl', function($scope,
                 } else if (status === RATE_LIMIT_EXHAUSTED) {
                     $scope.error = data.message || data;
                 } else if (data && data.code === EMAIL_NOT_VERIFIED) {
-                        showResendActivationEmailMsg();
+                    showResendActivationEmailMsg();
                 } else {
                     $scope.error = $rootScope.i18n.auth.invalid_username_password;
                     $scope.password = null;
@@ -179,15 +179,15 @@ iotController.controller('LoginCtrl', function($scope,
         enabled: false
     };
 
-   $scope.init = function () {
-       googleCaptchaService.getGoogleCaptchaKey(function success(data) {
-           $scope.recaptcha = {
-               key: data.captchaPublicKey,
-               enabled: true
-           };
-       }, function error(){
-       });
-   };
+    $scope.init = function () {
+        googleCaptchaService.getGoogleCaptchaKey(function success(data) {
+            $scope.recaptcha = {
+                key: data.captchaPublicKey,
+                enabled: true
+            };
+        }, function error(){
+        });
+    };
 
     $scope.checkSocialLoginAvailability = function() {
         loginService.getSocialConfig(function success(data) {
@@ -219,22 +219,22 @@ iotController.controller('LoginCtrl', function($scope,
             }
 
             usersService.addUser(user, function(){
-                    user.username = user.email;
-                    if(!getServicesConfig('verifyUserEmail')) {
-                        $window.location = '/ui/auth#/no_validate';
-                    } else {
-                        $window.location = '/ui/auth#/validate';
-                    }
-                },
-                function(e){
-                    var msg = errorUtils.extractMessageFromServerError(e);
-                    if(msg === 'conflict'){
-                        $scope.error = $rootScope.i18n.auth.email_conflict;
-                    } else {
-                        $scope.error = msg;
-                    }
-                    vcRecaptchaService.reload(false);
+                user.username = user.email;
+                if(!getServicesConfig('verifyUserEmail')) {
+                    $window.location = '/ui/auth#/no_validate';
+                } else {
+                    $window.location = '/ui/auth#/validate';
                 }
+            },
+            function(e){
+                var msg = errorUtils.extractMessageFromServerError(e);
+                if(msg === 'conflict'){
+                    $scope.error = $rootScope.i18n.auth.email_conflict;
+                } else {
+                    $scope.error = msg;
+                }
+                vcRecaptchaService.reload(false);
+            }
             );
         } else {
             $scope.error = $rootScope.i18n.auth.password_weak;

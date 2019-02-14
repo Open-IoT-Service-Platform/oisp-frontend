@@ -64,34 +64,34 @@ function validateDefault(schema, names) {
 function validateType(schema, names) {
     if (schema.type !== undefined) {
         switch (getType(schema.type)) {
-            case 'string':
-                // simple type - nothing to validate
-                break;
-            case 'array':
-                // union type
-                if (schema.type.length < 2) {
-                    throw new Error('Schema' + getName(names) + ': \'type\' attribute union length is ' + schema.type.length + ' when it should be at least 2');
-                }
-                for (var i = 0; i < schema.type.length; ++i) {
-                    switch (getType(schema.type[i])) {
-                        case 'string':
-                            // simple type (inside union type) - nothing to validate
-                            break;
-                        case 'object':
-                            // schema (inside union type)
-                            try {
-                                validateSchema(schema.type[i], []);
-                            } catch (err) {
-                                throw new Error('Schema' + getName(names) + ': \'type\' attribute union element ' + i + ' is not a valid schema: ' + err.message);
-                            }
-                            break;
-                        default:
-                            throwInvalidType(names, '\'type\' attribute union element ' + i, schema.type[i], 'either an object (schema) or a string');
+        case 'string':
+            // simple type - nothing to validate
+            break;
+        case 'array':
+            // union type
+            if (schema.type.length < 2) {
+                throw new Error('Schema' + getName(names) + ': \'type\' attribute union length is ' + schema.type.length + ' when it should be at least 2');
+            }
+            for (var i = 0; i < schema.type.length; ++i) {
+                switch (getType(schema.type[i])) {
+                case 'string':
+                    // simple type (inside union type) - nothing to validate
+                    break;
+                case 'object':
+                    // schema (inside union type)
+                    try {
+                        validateSchema(schema.type[i], []);
+                    } catch (err) {
+                        throw new Error('Schema' + getName(names) + ': \'type\' attribute union element ' + i + ' is not a valid schema: ' + err.message);
                     }
+                    break;
+                default:
+                    throwInvalidType(names, '\'type\' attribute union element ' + i, schema.type[i], 'either an object (schema) or a string');
                 }
-                break;
-            default:
-                throwInvalidType(names, '\'type\' attribute', schema.type, 'either a string or an array');
+            }
+            break;
+        default:
+            throwInvalidType(names, '\'type\' attribute', schema.type, 'either a string or an array');
         }
     }
 }
@@ -99,34 +99,34 @@ function validateType(schema, names) {
 function validateDisallow(schema, names) {
     if (schema.disallow !== undefined) {
         switch (getType(schema.disallow)) {
-            case 'string':
-                // simple type - nothing to validate
-                break;
-            case 'array':
-                // union type
-                if (schema.disallow.length < 2) {
-                    throw new Error('Schema' + getName(names) + ': \'disallow\' attribute union length is ' + schema.disallow.length + ' when it should be at least 2');
-                }
-                for (var i = 0; i < schema.disallow.length; ++i) {
-                    switch (getType(schema.disallow[i])) {
-                        case 'string':
-                            // simple type (inside union type) - nothing to validate
-                            break;
-                        case 'object':
-                            // schema (inside union type)
-                            try {
-                                validateSchema(schema.disallow[i], []);
-                            } catch (err) {
-                                throw new Error('Schema' + getName(names) + ': \'disallow\' attribute union element ' + i + ' is not a valid schema: ' + err.message);
-                            }
-                            break;
-                        default:
-                            throwInvalidType(names, '\'disallow\' attribute union element ' + i, schema.disallow[i], 'either an object (schema) or a string');
+        case 'string':
+            // simple type - nothing to validate
+            break;
+        case 'array':
+            // union type
+            if (schema.disallow.length < 2) {
+                throw new Error('Schema' + getName(names) + ': \'disallow\' attribute union length is ' + schema.disallow.length + ' when it should be at least 2');
+            }
+            for (var i = 0; i < schema.disallow.length; ++i) {
+                switch (getType(schema.disallow[i])) {
+                case 'string':
+                    // simple type (inside union type) - nothing to validate
+                    break;
+                case 'object':
+                    // schema (inside union type)
+                    try {
+                        validateSchema(schema.disallow[i], []);
+                    } catch (err) {
+                        throw new Error('Schema' + getName(names) + ': \'disallow\' attribute union element ' + i + ' is not a valid schema: ' + err.message);
                     }
+                    break;
+                default:
+                    throwInvalidType(names, '\'disallow\' attribute union element ' + i, schema.disallow[i], 'either an object (schema) or a string');
                 }
-                break;
-            default:
-                throwInvalidType(names, '\'disallow\' attribute', schema.disallow, 'either a string or an array');
+            }
+            break;
+        default:
+            throwInvalidType(names, '\'disallow\' attribute', schema.disallow, 'either a string or an array');
         }
     }
 }
@@ -142,26 +142,26 @@ function validateArray(schema, names) {
     if (schema.items !== undefined) {
         var i;
         switch (getType(schema.items)) {
-            case 'object':
-                // all the items in the array MUST be valid according to the schema
+        case 'object':
+            // all the items in the array MUST be valid according to the schema
+            try {
+                validateSchema(schema.items, []);
+            } catch (err) {
+                throw new Error('Schema' + getName(names) + ': \'items\' attribute is not a valid schema: ' + err.message);
+            }
+            break;
+        case 'array':
+            // each position in the instance array MUST conform to the schema in the corresponding position for this array
+            for (i = 0; i < schema.items.length; ++i) {
                 try {
-                    validateSchema(schema.items, []);
+                    validateSchema(schema.items[i], []);
                 } catch (err) {
-                    throw new Error('Schema' + getName(names) + ': \'items\' attribute is not a valid schema: ' + err.message);
+                    throw new Error('Schema' + getName(names) + ': \'items\' attribute element ' + i + ' is not a valid schema: ' + err.message);
                 }
-                break;
-            case 'array':
-                // each position in the instance array MUST conform to the schema in the corresponding position for this array
-                for (i = 0; i < schema.items.length; ++i) {
-                    try {
-                        validateSchema(schema.items[i], []);
-                    } catch (err) {
-                        throw new Error('Schema' + getName(names) + ': \'items\' attribute element ' + i + ' is not a valid schema: ' + err.message);
-                    }
-                }
-                break;
-            default:
-                throwInvalidType(names, '\'items\' attribute', schema.items, 'either an object (schema) or an array');
+            }
+            break;
+        default:
+            throwInvalidType(names, '\'items\' attribute', schema.items, 'either an object (schema) or an array');
         }
     }
 
@@ -215,29 +215,29 @@ function validateObject(schema, names) {
     if (schema.dependencies !== undefined) {
         for (var proper in schema.dependencies) {
             switch (getType(schema.dependencies[proper])) {
-                case 'string':
-                    // simple dependency - nothing to validate
-                    break;
-                case 'array':
-                    // simple dependency tuple
-                    for (var i = 0; i < schema.dependencies[proper].length; ++i) {
-                        if (isOfType(schema.dependencies[proper][i], 'string')) {
-                            // simple dependency (inside array) - nothing to validate
-                        } else {
-                            throwInvalidType(names, '\'dependencies\' attribute: value of property \'' + proper + '\' element ' + i, schema.dependencies[proper][i], 'a string');
-                        }
+            case 'string':
+                // simple dependency - nothing to validate
+                break;
+            case 'array':
+                // simple dependency tuple
+                for (var i = 0; i < schema.dependencies[proper].length; ++i) {
+                    if (isOfType(schema.dependencies[proper][i], 'string')) {
+                        // simple dependency (inside array) - nothing to validate
+                    } else {
+                        throwInvalidType(names, '\'dependencies\' attribute: value of property \'' + proper + '\' element ' + i, schema.dependencies[proper][i], 'a string');
                     }
-                    break;
-                case 'object':
-                    // schema dependency
-                    try {
-                        validateSchema(schema.dependencies[proper], []);
-                    } catch (err) {
-                        throw new Error('Schema' + getName(names) + ': \'dependencies\' attribute: value of property \'' + proper + '\' is not a valid schema: ' + err.message);
-                    }
-                    break;
-                default:
-                    throwInvalidType(names, '\'dependencies\' attribute: value of property \'' + proper + '\'', schema.dependencies[proper], 'either a string, an array or an object (schema)');
+                }
+                break;
+            case 'object':
+                // schema dependency
+                try {
+                    validateSchema(schema.dependencies[proper], []);
+                } catch (err) {
+                    throw new Error('Schema' + getName(names) + ': \'dependencies\' attribute: value of property \'' + proper + '\' is not a valid schema: ' + err.message);
+                }
+                break;
+            default:
+                throwInvalidType(names, '\'dependencies\' attribute: value of property \'' + proper + '\'', schema.dependencies[proper], 'either a string, an array or an object (schema)');
             }
         }
     }

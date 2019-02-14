@@ -1,0 +1,28 @@
+{
+    "env": {
+        "es6": true,
+        "browser": true,
+        "node": true,
+        "phantomjs": true,
+        "mocha": true,
+        "jasmine": true
+    },
+    "rules": {
+        "curly": "error",
+        "eqeqeq": "off",
+        "indent": ["error", 4]
+    },
+    "globals": {
+        "angular": "writeable",
+        "Rickshaw": "writeable",
+        "iotApp": "writeable",
+        "iotController": "writeable",
+        "iotServices": "writeable",
+        "iotAppLogin": "writeable",
+        "iotDirectives": "writeable",
+        "$": "writeable",
+        "moment": "writeable",
+        "flipCounter": "writeable",
+        "uuid": "writeable"
+    }
+}

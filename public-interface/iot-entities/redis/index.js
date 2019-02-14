@@ -15,10 +15,9 @@
  */
 
 'use strict';
-var config = require('../../config'),
-    rateLimits = require('./rateLimits'),
-    purchasedLimits = require('./purchasedLimits'),
-    userLocks = require('./userLocks'),
+var RateLimits = require('./rateLimits'),
+    PurchasedLimits = require('./purchasedLimits'),
+    UserLocks = require('./userLocks'),
     client =  require('./client'),
     redisClient;
 
@@ -27,8 +26,8 @@ exports.InitProvider = function(){
         redisClient = client.redisClient;
     }
     return {
-        RateLimits : new rateLimits(redisClient),
-        PurchasedLimits :  new purchasedLimits(redisClient),
-        UserLocks : new userLocks(redisClient)
-    }
+        RateLimits : new RateLimits(redisClient),
+        PurchasedLimits :  new PurchasedLimits(redisClient),
+        UserLocks : new UserLocks(redisClient)
+    };
 };

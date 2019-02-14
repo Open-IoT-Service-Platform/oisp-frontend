@@ -19,8 +19,8 @@
 
 
 iotController.controller('ListDevicesCtrl', function($scope,
-                                              $rootScope,
-                                              $location) {
+    $rootScope,
+    $location) {
 
     $scope.$parent.page = {
         menuSelected: "devices",

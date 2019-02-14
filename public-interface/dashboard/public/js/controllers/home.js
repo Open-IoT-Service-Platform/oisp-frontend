@@ -16,13 +16,13 @@
 
 'use strict';
 iotController.controller('HomeCtrl', function($scope,
-                                           $modal,
-                                           pollerService,
-                                           devicesService,
-                                           usersService,
-                                           dataService,
-                                           sessionService,
-                                           $q) {
+    $modal,
+    pollerService,
+    devicesService,
+    usersService,
+    dataService,
+    sessionService,
+    $q) {
 
 
     var i18n = $scope.$parent.i18n;
@@ -56,7 +56,7 @@ iotController.controller('HomeCtrl', function($scope,
     function getPercentage(total, current) {
         var a = 0;
         if (total > 0) {
-           a = parseInt((current / total) * 100);
+            a = parseInt((current / total) * 100);
         }
         return a;
     }
@@ -69,9 +69,11 @@ iotController.controller('HomeCtrl', function($scope,
         }
     }, true);
 
-    function getMessagesTotal(){
+    function hideloading () {
+        $scope.isLoadingDataSummary = false;
+    }
 
-
+    function getMessagesTotal() {
         if($scope.dashboardConfig && $scope.dashboardConfig.data && $scope.dashboardConfig.data.messages){
             if(sessionService.getCurrentAccount()) {
                 dataService.getTotal($scope.dashboardConfig.data.messages.period, hideloading);
@@ -79,16 +81,24 @@ iotController.controller('HomeCtrl', function($scope,
         }
     }
 
-    function hideloading(){
-        $scope.isLoadingDataSummary = false;
-
-    }
-
     $scope.$watch('dashboardConfig.data.messages.period', function(){
         $scope.isLoadingDataSummary = true;
         $scope.dataSummary.total = 0;
         getMessagesTotal();
     });
+
+    function saveDashboardConfig() {
+        var id = $scope.dashboardConfig.id;
+        var data = {
+            value: $scope.dashboardConfig.data,
+            public: false
+        };
+        usersService.updateUserSetting(sessionService.getCurrentAccount().id, 'dashboard', id, data, function () {
+
+        }, function(data) {
+            $scope.error = data.message || data;
+        });
+    }
 
     $scope.selectMessagesPeriod = function(period){
         $scope.dashboardConfig.data.messages.period = period;
@@ -115,7 +125,7 @@ iotController.controller('HomeCtrl', function($scope,
     var ModalAlertInstanceCtrl = function ($scope, $modalInstance, alert_title) {
         $scope.alert_title = alert_title;
         $scope.close = function () {
-             $modalInstance.close();
+            $modalInstance.close();
         };
     };
     $scope.showAlerts = function (button) {
@@ -130,47 +140,6 @@ iotController.controller('HomeCtrl', function($scope,
         });
         return modalInstance;
     };
-
-    $scope.$watch(sessionService.getCurrentAccount, function(data) {
-        if (data) {
-            usersService.getUserSettings(data.id, 'favorite', function (data) {
-                $scope.availableFilters = data || [];
-            }, function () {
-                $scope.availableFilters = [];
-            });
-
-            usersService.getUserSettings(data.id, 'dashboard', function (data) {
-                if (!data || !data[0] || !data[0].value || !data[0].value) {
-                    createDashboardConfig(function (data) {
-                        $scope.dashboardConfig = {
-                            id: data.id,
-                            data: data.value
-                        };
-                    });
-                } else {
-                    if (angular.isArray(data[0].value.widgets)) {
-                        $scope.dashboardConfig = {
-                            id: data[0].id,
-                            data: {
-                                chart: {
-                                    filter: data[0].value.widgets[0].filter
-                                },
-                                messages: {
-                                    period: 'last_hour'
-                                }
-                            }
-                        };
-                    } else {
-                        $scope.dashboardConfig = {
-                            id: data[0].id,
-                            data: data[0].value
-                        };
-                    }
-                    refreshWidget();
-                }
-            });
-        }
-    });
 
     function createDashboardConfig(callback) {
         var initialSetting = {
@@ -189,31 +158,12 @@ iotController.controller('HomeCtrl', function($scope,
         });
     }
 
-    function saveDashboardConfig() {
-        var id = $scope.dashboardConfig.id;
-        var data = {
-            value: $scope.dashboardConfig.data,
-            public: false
-        };
-        usersService.updateUserSetting(sessionService.getCurrentAccount().id, 'dashboard', id, data, function () {
-
-        }, function(data) {
-            $scope.error = data.message || data;
-        });
-    }
-
-    $scope.selectFilter = function(filter){
-        $scope.dashboardConfig.data.chart.filter = filter.id;
-
-        refreshWidget();
-        saveDashboardConfig();
-    };
-
     var dataCanceler;
+
     function refreshWidget() {
         if($scope.dashboardConfig && $scope.availableFilters && $scope.dashboardConfig.data.chart){
             var filter = $scope.availableFilters.filter(function(item){
-               return item.id === $scope.dashboardConfig.data.chart.filter;
+                return item.id === $scope.dashboardConfig.data.chart.filter;
             })[0];
 
             if(filter && filter.value) {
@@ -281,6 +231,54 @@ iotController.controller('HomeCtrl', function($scope,
             $scope.inProgress = false;
         }
     }
+
+    $scope.$watch(sessionService.getCurrentAccount, function(data) {
+        if (data) {
+            usersService.getUserSettings(data.id, 'favorite', function (data) {
+                $scope.availableFilters = data || [];
+            }, function () {
+                $scope.availableFilters = [];
+            });
+
+            usersService.getUserSettings(data.id, 'dashboard', function (data) {
+                if (!data || !data[0] || !data[0].value || !data[0].value) {
+                    createDashboardConfig(function (data) {
+                        $scope.dashboardConfig = {
+                            id: data.id,
+                            data: data.value
+                        };
+                    });
+                } else {
+                    if (angular.isArray(data[0].value.widgets)) {
+                        $scope.dashboardConfig = {
+                            id: data[0].id,
+                            data: {
+                                chart: {
+                                    filter: data[0].value.widgets[0].filter
+                                },
+                                messages: {
+                                    period: 'last_hour'
+                                }
+                            }
+                        };
+                    } else {
+                        $scope.dashboardConfig = {
+                            id: data[0].id,
+                            data: data[0].value
+                        };
+                    }
+                    refreshWidget();
+                }
+            });
+        }
+    });
+
+    $scope.selectFilter = function(filter){
+        $scope.dashboardConfig.data.chart.filter = filter.id;
+
+        refreshWidget();
+        saveDashboardConfig();
+    };
 
     $scope.refreshWidget = refreshWidget;
 

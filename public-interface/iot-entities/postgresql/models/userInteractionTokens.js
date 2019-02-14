@@ -19,27 +19,27 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('user_interaction_tokens', {
-            id: {
-                type: DataTypes.CHAR(16),
-                primaryKey: true
-            },
-            userId: {
-                type: DataTypes.UUID,
-                allowNull: false,
-                unique: 'userId_type_unique'
-            },
-            type: {
-                type: DataTypes.ENUM('activate-user', 'password-reset'),
-                allowNull: false,
-                unique: 'userId_type_unique'
-            },
-            expiresAt: {
-                type: DataTypes.DATE
-            }
-        }, {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            schema: 'dashboard'
+        id: {
+            type: DataTypes.CHAR(16),
+            primaryKey: true
+        },
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            unique: 'userId_type_unique'
+        },
+        type: {
+            type: DataTypes.ENUM('activate-user', 'password-reset'),
+            allowNull: false,
+            unique: 'userId_type_unique'
+        },
+        expiresAt: {
+            type: DataTypes.DATE
         }
+    }, {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        schema: 'dashboard'
+    }
     );
 };

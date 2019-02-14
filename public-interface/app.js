@@ -40,7 +40,7 @@ var http = require('http'),
     systemUsers = require('./lib/dp-users/systemUsers'),
     forceSSL = require('express-force-ssl'),
     heartBeat = require('./lib/heartbeat');
-    const cbor = require("./lib/cbor");
+const cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
     appServer = express(),
@@ -144,6 +144,6 @@ models.sequelize.authenticate().then(function() {
                     } else {
                         module.exports.server = appServer;
                     }
-            });
+                });
         });
 });

@@ -48,44 +48,44 @@ var escapeValue = function (value) {
 var parseSinglePredicate = function (predicate, key, query) {
 
     switch (predicate.operator) {
-        case IN:
-            if (predicate.value && Array.isArray(predicate.value) && predicate.value.length > 0) {
-                query[key] = " in ('" + parseArray(predicate.value) + "')";
-            }
-            break;
-        case ALL:
-            if (predicate.value && Array.isArray(predicate.value) && predicate.value.length > 0) {
-                if (predicate.value.length === 1) {
-                    query[key] = " = '" + predicate.value + "'";
-                } else {
-                    //Format predicate.value to postgres array format. Query will return any result only if db column's type is array.
-                    query[key] = " = '{" + predicate.value + "}'";
-                }
-            }
-            break;
-        case LIKE:
-            if (predicate.value) {
-                query[key] = " like '%" + predicate.value + "%'";
-            }
-            break;
-        case EQ:
-            if (predicate.value) {
+    case IN:
+        if (predicate.value && Array.isArray(predicate.value) && predicate.value.length > 0) {
+            query[key] = " in ('" + parseArray(predicate.value) + "')";
+        }
+        break;
+    case ALL:
+        if (predicate.value && Array.isArray(predicate.value) && predicate.value.length > 0) {
+            if (predicate.value.length === 1) {
                 query[key] = " = '" + predicate.value + "'";
+            } else {
+                //Format predicate.value to postgres array format. Query will return any result only if db column's type is array.
+                query[key] = " = '{" + predicate.value + "}'";
             }
-            break;
-        case NEQ:
-            if (predicate.value) {
-                query[key] = " <> '" + predicate.value + "'";
-            }
-            break;
-        case EXISTS:
-            if (predicate.value === true) {
-                query[key] = " IS NOT NULL ";
-            } else if (predicate.value === false) {
-                query[key] = " IS NULL ";
-            }
-            break;
-        default:
+        }
+        break;
+    case LIKE:
+        if (predicate.value) {
+            query[key] = " like '%" + predicate.value + "%'";
+        }
+        break;
+    case EQ:
+        if (predicate.value) {
+            query[key] = " = '" + predicate.value + "'";
+        }
+        break;
+    case NEQ:
+        if (predicate.value) {
+            query[key] = " <> '" + predicate.value + "'";
+        }
+        break;
+    case EXISTS:
+        if (predicate.value === true) {
+            query[key] = " IS NOT NULL ";
+        } else if (predicate.value === false) {
+            query[key] = " IS NULL ";
+        }
+        break;
+    default:
     }
 };
 
@@ -304,23 +304,23 @@ var parseTagsQuery = function (tags, tableName) {
         } else {
             var tagOperator = "=";
             switch (tags.operator) {
-                case ALL:
-                    // is contained by
-                    tagOperator = "<@";
-                    break;
-                case EQ:
-                    tagOperator = "=";
-                    break;
-                case NEQ:
-                    tagOperator = "<>";
-                    break;
-                case IN:
-                    // contains @>
-                    tagOperator = "@>";
-                    break;
-                case EXISTS:
-                    tagOperator = "&&";
-                    break;
+            case ALL:
+                // is contained by
+                tagOperator = "<@";
+                break;
+            case EQ:
+                tagOperator = "=";
+                break;
+            case NEQ:
+                tagOperator = "<>";
+                break;
+            case IN:
+                // contains @>
+                tagOperator = "@>";
+                break;
+            case EXISTS:
+                tagOperator = "&&";
+                break;
             }
 
             queries += ' array_agg(value ORDER BY value)';
@@ -338,18 +338,18 @@ var parseFilters = function (filters, attributes, callback) {
 
     var result = {};
     delete filters._;
-    if(undefined == filters.limit){
+    if (undefined === filters.limit) {
         result.limit = null;
-    }else{
+    } else {
         result.limit = parseInt(filters.limit);
-    };
+    }
 
-    if(undefined == filters.skip){
-	result.offset = null;
-    }else{
-	result.offset = parseInt(filters.skip);
-    };
-   result.where = {};
+    if (undefined === filters.skip) {
+        result.offset = null;
+    } else {
+        result.offset = parseInt(filters.skip);
+    }
+    result.where = {};
     if (filters.sort && filters.sort in attributes) {
         var order = filters.order === "desc" ? DESC : ASC;
         result.order = [[attributes[filters.sort].fieldName, order]];
@@ -384,7 +384,7 @@ var parseFiltersToSql = function (filters, attributes, callback) {
         queryfilters += (" OFFSET " + parseInt(filters.skip));
     }
 
-    if(queryfilters == '' || queryfilters == undefined){
+    if(queryfilters === '' || queryfilters === undefined){
     	queryfilters = null;
     }
     callback(null, queryfilters);

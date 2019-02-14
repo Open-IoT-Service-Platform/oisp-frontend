@@ -35,16 +35,16 @@ var validator = function(dataType, value) {
 
     this.validate = function() {
         switch (dataType) {
-            case 'Number':
-                return numberValidator(value);
-            case 'Boolean':
-                return booleanValidator(value);
-            case 'String':
-                return true;
-            case 'ByteArray':
-                return true;
-            default:
-                return false;
+        case 'Number':
+            return numberValidator(value);
+        case 'Boolean':
+            return booleanValidator(value);
+        case 'String':
+            return true;
+        case 'ByteArray':
+            return true;
+        default:
+            return false;
         }
     };
 };

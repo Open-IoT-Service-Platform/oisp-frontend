@@ -16,72 +16,72 @@
 
 "use strict";
 iotServices.factory('Catalog', ['$http', 'utilityService','sessionService',
-                                       function($http,
-                                               utilityService, sessionService) {
+    function($http,
+        utilityService, sessionService) {
 
-    function Catalog () {
-        this.id = null;
-        this.dataType = null;
-        this.type = null;
-        this.measureunit= null;
-        this.display = null;
-    }
-    function CatalogOptions() {
-        this.url = '/cmpcatalog/';
-        this.params = {
-                        "_" : utilityService.timeStamp()
-                      };
-    }
-    function GetCatalog (){
-        angular.copy(new CatalogOptions(), this);
-
-                this.url = this.url;
-                this.method = 'GET';
-                return this;
-
-    }
-    function GetComponentById (id){
-       angular.copy(new CatalogOptions(), this);
-
-                this.url = this.url + id;
-                this.method = 'GET';
-                return this;
-
-    }
-    function request (options, callback) {
-        sessionService.addAccountIdPrefix(options.url)
-            .then(function(url) {
-                options.url = url;
-                $http(options)
-                    .success(function (data) {
-                        if (callback) {
-                            callback(data);
-                        }
-                    });
-            });
-    }
-
-   Catalog.prototype = {
-        setData: function (ruleData) {
-            angular.extend(this, ruleData);
-        },
-        getAll: function () {
-            var me = this;
-            var opt = new GetCatalog();
-            request(opt, function(data){
-                me.setData(data);
-            });
-        },
-        getComponentById: function (id, callback) {
-           var me = this;
-           var opt = new GetComponentById(id);
-           request(opt, function(data){
-               me.setData(data);
-               if (callback) {
-                   callback(me);
-               }
-           });
+        function Catalog () {
+            this.id = null;
+            this.dataType = null;
+            this.type = null;
+            this.measureunit= null;
+            this.display = null;
         }
-    };
-    return Catalog;
-}]);
+        function CatalogOptions() {
+            this.url = '/cmpcatalog/';
+            this.params = {
+                "_" : utilityService.timeStamp()
+            };
+        }
+        function GetCatalog (){
+            angular.copy(new CatalogOptions(), this);
+
+            this.url = this.url;
+            this.method = 'GET';
+            return this;
+
+        }
+        function GetComponentById (id){
+            angular.copy(new CatalogOptions(), this);
+
+            this.url = this.url + id;
+            this.method = 'GET';
+            return this;
+
+        }
+        function request (options, callback) {
+            sessionService.addAccountIdPrefix(options.url)
+                .then(function(url) {
+                    options.url = url;
+                    $http(options)
+                        .success(function (data) {
+                            if (callback) {
+                                callback(data);
+                            }
+                        });
+                });
+        }
+
+        Catalog.prototype = {
+            setData: function (ruleData) {
+                angular.extend(this, ruleData);
+            },
+            getAll: function () {
+                var me = this;
+                var opt = new GetCatalog();
+                request(opt, function(data){
+                    me.setData(data);
+                });
+            },
+            getComponentById: function (id, callback) {
+                var me = this;
+                var opt = new GetComponentById(id);
+                request(opt, function(data){
+                    me.setData(data);
+                    if (callback) {
+                        callback(me);
+                    }
+                });
+            }
+        };
+        return Catalog;
+    }]);

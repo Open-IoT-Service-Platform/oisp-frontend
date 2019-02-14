@@ -28,13 +28,13 @@ var config = require('../../config'),
 
 
 // Patch redis client for jaeger support
-var wrapSend = function (original) {
+function wrapSend(original) {
     return function wrappedSend(commandObj) {
         const context = contextProvider.instance();
         var fatherSpan = context.get(spanContext.parent);
         // Track if request coming from express
         if (!fatherSpan)
-            fatherSpan = {};
+        {fatherSpan = {};}
         var span = tracer.startSpan('redis-call', { childOf: fatherSpan.span });
         span.log({
             event: 'redis command',
@@ -54,11 +54,11 @@ var wrapSend = function (original) {
             }
             span.finish();
             if (originalCb)
-                originalCb(err, replies);
-        }
+            {originalCb(err, replies);}
+        };
 
         original.call(this, commandObj);
-    }
+    };
 }
 
 if (jaegerConfig.tracing) {

@@ -14,7 +14,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-/*jshint esnext: true */
 
 "use strict";
 const fs = require('fs');
@@ -29,32 +28,32 @@ function writeRamlFromArray(array, prefix)
     var responses = {};
 
     array.sort(function(a,b){
-                return a[1].status - b[1].status;
+        return a[1].status - b[1].status;
     });
-    
+
     for(var i in array){
         var status = array[i][1].status;
         if (!responses[status]){
             responses[status] = {};
-        }    
+        }
         var description = array[i][0];
         if (!responses[status]["description"]){
             responses[status]["description"] = description;
-	}
+        }
         else {
             responses[status]["description"] += " or " + description;
-	}
-        
+        }
+
         var example = array[i][0];
         if (!responses[status]["body"]){
             responses[status]["body"] = {};
-	}
+        }
         if (!responses[status]["body"]["examples"]){
             responses[status]["body"]["examples"] = {};
-	}
+        }
         if (!responses[status]["body"]["examples"][example]){
             responses[status]["body"]["examples"][example] = {};
-	}
+        }
         responses[status]["body"]["examples"][example] = JSON.stringify(array[i][1]).replace(/\"([^(\")"]+)\":/g,"$1:");
     }
     const content = yaml.stringify({responses: responses});
@@ -100,13 +99,13 @@ function writeRamlFromArray(array, prefix)
 function recurseAndWriteRaml(errors, prefix){
     var array = [];
     for (var message in errors){
-                if (errors[message].code) {
-                    array.push([message, errors[message]]);
-                }
-                else{
-                    // recurse into next level
-                    recurseAndWriteRaml(errors[message], prefix + "_" + message);
-                }
+        if (errors[message].code) {
+            array.push([message, errors[message]]);
+        }
+        else{
+            // recurse into next level
+            recurseAndWriteRaml(errors[message], prefix + "_" + message);
+        }
     }
     writeRamlFromArray(array, prefix);
 }

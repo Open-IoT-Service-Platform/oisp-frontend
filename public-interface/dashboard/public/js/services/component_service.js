@@ -19,43 +19,43 @@ iotServices.factory('componentsService', ['$http', 'sessionService', function($h
     return {
         getComponentDefinition: function(type, successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/cmpcatalog/' + type)
-            .then(function(url) {
-                $http({
-                    method: 'GET',
-                    url: url
-                })
-                    .success(successCallback).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'GET',
+                        url: url
+                    })
+                        .success(successCallback).error(errorCallback);
+                });
         },
         getFullCatalog: function(successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/cmpcatalog?full=true')
-            .then(function(url) {
-                $http({
-                    method: 'GET',
-                    url: url
-                })
-                    .success(successCallback).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'GET',
+                        url: url
+                    })
+                        .success(successCallback).error(errorCallback);
+                });
         },
         addComponent: function(component, successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/cmpcatalog/')
-            .then(function(url) {
-                $http({
-                    method: 'POST',
-                    url: url,
-                    data: component
-                }).success(successCallback).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'POST',
+                        url: url,
+                        data: component
+                    }).success(successCallback).error(errorCallback);
+                });
         },
         editComponent: function(id, component, successCallback, errorCallback){
             sessionService.addAccountIdPrefix('/cmpcatalog/' + id)
-            .then(function(url) {
-                $http({
-                    method: 'PUT',
-                    url: url,
-                    data: component
-                }).success(successCallback).error(errorCallback);
-            });
+                .then(function(url) {
+                    $http({
+                        method: 'PUT',
+                        url: url,
+                        data: component
+                    }).success(successCallback).error(errorCallback);
+                });
         }
     };}
 ]);

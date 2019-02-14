@@ -62,7 +62,7 @@ var getReplacementsForQuery = function (userModel, id) {
         type: userModel.type
     };
     for(var value in replaceObject){
-        if (undefined == replaceObject[value]){
+        if (undefined === replaceObject[value]){
             replaceObject[value] = null;
         }
     }
@@ -75,20 +75,20 @@ exports.new = function (userData, transaction) {
 
     return sequelize.query(ADD_USER_QUERY,
         {replacements: replacements, transaction: transaction})
-            .then(function (result) {
-                if (result && result.length > 0 && result[0][0]) {
-                    var user = result[0][0];
-                    return Q.resolve(interpreterHelper.mapAppResults({dataValues: user}, interpreter));
-                } else {
-                    throw errBuilder.Errors.User.SavingError;
-                }
-            })
-            .catch(function (err) {
-                if (err && err.name === errBuilder.SqlErrors.AlreadyExists) {
-                    throw errBuilder.Errors.User.AlreadyExists;
-                }
+        .then(function (result) {
+            if (result && result.length > 0 && result[0][0]) {
+                var user = result[0][0];
+                return Q.resolve(interpreterHelper.mapAppResults({dataValues: user}, interpreter));
+            } else {
                 throw errBuilder.Errors.User.SavingError;
-            });
+            }
+        })
+        .catch(function (err) {
+            if (err && err.name === errBuilder.SqlErrors.AlreadyExists) {
+                throw errBuilder.Errors.User.AlreadyExists;
+            }
+            throw errBuilder.Errors.User.SavingError;
+        });
 };
 
 exports.all = function (accountId, resultCallback) {
@@ -116,7 +116,7 @@ var getUsersWithAllAccounts = function(users) {
             .then(function(foundUser) {
                 result.push(foundUser);
             });
-        }))
+    }))
         .then(function() {
             return Q.resolve(result);
         });
@@ -168,12 +168,12 @@ exports.findByEmail = function (email, resultCallback) {
     users.find({where: {email: email}, include: [
         accounts
     ]})
-    .then(function (user) {
-        interpreterHelper.mapAppResults(user, interpreter, resultCallback);
-    })
-    .catch(function (err) {
-        resultCallback(err);
-    });
+        .then(function (user) {
+            interpreterHelper.mapAppResults(user, interpreter, resultCallback);
+        })
+        .catch(function (err) {
+            resultCallback(err);
+        });
 };
 
 exports.find = function (email, accountId, resultCallback) {
@@ -183,18 +183,18 @@ exports.find = function (email, accountId, resultCallback) {
             where: {id: accountId}
         }
     ]})
-    .then(function (user) {
-        interpreterHelper.mapAppResults(user, interpreter, resultCallback);
-    })
-    .catch(function (err) {
-        resultCallback(err);
-    });
+        .then(function (user) {
+            interpreterHelper.mapAppResults(user, interpreter, resultCallback);
+        })
+        .catch(function (err) {
+            resultCallback(err);
+        });
 };
 
 exports.findByIdWithAccountDetails = function (id, resultCallback) {
     users.find({where: {id: id}, include: [
         accounts
-        ]})
+    ]})
         .then(function (user) {
             if (user) {
                 return resultCallback(null, interpreter.toApp(user, true));

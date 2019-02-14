@@ -17,21 +17,21 @@
 
 'use strict';
 iotController.controller('InviteModalCtrl', function ( $scope,
-                                                       $rootScope,
-                                                       $window,
-                                                       $timeout,
-                                                       $modalInstance,
-                                                       currentAccount,
-                                                       users,
-                                                       deviceCount,
-                                                       invitesService,
-                                                       accountsService,
-                                                       usersService,
-                                                       loginService,
-                                                       vcRecaptchaService,
-                                                       flash,
-                                                       errorUtils,
-                                                       googleCaptchaService) {
+    $rootScope,
+    $window,
+    $timeout,
+    $modalInstance,
+    currentAccount,
+    users,
+    deviceCount,
+    invitesService,
+    accountsService,
+    usersService,
+    loginService,
+    vcRecaptchaService,
+    flash,
+    errorUtils,
+    googleCaptchaService) {
 
     $scope.toInvite = {
         email:  null

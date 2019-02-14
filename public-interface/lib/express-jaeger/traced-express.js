@@ -31,7 +31,7 @@ const spanContext = {
 var middlewareMethods = ['use', 'param'];
 var contextRegistered = false;
 
-var startRequest = function(req, res, next) {
+function startRequest(req, res, next) {
     const context = contextProvider.instance();
     const rootSpan = tracer.startSpan('start-request');
     rootSpan.log({
@@ -75,10 +75,12 @@ var startRequest = function(req, res, next) {
         context.set(spanContext.parent, null);
         rootSpan.log({ event: 'request finish' });
         rootSpan.setTag(opentracing.Tags.HTTP_STATUS_CODE, res.statusCode);
-        if (res.statusCode >= 400)
+        if (res.statusCode >= 400) {
             rootSpan.setTag(opentracing.Tags.ERROR, true);
+        }
         rootSpan.finish();
-    }
+        return returned;
+    };
 
     return next();
 }
@@ -90,13 +92,14 @@ express.application['startTracing'] = function() {
     }
 };
 
-const tracedMiddleware = function(originalService, name, method) {
+function tracedMiddleware(originalService, name, method) {
     return function(req, res, next) {
         const context = contextProvider.instance();
         // check and end if there is an active span
         const active = context.get(spanContext.active);
-        if (active)
+        if (active) {
             active.finish();
+        }
         var parentSpan = context.get(spanContext.parent);
         if (!parentSpan) {
             // untracked middlewares after request gets handled
@@ -126,16 +129,16 @@ const tracedMiddleware = function(originalService, name, method) {
         context.set(spanContext.active, span);
         return originalService(req, res, next);
     };
-};
+}
 
 const ERROR_HANDLER_ARGUMENTS_LENGTH = 4;
-const tracedErrorHandler = function(originalErrorHandler, name, method) {
+function tracedErrorHandler(originalErrorHandler, name, method) {
     return function (err, req, res, _next) {
         // check and end if there is an active span
         const context = contextProvider.instance();
         const active = context.get(spanContext.active);
         if (active)
-            active.finish();
+        {active.finish();}
         var parentSpan = context.get(spanContext.parent);
         if (!parentSpan) {
             // untracked middlewares after request gets handled
@@ -146,21 +149,22 @@ const tracedErrorHandler = function(originalErrorHandler, name, method) {
         });
         span.setTag('METHOD', method.toUpperCase());
         if (err)
-            span.log({
-                event: 'error',
-                error: err,
-                message: err.message,
-                stack: err.stack
-            });
+        {span.log({
+            event: 'error',
+            error: err,
+            message: err.message,
+            stack: err.stack
+        });}
         context.set(spanContext.active, span);
         return originalErrorHandler(err, req, res, _next);
-    }
+    };
 }
 
-const patchMiddlewares = function(middlewares, startIndex, method) {
-    for (i = startIndex; i < middlewares.length; i++) {
-        if (Array.isArray(middlewares[i]))
+function patchMiddlewares(middlewares, startIndex, method) {
+    for (var i = startIndex; i < middlewares.length; i++) {
+        if (Array.isArray(middlewares[i])) {
             patchMiddlewares(middlewares[i], 0);
+        }
         else if (typeof middlewares[i] === "function") {
             var original = middlewares[i];
             var name = middlewares[i].name;
@@ -171,11 +175,10 @@ const patchMiddlewares = function(middlewares, startIndex, method) {
     }
 }
 
-const wrapRegister = function(method) {
+function wrapRegister(method) {
     return function(original) {
         return function() {
             if (contextRegistered) {
-                var path = typeof arguments[0] === "string" ? arguments[0] : '/';
                 var start = typeof arguments[0] === "string" ? 1 : 0;
                 patchMiddlewares(arguments, start, method);
                 original.apply(this, arguments);

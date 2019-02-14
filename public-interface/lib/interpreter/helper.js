@@ -102,7 +102,7 @@ exports.mapAppResults = function(result, interpreter, resultCallback) {
                 return interpreter.toApp(item);
             });
         } else {
-           mappedResult = interpreter.toApp(result);
+            mappedResult = interpreter.toApp(result);
         }
     }
     if (resultCallback) {

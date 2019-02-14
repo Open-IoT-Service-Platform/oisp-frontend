@@ -18,9 +18,7 @@
 
 var postgresProvider = require('../iot-entities/postgresql'),
     user = postgresProvider.users,
-    cryptoUtils = require('../lib/cryptoUtils'),
-    config = require('../config');
-
+    cryptoUtils = require('../lib/cryptoUtils');
 
 function add (data) {
     return user.new(data, null)

@@ -14,7 +14,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-/*jshint esnext: true */
 
 "use strict";
 const fs = require('fs');
@@ -68,7 +67,7 @@ secConfig.routes.forEach(function(i){
 *  PATH is the resource path for the API call
 */
 args.forEach(function(filename){
-    
+
     //First get the metatags
     //Regexp for detecting and retrieving
     var searchRegexp = new RegExp('<meta.*">',"g");
@@ -78,7 +77,7 @@ args.forEach(function(filename){
 
     //For all PATH/METHOD pairs, check the SCOPE and associated ROLES
     searchRegexp = new RegExp('<meta.+name="access-roles".+path="([A-Z]+):(.+)">');
-    
+
     if (metatags){
         metatags.forEach(function(metatag){
             var methodRoute = searchRegexp.exec(metatag);
@@ -99,7 +98,7 @@ args.forEach(function(filename){
                     accessRoles.push(accessRole);
                 }
             }
-            
+
             //Replace the metatag in the file
 
             var replaceString = createReplaceString(accessRoles);

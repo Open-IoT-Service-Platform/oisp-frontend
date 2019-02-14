@@ -65,13 +65,13 @@ var generateToken = function(subjectId, accounts, role, expire, type, callback){
 
 function findDeletedAccounts(tokenAccounts, accountIds){
     var accountsArray = [];
-
+    var i = null;
 
     var isId = function (element) {
         return element === i;
     };
 
-    for(var i in tokenAccounts){
+    for(i in tokenAccounts){
         if(!accountIds.some(isId)){
             accountsArray.push({
                 id: i,
@@ -127,18 +127,18 @@ var getTokenInfo = function(token, req, callback){
                             }
                             req.tokenInfo.payload.accounts = findDeletedAccounts(req.tokenInfo.payload.accounts, accountIds);
                             accountIds.map(function (accountId) {
-                                    var account = user.accounts[accountId];
-                                    if(typeof account !== 'object'){
-                                        account = {
-                                            name:"",
-                                            role: account
-                                        };
-                                    }
-                                    req.tokenInfo.payload.accounts.push({
-                                        id: accountId,
-                                        name: account.name,
-                                        role: account.role
-                                    });
+                                var account = user.accounts[accountId];
+                                if(typeof account !== 'object'){
+                                    account = {
+                                        name:"",
+                                        role: account
+                                    };
+                                }
+                                req.tokenInfo.payload.accounts.push({
+                                    id: accountId,
+                                    name: account.name,
+                                    role: account.role
+                                });
                             });
                             result.accounts = req.tokenInfo.payload.accounts;
                             callback(result);
@@ -157,7 +157,7 @@ var getTokenInfo = function(token, req, callback){
 
         }
     }catch(e){
-        console.log(e)
+        console.log(e);
         logger.error("Failed to verify JWS token");
         callback();
     }
@@ -197,7 +197,7 @@ var getAccountId = function(path, body, tokenAccounts) {
 };
 
 var isAllowed = function(req, callback) {
-    var requestPath = req.path
+    var requestPath = req.path;
 
     if(publicRoutes.some(function(i){
         return req.method === i.verb &&
@@ -219,8 +219,8 @@ var isAllowed = function(req, callback) {
                 return i.verb === req.method &&
                 i.regex.test(req.path) &&
                 rolesConfig[role].some(function (j) {
-                        return i.scope === j;
-                    });
+                    return i.scope === j;
+                });
             }));
         });
     }
@@ -232,7 +232,7 @@ module.exports.isAdminForAccountInUri = function(req, userId, callback)
         var isSelf = (!tokenInfo) ? false : tokenInfo.payload.sub === userId;
         var accountId = getAccountId(req.path, req.body);
         var role = (!tokenInfo) ? null :
-                (!tokenInfo.payload.accounts) ? 'user' :
+            (!tokenInfo.payload.accounts) ? 'user' :
                 getAccountRole(accountId, tokenInfo.payload);
         var res = accountIdRex.exec(req.path);
         if(!res) {
@@ -249,8 +249,8 @@ var authorizeRoute = function (req, res, next) {
             next();
         } else {
             if (req.path.indexOf('/api/') === 0) {
-              var err = errBuilder.build(
-                errBuilder.Errors.Generic.NotAuthorized.code);
+                var err = errBuilder.build(
+                    errBuilder.Errors.Generic.NotAuthorized.code);
                 res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(err);
             } else {
                 res.redirect('/');
@@ -335,7 +335,7 @@ module.exports.middleware = function(secConfig, forceSSL){
     app.use(authorizeRoute);
 
     app.get("/api/auth/tokenInfo", function(req, res){
-       res.status(200).send(req.tokenInfo);
+        res.status(200).send(req.tokenInfo);
     });
 
     return app;

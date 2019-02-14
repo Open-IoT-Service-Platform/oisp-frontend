@@ -144,18 +144,18 @@ var ComponentDetailsModalInstanceCtrl = function ($scope, $modalInstance, compon
 };
 
 iotController.controller('AccountCtrl', function($scope,
-                                                $rootScope,
-                                                $modal,
-                                                $timeout,
-                                                usersService,
-                                                invitesService,
-                                                accountsService,
-                                                $filter,
-                                                $window,
-                                                ngTableParams,
-                                                devicesService,
-                                                componentsService,
-                                                sessionService) {
+    $rootScope,
+    $modal,
+    $timeout,
+    usersService,
+    invitesService,
+    accountsService,
+    $filter,
+    $window,
+    ngTableParams,
+    devicesService,
+    componentsService,
+    sessionService) {
 
     $scope.$parent.page = {
         menuSelected: "account",
@@ -170,6 +170,16 @@ iotController.controller('AccountCtrl', function($scope,
     $scope.selectedRole = $scope.selectedRole || {};
     $scope.roleEdit = {};
     $scope.editing = false;
+
+    function processActivationCode (codeData) {
+        if (codeData && codeData.activationCode) {
+            $scope.account.activationCode = codeData.activationCode;
+            $scope.account.timeLeft = codeData.timeLeft;
+        } else {
+            $scope.account.activationCode = $rootScope.i18n.account.regenerate;
+            $scope.account.timeLeft = null;
+        }
+    }
 
     $scope.$watch(sessionService.getCurrentAccount, function(data){
         $scope.currentAccount = data;
@@ -228,9 +238,9 @@ iotController.controller('AccountCtrl', function($scope,
     }
 
     $scope.$watch('account.timeLeft', function (newTime) {
-         if (angular.isNumber(newTime)) {
+        if (angular.isNumber(newTime)) {
             $scope.account.countDown = newTime - getNowTime();
-             counterDown();
+            counterDown();
         }
     });
 
@@ -469,16 +479,6 @@ iotController.controller('AccountCtrl', function($scope,
         $scope.account.healthTimePeriod = ($scope.currentAccount.healthTimePeriod || 86400) / 24 / 60 / 60;
     };
 
-    function processActivationCode (codeData) {
-        if (codeData && codeData.activationCode) {
-            $scope.account.activationCode = codeData.activationCode;
-            $scope.account.timeLeft = codeData.timeLeft;
-        } else {
-            $scope.account.activationCode = $rootScope.i18n.account.regenerate;
-            $scope.account.timeLeft = null;
-        }
-    }
-
     $scope.refreshActivationCode  = function () {
         accountsService.refreshActivationCode($scope.currentAccount.id, function (err, data) {
             var result = null;
@@ -488,7 +488,7 @@ iotController.controller('AccountCtrl', function($scope,
             processActivationCode(result);
         });
     };
-    
+
     $scope.editAccount = function(){
         $scope.accountNameEdit = true;
     };

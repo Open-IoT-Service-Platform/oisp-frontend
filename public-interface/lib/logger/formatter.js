@@ -27,6 +27,40 @@ module.exports = function(options) {
     this.machineName = options.machineName;
     this.maxLines = options.maxLines;
 
+    function addAuthorizationData(logLine, headers) {
+        if (headers) {
+            var authorization =  headers['authorization'];
+            if (authorization) {
+                logLine.authorization = authorization.substring(0, 20) + '...';
+                logLine.subjectId = securityUtils.getSubjectFromHeader(authorization);
+            }
+        }
+    }
+
+    function limitOutputLines(message, maxLines) {
+        maxLines = maxLines || 1000000; // default
+        var ret = '';
+
+        if (typeof message === 'string') {
+            var lines = message.split(' ');
+            var absoluteMax = lines.length < maxLines ? lines.length: maxLines;
+            for (var i = 0; i < absoluteMax; i++) {
+                ret = ret + lines[i];
+                if((i < absoluteMax - 1)) {
+                    ret = ret + ' ';
+                }
+            }
+            if (lines.length > maxLines) {
+                ret = ret + '...';
+            }
+            ret = ret.split('\n').join(' ');
+        } else {
+            ret = message;
+        }
+
+        return ret;
+    }
+
     this.format = function(message, logLevel, opt) {
         var logLine = {};
         var tags = [];
@@ -92,38 +126,4 @@ module.exports = function(options) {
 
         return logLine;
     };
-
-    function addAuthorizationData(logLine, headers) {
-        if (headers) {
-            var authorization =  headers['authorization'];
-            if (authorization) {
-                logLine.authorization = authorization.substring(0, 20) + '...';
-                logLine.subjectId = securityUtils.getSubjectFromHeader(authorization);
-            }
-        }
-    }
-  
-    function limitOutputLines(message, maxLines) {
-        maxLines = maxLines || 1000000; // default
-        var ret = '';
-
-        if (typeof message === 'string') {
-            var lines = message.split(' ');
-            var absoluteMax = lines.length < maxLines ? lines.length: maxLines;
-            for (var i = 0; i < absoluteMax; i++) {
-                ret = ret + lines[i];
-                if((i < absoluteMax - 1)) {
-                    ret = ret + ' ';
-                }
-            }
-            if (lines.length > maxLines) {
-                ret = ret + '...';
-            }
-            ret = ret.split('\n').join(' ');
-        } else {
-            ret = message;
-        }
-
-        return ret;
-    }
 };

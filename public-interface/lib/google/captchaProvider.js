@@ -26,8 +26,8 @@ var getCaptchaPublicKey = function(req, res) {
         res.status(404).send();
     } else {
         res.status(200).send({
-                captchaPublicKey : config.auth.captcha.publicKey
-            }
+            captchaPublicKey : config.auth.captcha.publicKey
+        }
         );
     }
 };

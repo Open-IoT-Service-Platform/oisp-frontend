@@ -31,7 +31,7 @@ exports.new = function (setting, resultCallback) {
 
     settings.create(settingModel)
         .then(function (res) {
-           interpreterHelper.mapAppResults(res, interpreter, resultCallback);
+            interpreterHelper.mapAppResults(res, interpreter, resultCallback);
         })
         .catch(function (err) {
             resultCallback(err);

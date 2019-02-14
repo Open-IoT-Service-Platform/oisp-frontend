@@ -60,7 +60,7 @@ exports.new = function (accountData, userId, transaction) {
     };
 
     for(var value in replacements){
-        if(undefined == replacements[value]){
+        if(undefined === replacements[value]){
             replacements[value] = null;
         }
     }
@@ -97,7 +97,7 @@ exports.update = function (accountData, transaction) {
 };
 
 exports.delete = function (id, transaction) {
-  return account.destroy({where: {id: id}, transaction: transaction});
+    return account.destroy({where: {id: id}, transaction: transaction});
 };
 
 exports.find = function (id, resultCallback) {
@@ -162,4 +162,3 @@ exports.refreshActivationCode = function (id, resultCallback) {
             resultCallback(err);
         });
 };
-

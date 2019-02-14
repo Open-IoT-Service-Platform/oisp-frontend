@@ -29,16 +29,16 @@ var ConfirmChangeAlertStatusModalInstanceCtrl = function($scope, $modalInstance,
 };
 
 iotController.controller('ListAlertsCtrl', function($scope,
-                                                    $routeParams,
-                                                    $location,
-                                                    $filter,
-                                                    $modal,
-                                                    $q,
-                                                    alertsService,
-                                                    orderingService,
-                                                    filteringService,
-                                                    sessionService,
-                                                    ngTableParams) {
+    $routeParams,
+    $location,
+    $filter,
+    $modal,
+    $q,
+    alertsService,
+    orderingService,
+    filteringService,
+    sessionService,
+    ngTableParams) {
 
 
     var i18n = $scope.$parent.i18n;

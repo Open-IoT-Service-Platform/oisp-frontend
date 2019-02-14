@@ -17,19 +17,19 @@
 /*global angular*/
 'use strict';
 iotController.controller('ChartCtrl', function( $scope,
-                                                $rootScope,
-                                                $q,
-                                                $window,
-                                                dataService,
-                                                devicesService,
-                                                componentsService,
-                                                sessionService,
-                                                usersService,
-                                                ngTableParams,
-                                                flash,
-                                                $filter,
-                                                $timeout,
-                                                $modal) {
+    $rootScope,
+    $q,
+    $window,
+    dataService,
+    devicesService,
+    componentsService,
+    sessionService,
+    usersService,
+    ngTableParams,
+    flash,
+    $filter,
+    $timeout,
+    $modal) {
     var chartRefreshCancellationToken;
 
     $scope.chosenTimePeriod = null;
@@ -342,15 +342,15 @@ iotController.controller('ChartCtrl', function( $scope,
             }) ||
             !$scope.filters.chart.devices ||
                 !Object.keys($scope.filters.chart.devices).some(function(item){
-                return $scope.filters.chart.devices[item];
-            });
+                    return $scope.filters.chart.devices[item];
+                });
     };
 
     $scope.noData = function(){
         return !$scope.chartSeries || !$scope.chartSeries.series || $scope.chartSeries.series.length === 0;
     };
 
-    
+
     $scope.showAlert =function(){
         if(typeof $scope.chartSeries === "undefined" ){
             return false;
@@ -370,7 +370,30 @@ iotController.controller('ChartCtrl', function( $scope,
     };
 
     $scope.chartData = [];
+
     /*jshint newcap: false */
+    function isEmpty(obj) {
+
+        if (obj === null) {
+            return true;
+        }
+
+        if (obj.length > 0)    {
+            return false;
+        }
+        if (obj.length === 0)  {
+            return true;
+        }
+
+        for (var key in obj) {
+            if (hasOwnProperty.call(obj, key)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     $scope.tableChartData = new ngTableParams({
         page: 1,                // show first page
         count: 10,              // count per page
@@ -399,7 +422,7 @@ iotController.controller('ChartCtrl', function( $scope,
     var dataCanceler;
 
     function calculateChartHeight(){
-       $scope.chartHeight = 300;
+        $scope.chartHeight = 300;
     }
 
     function getFilters() {
@@ -465,31 +488,6 @@ iotController.controller('ChartCtrl', function( $scope,
         return filters;
     };
 
-    function refreshChart() {
-        $scope.stopAutoRefresh();
-
-        var promise;
-        if($scope.noMetrics()) {
-            promise = emptyPromise();
-        } else {
-            if($scope.isChartRendered) {
-                promise = downloadNewData().then(function(data) {
-                    return updateChartWithDownloadedData(data);
-                });
-            } else {
-                promise = renderChart();
-            }
-        }
-
-        promise.finally(function() {
-            scheduleRefresh();
-        });
-    }
-
-    $scope.refreshChart = function(){
-        refreshChart();
-    };
-
     var updateChartWithDownloadedData = function(data) {
         data.series.forEach(function(serie) {
             var oldSerie = $scope.chartSeries.series.filter(function(ser) {
@@ -520,12 +518,6 @@ iotController.controller('ChartCtrl', function( $scope,
         });
     };
 
-    function scheduleRefresh() {
-        chartRefreshCancellationToken = $timeout(function() {
-            refreshChart();
-        }, $scope.refreshRateSeconds * 1000);
-    }
-
     function emptyPromise() {
         return $q.when();
     }
@@ -533,30 +525,7 @@ iotController.controller('ChartCtrl', function( $scope,
     $scope.status.errorLoadingData = false;
     $scope.status.errorLoadingDataReason = '';
 
-    function renderChart(){     
-        if($scope.noMetrics() || $scope.status.inProgress || $scope.status.errorLoadingData ||
-            getFilters().metrics.length === 0) {
-            return emptyPromise();
-        }
-
-        $scope.status.inProgress = true;
-        return downloadAllData()
-            .then(drawChartFromScratch)
-            .catch(function(error){
-                $scope.chartSeries = {
-                    from: $scope.filters.chart.timePeriod.value,
-                    to: $scope.filters.chart.to,
-                    timeUnit: $scope.filters.chart.timePeriod.unit,
-                    series: []
-                };
-                $scope.status.errorLoadingDataReason = error.message;
-                $scope.status.errorLoadingData = true;
-            })
-            .finally(function() {
-                $scope.status.inProgress = false;
-            });
-    }
-
+    /*jshint -W003 */
     function drawChartFromScratch(data){
         data.timeUnit = $scope.filters.chart.timePeriod.unit;
         $scope.chartSeries = data;
@@ -569,8 +538,6 @@ iotController.controller('ChartCtrl', function( $scope,
 
         $scope.isChartRendered = true;
     }
-
-    $scope.renderChart = refreshChart;
 
     function downloadData(filters) {
         if(dataCanceler) {
@@ -601,27 +568,63 @@ iotController.controller('ChartCtrl', function( $scope,
         return downloadData(filters);
     }
 
-    function isEmpty(obj) {
-
-        if (obj === null) {
-            return true;
+    function renderChart(){
+        if($scope.noMetrics() || $scope.status.inProgress || $scope.status.errorLoadingData ||
+            getFilters().metrics.length === 0) {
+            return emptyPromise();
         }
 
-        if (obj.length > 0)    {
-            return false;
-        }
-        if (obj.length === 0)  {
-            return true;
-        }
+        $scope.status.inProgress = true;
+        return downloadAllData()
+            .then(drawChartFromScratch)
+            .catch(function(error){
+                $scope.chartSeries = {
+                    from: $scope.filters.chart.timePeriod.value,
+                    to: $scope.filters.chart.to,
+                    timeUnit: $scope.filters.chart.timePeriod.unit,
+                    series: []
+                };
+                $scope.status.errorLoadingDataReason = error.message;
+                $scope.status.errorLoadingData = true;
+            })
+            .finally(function() {
+                $scope.status.inProgress = false;
+            });
+    }
 
-        for (var key in obj) {
-            if (hasOwnProperty.call(obj, key)) {
-                return false;
+    function refreshChart() {
+        $scope.stopAutoRefresh();
+
+        var promise;
+        if($scope.noMetrics()) {
+            promise = emptyPromise();
+        } else {
+            if($scope.isChartRendered) {
+                promise = downloadNewData().then(function(data) {
+                    return updateChartWithDownloadedData(data);
+                });
+            } else {
+                promise = renderChart();
             }
         }
 
-        return true;
+        promise.finally(function() {
+            scheduleRefresh();
+        });
     }
+
+    function scheduleRefresh() {
+        chartRefreshCancellationToken = $timeout(function() {
+            refreshChart();
+        }, $scope.refreshRateSeconds * 1000);
+    }
+
+    $scope.refreshChart = function(){
+        refreshChart();
+    };
+    /*jshint +W003 */
+
+    $scope.renderChart = refreshChart;
 
     $scope.stopAutoRefresh = function() {
         if (angular.isDefined(chartRefreshCancellationToken)) {

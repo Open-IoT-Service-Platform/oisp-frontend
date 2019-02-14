@@ -90,7 +90,7 @@ function authorize(options) {
         var req = socket.request || socket;
         var authorization_header = (req.headers || {}).authorization;
 
-            if (authorization_header) {
+        if (authorization_header) {
             var parts = authorization_header.split(' ');
             if (parts.length === 2) {
                 var scheme = parts[0],

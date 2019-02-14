@@ -20,8 +20,8 @@ var validator = require('../json-gate').createSchema,
 var validate = function(obj, schema){
     var schemaJs = validator(schema);
     return schemaJs.validate(obj).errors.map(function(e){
-            e.customMessage = e.property + ' ' + e.message;
-            return e;
+        e.customMessage = e.property + ' ' + e.message;
+        return e;
     });
 };
 

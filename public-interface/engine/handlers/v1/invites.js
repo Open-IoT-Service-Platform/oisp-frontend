@@ -127,12 +127,12 @@ exports.updateInviteStatus = function (req, res) {
     invites.updateInviteStatus(req.params.inviteId, data.accept, req.identity, function(err, inv) {
     		if (!err) {
         		var resBody = inv;
-                if (!inv) {
-                    resBody = httpStatuses.DeleteOK;
-                }
-                res.status(httpStatuses.OK.code).send(resBody);
+            if (!inv) {
+                resBody = httpStatuses.DeleteOK;
+            }
+            res.status(httpStatuses.OK.code).send(resBody);
     		} else {
         		res.status(err.status).send(err.message);
     		}
-        });
+    });
 };

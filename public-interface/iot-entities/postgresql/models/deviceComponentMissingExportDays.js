@@ -19,20 +19,20 @@
 module.exports = function (sequelize, DataTypes) {
 
     var model = sequelize.define('device_component_missing_export_days', {
-            componentId: {
-                type: DataTypes.STRING(255),
-                allowNull: false,
-                primaryKey: true
-            },
-            day: {
-                type: DataTypes.DATE,
-                primaryKey: true
-            }
+        componentId: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+            primaryKey: true
         },
-        {
-            timestamps: false,
-            schema: 'dashboard'
-        });
+        day: {
+            type: DataTypes.DATE,
+            primaryKey: true
+        }
+    },
+    {
+        timestamps: false,
+        schema: 'dashboard'
+    });
     model.removeAttribute('id');
     return model;
 };

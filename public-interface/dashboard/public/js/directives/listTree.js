@@ -27,18 +27,18 @@ iotApp.directive('treeList', function () {
             selectGroup: '&'
         },
         link: function (scope, element) {
-              scope.$on('repeat-done', function(){
-                  angular.element('#hierarchy').menu({
-                      content: element.html(),
-                      positionOpts: { posX: 'left', posY: 'top' },
-                      //maxHeight:100,
-                      crumbDefaultText: '',
-                      linkHover: 'fg-menu-li-hover',
-                      eagerInit: scope.eagerInit || false,
-                      chooseItemCallback: scope.selectGroup
+            scope.$on('repeat-done', function(){
+                angular.element('#hierarchy').menu({
+                    content: element.html(),
+                    positionOpts: { posX: 'left', posY: 'top' },
+                    //maxHeight:100,
+                    crumbDefaultText: '',
+                    linkHover: 'fg-menu-li-hover',
+                    eagerInit: scope.eagerInit || false,
+                    chooseItemCallback: scope.selectGroup
                 });
             });
-            }
+        }
     };
 });
 iotApp.directive('treeListItem', function ($compile, $timeout) {

@@ -19,52 +19,52 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('devices', {
-            id: {
-                type: DataTypes.STRING(255),
-                primaryKey: true
-            },
-            name: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            description: {
-                type: DataTypes.STRING(255)
-            },
-            gatewayId: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            loc: DataTypes.ARRAY(DataTypes.DECIMAL),
-            email: {
-                type: DataTypes.STRING(255)
-            },
-            phone: DataTypes.STRING(255),
-            status: {
-                //Ordering in enum depends on creation date of type, so enum types should be listed in alfabetical order
-                type: DataTypes.ENUM('active', 'created'),
-                allowNull: false,
-                defaultValue: 'created'
-            }
+        id: {
+            type: DataTypes.STRING(255),
+            primaryKey: true
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'devices_accountId_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                },
-                {
-                    name: 'devices_id_accountId_index',
-                    method: 'BTREE',
-                    fields: ['id', 'accountId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        name: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        description: {
+            type: DataTypes.STRING(255)
+        },
+        gatewayId: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        loc: DataTypes.ARRAY(DataTypes.DECIMAL),
+        email: {
+            type: DataTypes.STRING(255)
+        },
+        phone: DataTypes.STRING(255),
+        status: {
+            //Ordering in enum depends on creation date of type, so enum types should be listed in alfabetical order
+            type: DataTypes.ENUM('active', 'created'),
+            allowNull: false,
+            defaultValue: 'created'
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'devices_accountId_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            },
+            {
+                name: 'devices_id_accountId_index',
+                method: 'BTREE',
+                fields: ['id', 'accountId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

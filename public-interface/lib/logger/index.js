@@ -15,9 +15,9 @@
  */
 
 "use strict";
-var logger = require('./logger'),
+var Logger = require('./logger'),
     config = require('../../config').logger,
-    formatter = require('./formatter'),
+    Formatter = require('./formatter'),
     os = require('os');
 
 var loggerInstance = null;
@@ -25,11 +25,11 @@ var machineName = os.hostname();
 
 module.exports.init = function init () {
     if (loggerInstance === null) {
-        var formatterInstance = new formatter({machineName: machineName,
-                                               env: process.env.NODE_ENV,
-                                               maxLines: config.maxLines
-                                               });
-        this.loggerInstance = new logger(formatterInstance);
+        var formatterInstance = new Formatter({machineName: machineName,
+            env: process.env.NODE_ENV,
+            maxLines: config.maxLines
+        });
+        this.loggerInstance = new Logger(formatterInstance);
     }
     return this.loggerInstance;
 };

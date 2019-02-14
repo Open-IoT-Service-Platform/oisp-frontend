@@ -19,44 +19,44 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('device_components', {
-            componentId: {
-                type: DataTypes.STRING(255),
-                primaryKey: true
-            },
-            name: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            componentTypeId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            deviceId: {
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            last_observation_time: {
-                type: DataTypes.DATE
-            },
-            last_export_date: {
-                type: DataTypes.DATE
-            }
+        componentId: {
+            type: DataTypes.STRING(255),
+            primaryKey: true
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'device_components_deviceId_index',
-                    method: 'BTREE',
-                    fields: ['deviceId']
-                },
-                {
-                    name: 'device_components_componentTypeId_index',
-                    method: 'BTREE',
-                    fields: ['componentTypeId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        name: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        componentTypeId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        deviceId: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        last_observation_time: {
+            type: DataTypes.DATE
+        },
+        last_export_date: {
+            type: DataTypes.DATE
+        }
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'device_components_deviceId_index',
+                method: 'BTREE',
+                fields: ['deviceId']
+            },
+            {
+                name: 'device_components_componentTypeId_index',
+                method: 'BTREE',
+                fields: ['componentTypeId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

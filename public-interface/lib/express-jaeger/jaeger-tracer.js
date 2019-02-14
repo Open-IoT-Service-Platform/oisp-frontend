@@ -18,7 +18,7 @@ var initJaegerTracer = require('jaeger-client').initTracer,
     jaegerConfig = require('./../../config').jaeger,
     logger = require('./../../lib/logger').init();
 
-var initTracer = function(serviceName) {
+function initTracer() {
     const config = {
         serviceName: jaegerConfig.serviceName,
         sampler: {
@@ -47,11 +47,11 @@ var initTracer = function(serviceName) {
 // Singleton
 var tracer;
 
-module.exports = function() {
-    if (tracer)
+module.exports = (function() {
+    if (tracer) {
         return tracer;
-    else {
-        tracer = initTracer('frontend');
+    } else {
+        tracer = initTracer();
         return tracer;
     }
-}();
+})();

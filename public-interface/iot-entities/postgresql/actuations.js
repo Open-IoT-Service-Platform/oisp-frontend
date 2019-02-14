@@ -32,59 +32,59 @@ var getActuationRelations = function(){
 };
 
 exports.findById = function (id, resultCallback) {
-        var filter = {
-            include: getActuationRelations(),
-            where: {
-                id: id
-            }
-        };
-
-        return actuations.find(filter)
-            .then(function (actuation) {
-                actuation = interpreter.toApp(actuation);
-                resultCallback(null, actuation);
-            });
+    var filter = {
+        include: getActuationRelations(),
+        where: {
+            id: id
+        }
     };
+
+    return actuations.find(filter)
+        .then(function (actuation) {
+            actuation = interpreter.toApp(actuation);
+            resultCallback(null, actuation);
+        });
+};
 
 exports.findByDeviceId = function (deviceId, limit, dateFilter, resultCallback) {
-        var filter = {
-            include: getActuationRelations(),
-            order:[['created','DESC']]
-        };
-        filter.include[0].include["where"] = {id: deviceId};
-
-        if (dateFilter) {
-            filter["where"] = {
-                created:{$gt:dateFilter.from}};
-            filter["limit"] = limit;
-
-        }
-
-        return actuations.findAll(filter)
-            .then(function (actuations) {
-                actuations = actuations.map(function(actuation) {
-                    return interpreter.toApp(actuation);
-                });
-                resultCallback(null, actuations);
-            });
+    var filter = {
+        include: getActuationRelations(),
+        order:[['created','DESC']]
     };
+    filter.include[0].include["where"] = {id: deviceId};
+
+    if (dateFilter) {
+        filter["where"] = {
+            created:{$gt:dateFilter.from}};
+        filter["limit"] = limit;
+
+    }
+
+    return actuations.findAll(filter)
+        .then(function (actuations) {
+            actuations = actuations.map(function(actuation) {
+                return interpreter.toApp(actuation);
+            });
+            resultCallback(null, actuations);
+        });
+};
 
 exports.new = function (data, resultCallback) {
-        var actuationModel = interpreter.toDb(data);
-        return actuations.create(actuationModel)
-            .then(function (actuation) {
-                return actuations.find({
-                    where: {id: actuation.id},
-                    include: getActuationRelations()})
-                    .then(function (actuation) {
-                        actuation = interpreter.toApp(actuation);
-                        return resultCallback(null, actuation);
-                    });
-            })
-            .catch(function (err) {
-                resultCallback(err);
-            });
-    };
+    var actuationModel = interpreter.toDb(data);
+    return actuations.create(actuationModel)
+        .then(function (actuation) {
+            return actuations.find({
+                where: {id: actuation.id},
+                include: getActuationRelations()})
+                .then(function (actuation) {
+                    actuation = interpreter.toApp(actuation);
+                    return resultCallback(null, actuation);
+                });
+        })
+        .catch(function (err) {
+            resultCallback(err);
+        });
+};
 
 exports.deleteByDeviceId = function (deviceId, resultCallback) {
     var filter = {
@@ -93,9 +93,9 @@ exports.deleteByDeviceId = function (deviceId, resultCallback) {
     };
     filter.include[0].include["where"] = {id: deviceId};
 
-        actuations.destroy(filter)
-            .then(function(){
-                resultCallback();
-            });
-    };
+    actuations.destroy(filter)
+        .then(function(){
+            resultCallback();
+        });
+};
 

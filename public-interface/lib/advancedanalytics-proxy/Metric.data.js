@@ -77,6 +77,6 @@ Metric.prototype.prepareDataIngestionMsg= function(msg) {
 };
 
 module.exports.init = function (Util) {
-  dateUtil = Util;
-  return Metric;
+    dateUtil = Util;
+    return Metric;
 };

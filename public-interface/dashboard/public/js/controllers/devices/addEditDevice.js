@@ -42,13 +42,13 @@ var ComponentDefinitionModalInstanceCtrl = function ($scope, $modalInstance, com
 };
 
 iotController.controller('AddEditDeviceCtrl', function($scope,
-                                                $rootScope,
-                                                $location,
-                                                $filter,
-                                                $routeParams,
-                                                $modal,
-                                                devicesService,
-                                                sessionService) {
+    $rootScope,
+    $location,
+    $filter,
+    $routeParams,
+    $modal,
+    devicesService,
+    sessionService) {
 
     $scope.$parent.page = {
         menuSelected: "devices",
@@ -63,19 +63,19 @@ iotController.controller('AddEditDeviceCtrl', function($scope,
         $scope.$watch(sessionService.getCurrentAccount, function(data) {
             if (data) {
                 devicesService.getDevice($routeParams.deviceId, function (data) {
-                        $scope.device = data;
-                        if (typeof data.loc !== "undefined") {
-                            var loc = {
-                                latitude : parseFloat(data.loc.latitude),
-                                longitude : parseFloat(data.loc.longitude),
-                                height : parseFloat(data.loc.height)
-                            };
-                            $scope.device.loc = loc;
-                        }
-                    },
-                    function (error) {
-                        $scope.error = error.message || error;
-                    });
+                    $scope.device = data;
+                    if (typeof data.loc !== "undefined") {
+                        var loc = {
+                            latitude : parseFloat(data.loc.latitude),
+                            longitude : parseFloat(data.loc.longitude),
+                            height : parseFloat(data.loc.height)
+                        };
+                        $scope.device.loc = loc;
+                    }
+                },
+                function (error) {
+                    $scope.error = error.message || error;
+                });
             }
         });
     }

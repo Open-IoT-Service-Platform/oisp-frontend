@@ -17,12 +17,12 @@
 'use strict';
 
 iotController.controller('AboutCtrl', function($scope,
-                                               $routeParams,
-                                               $location,
-                                               $filter,
-                                               $modal,
-                                               $q,
-                                               aboutService) {
+    $routeParams,
+    $location,
+    $filter,
+    $modal,
+    $q,
+    aboutService) {
 
     $scope.version = "";
 
@@ -41,7 +41,7 @@ iotController.controller('AboutCtrl', function($scope,
         $scope.version = data.build;
         $scope.revision = data.revision || 'unknown';
     }, function(data){
-            $scope.error = data;
+        $scope.error = data;
     });
     var i18n = $scope.$parent.i18n;
     $scope.$parent.page = {

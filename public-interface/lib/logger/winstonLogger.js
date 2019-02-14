@@ -21,14 +21,9 @@ var winston = require('winston'),
 
 winston.addColors(logLevel.logLevels.colors);
 
-var getLogConfiguration = function (baseConfig) {
-    baseConfig.level = loggerConf.logLevel;
-    return baseConfig;
-};
-
 module.exports = winston.createLogger({
-	format: loggerConf.format,
-	levels: logLevel.logLevels.levels,
+    format: loggerConf.format,
+    levels: logLevel.logLevels.levels,
     transports: loggerConf.frontendTransports,
     exitOnError: loggerConf.exitOnError,
     maxLines: loggerConf.maxLines

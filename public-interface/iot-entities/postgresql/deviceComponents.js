@@ -49,7 +49,7 @@ exports.all = function (accountId, resultCallback) {
         })
         .catch (function(err) {
             resultCallback(err);
-    });
+        });
 };
 
 var filterByDeviceProperties = function (customFilter, filter) {
@@ -125,27 +125,27 @@ exports.getByCustomFilter = function(accountId, customFilter, resultCallback) {
         .catch (function(err) {
             console.log(err);
             resultCallback(err);
-    });
+        });
 };
 
 exports.findComponentsAndTypesForDevice = function(deviceId, resultCallback) {
-  var filter = {
-    where: {
-      deviceId: deviceId
-    },
-    include: [
-    {
-      model: componentTypes
-    }]
-  };
-  deviceComponents.findAll(filter)
-  .then(function(result) {
-    interpreterHelper.mapAppResults(result, interpreter, resultCallback);
-  })
-  .catch(function(err) {
-    console.log(err);
-    resultCallback(err);
-  });
+    var filter = {
+        where: {
+            deviceId: deviceId
+        },
+        include: [
+            {
+                model: componentTypes
+            }]
+    };
+    deviceComponents.findAll(filter)
+        .then(function(result) {
+            interpreterHelper.mapAppResults(result, interpreter, resultCallback);
+        })
+        .catch(function(err) {
+            console.log(err);
+            resultCallback(err);
+        });
 };
 
 exports.updateLastObservationTS = function (componentId, date, resultCallback) {

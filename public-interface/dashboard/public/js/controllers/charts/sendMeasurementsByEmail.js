@@ -16,12 +16,12 @@
 
 'use strict';
 iotController.controller('SendMeasurementsByEmailModalCtrl', function (  $scope,
-                                                                    $window,
-                                                                    $timeout,
-                                                                    $modalInstance,
-                                                                    users,
-                                                                    searchFilters,
-                                                                    dataService) {
+    $window,
+    $timeout,
+    $modalInstance,
+    users,
+    searchFilters,
+    dataService) {
 
     $scope.userList = [];
     $scope.userListFilter = [];

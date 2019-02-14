@@ -52,10 +52,10 @@ exports.new = function(data, resultCallback){
 
             var dbEntity = interpreter.toDb(data);
 
-        return userInteractionTokens.create(dbEntity)
-            .then(function (res) {
-                resultCallback(null, interpreter.toApp(res));
-            });
+            return userInteractionTokens.create(dbEntity)
+                .then(function (res) {
+                    resultCallback(null, interpreter.toApp(res));
+                });
         })
         .catch(function(err) {
             resultCallback(err);

@@ -18,40 +18,40 @@
 
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('purchased_limits', {
-            id: {
-                type: DataTypes.UUID,
-                primaryKey: true,
-                allowNull: false,
-                defaultValue: DataTypes.UUIDV4
-            },
-            accountId: {
-                type: DataTypes.UUID,
-                allowNull: false
-            },
-            route:{
-                type: DataTypes.STRING(255),
-                allowNull: false
-            },
-            limit:{
-                type: DataTypes.BIGINT,
-                allowNull: false
-            },
-            method:{
-                type: DataTypes.STRING(10),
-                allowNull: false
-            }
-
+        id: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            allowNull: false,
+            defaultValue: DataTypes.UUIDV4
         },
-        {
-            createdAt: 'created',
-            updatedAt: 'updated',
-            indexes: [
-                {
-                    name: 'purchased_limits_accountId_index',
-                    method: 'BTREE',
-                    fields: ['accountId']
-                }
-            ],
-            schema: 'dashboard'
-        });
+        accountId: {
+            type: DataTypes.UUID,
+            allowNull: false
+        },
+        route:{
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        limit:{
+            type: DataTypes.BIGINT,
+            allowNull: false
+        },
+        method:{
+            type: DataTypes.STRING(10),
+            allowNull: false
+        }
+
+    },
+    {
+        createdAt: 'created',
+        updatedAt: 'updated',
+        indexes: [
+            {
+                name: 'purchased_limits_accountId_index',
+                method: 'BTREE',
+                fields: ['accountId']
+            }
+        ],
+        schema: 'dashboard'
+    });
 };

@@ -20,13 +20,13 @@ var Kafka = require('kafka-node'),
     logger = require('./logger').init(),
     rulesUpdateNotifier = require('../engine/api/helpers/rules-update-notifier'),
     heartBeatInterval = null;
-    var kafkaClient = null;
-    var kafkaProducer = null;
+var kafkaClient = null;
+var kafkaProducer = null;
 
 var heartBeat = function(producer, partition, topic) {
     if ( producer != null) {
         try {
-            console.log("--------------------Sending heartbeat ...")
+            console.log("--------------------Sending heartbeat ...");
             producer.send([
                 {
                     topic: topic,
@@ -36,40 +36,42 @@ var heartBeat = function(producer, partition, topic) {
             ], function (err) {
                 if (err) {
                     logger.error("Error when sending heartbear message to Kafka: " + JSON.stringify(err));
-                } 
+                }
             });
         } catch(exception) {
             logger.error("Exception occured when sending heartbear message to Kafka: " + exception);
         }
     }
-}
+};
 
 exports.start = function () {
-  
+
     kafkaClient = new Kafka.KafkaClient({kafkaHost: config.drsProxy.kafka.uri});
 
-    kafkaProducer = new Kafka.HighLevelProducer(kafkaClient, { requireAcks: 1, ackTimeoutMs: 500 });    
+    kafkaProducer = new Kafka.HighLevelProducer(kafkaClient, { requireAcks: 1, ackTimeoutMs: 500 });
 
     kafkaProducer.on('ready', function () {
         var topic = config.drsProxy.kafka.topicsHeartbeatName;
         var interval = parseInt(config.drsProxy.kafka.topicsHeartbeatInterval);
         var partition = 0;
-    
+
+        /*jshint -W098 */
         kafkaProducer.createTopics([topic], true, function (error, data) {
             if (!error) {
-                
+
                 heartBeat(kafkaProducer, partition, topic);
                 heartBeatInterval = setInterval( function (producer, partition, topic) {
                     heartBeat(producer, partition, topic);
                 }, interval, kafkaProducer, partition, topic );
                 rulesUpdateNotifier.notify();
             }
-        })
-    })
+        });
+        /*jshint +W098 */
+    });
 };
 
 exports.stop = function () {
     if ( heartBeatInterval != null ) {
-        clearInterval(heartBeatInterval)
+        clearInterval(heartBeatInterval);
     }
-}
+};
