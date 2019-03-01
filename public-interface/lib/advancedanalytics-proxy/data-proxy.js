@@ -22,7 +22,7 @@ var MQTTConnector = require('./../../lib/mqtt'),
     request = require('request'),
     util = require('../dateUtil'),
     logger = require('../logger').init(),
-    contextProvider = require('./../context-provider'),
+    context = require('./../context-provider').instance(),
     tracer = require('./../express-jaeger').tracer,
     spanContext = require('./../express-jaeger').spanContext,
     opentracing = require('opentracing'),
@@ -70,21 +70,14 @@ var buildICFALMessage = function(data) {
 };
 
 function createSpan(name) {
-    const context = contextProvider.instance();
     if (!jaegerConfig.tracing) {
         return null;
     }
-    var fatherSpan = context.get(spanContext.parent);
+    var fatherSpan = context.get(spanContext.active);
     if (!fatherSpan) {
-        // something is wrong
-        logger.warn('Span must be dropped due to no father is present');
-        var rootSpan = context.get(spanContext.root);
-        if (rootSpan) {
-            rootSpan.setTag(opentracing.Tags.SAMPLING_PRIORITY, 0);
-        }
         return null;
     }
-    const span = tracer.startSpan(name, { childOf: fatherSpan.span });
+    const span = tracer.startSpan(name, { childOf: fatherSpan });
     return span;
 }
 
@@ -156,7 +149,6 @@ module.exports = function(config) {
     };
 
     this.submitDataREST = function(data, callback) {
-        const context = contextProvider.instance();
         const span = createSpan('submitDataRest');
 
         var dataMetric = new Metric();
@@ -239,7 +231,6 @@ module.exports = function(config) {
     };
 
     this.dataInquiry = function(data, callback){
-        const context = contextProvider.instance();
         const span = createSpan('dataInquiry');
 
         var dataInquiryMessage = buildDIMessage(data);
@@ -296,7 +287,6 @@ module.exports = function(config) {
     };
 
     this.dataInquiryAdvanced = function(data, callback) {
-        const context = contextProvider.instance();
         const span = createSpan('dataInquiryAdvanced');
 
         var accountId = data.accountId;
@@ -360,7 +350,6 @@ module.exports = function(config) {
     };
 
     this.report = function(data, callback) {
-        const context = contextProvider.instance();
         const span = createSpan('dataReport');
 
         var domainId = data.domainId;
@@ -407,7 +396,6 @@ module.exports = function(config) {
     };
 
     this.getFirstAndLastMeasurement = function(data, callback) {
-        const context = contextProvider.instance();
         const span = createSpan('getFirstAndLastMeasurement');
 
         var domainId = data.domainId;
