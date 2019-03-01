@@ -189,7 +189,7 @@ var createAndRegisterDevice = function (deviceToRegister, accountId) {
 
 
 exports.registerDevice = function (deviceToRegister, activationCode, resultCallback) {
-    
+
     return Device.confirmActivation(deviceToRegister.deviceId, activationCode)
         .then (function(activationResult) {
             if (activationResult.activated === false) {
@@ -332,7 +332,7 @@ exports.deleteComponent = function (deviceId, componentId, accountId) {
                 })
                 .catch (function(err) {
                     return postgresProvider.rollback(transaction)
-                        .done(function() {
+                        .then(function() {
                             var errMsg = errBuilder.Errors.Device.Component.DeleteError;
                             if(err && err.code) {
                                 errMsg = errBuilder.build(err);
