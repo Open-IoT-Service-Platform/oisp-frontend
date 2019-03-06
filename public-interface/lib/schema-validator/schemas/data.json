@@ -35,7 +35,7 @@
                             }
                         },
                         "value": {
-                            "type": "string",
+                            "type": ["number", "string", "boolean"],
                             "required": true
                         },
                         "attributes": {
@@ -76,7 +76,7 @@
 		"description": "The filter object that will be used to select devices",
 		"examples": [ "criteria or deviceList object" ],
 
-		
+
                 "properties": {
                     "criteria": {
                         "type": "object",
