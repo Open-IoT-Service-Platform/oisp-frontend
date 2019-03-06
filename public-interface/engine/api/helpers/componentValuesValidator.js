@@ -34,11 +34,12 @@ var validator = function(dataType, value) {
     };
 
     this.validate = function() {
+        // String encoding is allowed for backward compatibilty
         switch (dataType) {
         case 'Number':
-            return numberValidator(value);
+            return typeof value === "number" || (typeof value === "string" && numberValidator(value));
         case 'Boolean':
-            return booleanValidator(value);
+            return typeof value === "boolean" || (typeof value === "string" && booleanValidator(value));
         case 'String':
             return true;
         case 'ByteArray':
