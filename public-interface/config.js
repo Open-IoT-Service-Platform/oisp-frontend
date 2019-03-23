@@ -106,7 +106,7 @@ var config = {
         forceSSL: true,
         port: process.env.PORT || 4001,
         socket: 1024,
-        bodySizeLimit: '256kb'
+        bodySizeLimit: '2560kb'
     },
     biz: {
         domain: {
