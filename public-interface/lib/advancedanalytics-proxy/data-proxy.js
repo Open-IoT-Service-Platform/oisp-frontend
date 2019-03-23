@@ -30,7 +30,7 @@ var MQTTConnector = require('./../../lib/mqtt'),
     errBuilder  = require("../errorHandler").errBuilder,
     Metric = require('./Metric.data').init(util),
     responses = require('./utils/responses');
-const cbor = require('cbor');
+const cbor = require('borc');
 
 var buildDIMessage = function(data) {
     var times = util.extractFromAndTo(data);
@@ -162,15 +162,8 @@ module.exports = function(config) {
         var dataMetric = new Metric();
         var message = dataMetric.prepareDataIngestionMsg(data);
 
-        var body;
-        var contentType;
-        if (data.hasBinary) {
-            body = cbor.encode(message);
-            contentType = "application/cbor";
-        } else {
-            body = JSON.stringify(message);
-            contentType = "application/json";
-        }
+        var body = JSON.stringify(message);
+        var contentType = "application/json";
         var options = {
             url: config.dataUrl + '/v1/accounts/' + data.domainId + '/dataSubmission',
             method: 'POST',

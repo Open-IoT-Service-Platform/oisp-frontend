@@ -18,7 +18,7 @@
 var data = require('../../api/v1/data'),
     errBuilder = require('../../../lib/errorHandler/index').errBuilder,
     httpStatuses = require('../../res/httpStatuses');
-const cbor = require('cbor');
+const cbor = require('borc');
 
 exports.usage = function(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -39,7 +39,7 @@ exports.collectData = function (req, res, next) {
     options.hasBinary = false;
     if (req.binaryValues !== undefined) {
         req.binaryValues.forEach((item) => {
-            req.body.data[item.index].bValue = item.value;
+            req.body.data[item.index].bValue = item.value.toString("base64");
         });
         delete req.binaryValues;
         options.hasBinary = true;
