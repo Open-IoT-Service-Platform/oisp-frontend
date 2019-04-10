@@ -84,8 +84,10 @@ if (postgres_config.readReplicas) {
 	postgresReadReplicas.push({
 		host: postgres_config.readHostname,
 		port: postgres_config.readPort,
-		username: postgres_config.readUsername,
-		password: postgres_config.readPassword
+		su_username: postgres_config.readUsername,
+		su_password: postgres_config.readPassword,
+		username: 'oisp_user',
+		password: 'supersecret',
 	});
 } else {
 	// Use default db config as read
@@ -98,6 +100,8 @@ if (postgres_config.writeHostname) {
 		port: postgres_config.writePort,
 		username: postgres_config.writeUsername,
 		password: postgres_config.writePassword,
+		username: 'oisp_user',
+		password: 'supersecret',
 	};
 }
 
@@ -163,6 +167,8 @@ var config = {
         database: postgres_config.dbname,
         username: postgres_config.username,
         password: postgres_config.password,
+		  username: 'oisp_user',
+		  password: 'supersecret',
         options: {
             host: postgres_config.hostname,
             port: postgres_config.port,

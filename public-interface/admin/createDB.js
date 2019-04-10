@@ -45,7 +45,9 @@ CreateDB.prototype.create = function(){
             return systemUsers.create();
         })
     	.then(function() {
-            return models.sequelize.close();
+            models.sequelize.close();
+            models.super_user_sequelize.close();
+            return;
         })
         .then(() => {
 	    return tracer.close();

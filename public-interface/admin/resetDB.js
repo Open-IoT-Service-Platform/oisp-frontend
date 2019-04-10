@@ -23,15 +23,15 @@ var ResetDB = function(){};
 /*jshint -W098 */
 /*globals requests: true */
 ResetDB.prototype.reset = function(cb) {
-    models.sequelize.authenticate()
+    models.super_user_sequelize.authenticate()
         .then(function() {
             var tables = [];
 	        var fn = function(model){
-                const tableData = models.sequelize.models[model].getTableName();
+                const tableData = models.super_user_sequelize.models[model].getTableName();
                 const tableName = '"' + tableData.schema + '"."' + tableData.tableName + '"';
-                return models.sequelize.query('TRUNCATE TABLE ' + tableName + ' CASCADE');
+                return models.super_user_sequelize.query('TRUNCATE TABLE ' + tableName + ' CASCADE');
 	        };
-            requests = Object.keys(models.sequelize.models)
+            requests = Object.keys(models.super_user_sequelize.models)
                 .map(fn);
             return Promise.all(requests);
         })
@@ -47,7 +47,7 @@ ResetDB.prototype.reset = function(cb) {
             process.exit(1);
         })
         .finally(function() {
-            models.sequelize.close();
+            models.super_user_sequelize.close();
             tracer.close();
         });
 };

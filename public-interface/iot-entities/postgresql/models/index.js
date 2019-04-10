@@ -62,6 +62,14 @@ var sequelize = new Sequelize(
     getSequelizeOptions()
 );
 
+
+var super_user_sequelize = new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    getSequelizeOptions()
+);
+
 // Patch sequelize.query for jaeger support
 function wrapQuery(original) {
     /*jshint -W098 */
@@ -101,6 +109,29 @@ if (jaegerConfig.tracing) {
     shimmer.wrap(sequelize, 'query', wrapQuery);
 }
 
+/* Fill super_user with models */
+var accounts = new Accounts(super_user_sequelize, Sequelize);
+var actuations = new Actuations(super_user_sequelize, Sequelize);
+var users = new Users(super_user_sequelize, Sequelize);
+var settings = new Settings(super_user_sequelize, Sequelize);
+var userAccounts = new UserAccounts(super_user_sequelize, Sequelize);
+var componentTypes = new ComponentTypes(super_user_sequelize, Sequelize);
+var rules = new Rules(super_user_sequelize, Sequelize);
+var complexCommands = new ComplexCommands(super_user_sequelize, Sequelize);
+var commands = new Commands(super_user_sequelize, Sequelize);
+var devices = new Devices(super_user_sequelize, Sequelize);
+var deviceAttributes = new DeviceAttributes(super_user_sequelize, Sequelize);
+var deviceTags = new DeviceTags(super_user_sequelize, Sequelize);
+var invites = new Invites(super_user_sequelize, Sequelize);
+var deviceComponents = new DeviceComponents(super_user_sequelize, Sequelize);
+var deviceComponentMissingExportDays = new DeviceComponentMissingExportDays(super_user_sequelize, Sequelize);
+var userInteractionTokens = new UserInteractionTokens(super_user_sequelize, Sequelize);
+var alerts = new Alerts(super_user_sequelize, Sequelize);
+var connectionBindings = new ConnectionBindings(super_user_sequelize, Sequelize);
+var purchasedLimits = new PurchasedLimits(super_user_sequelize, Sequelize);
+var alertComments = new AlertComments(super_user_sequelize, Sequelize);
+
+/* Fill regular_user with models */
 var accounts = new Accounts(sequelize, Sequelize);
 var actuations = new Actuations(sequelize, Sequelize);
 var users = new Users(sequelize, Sequelize);
@@ -461,3 +492,4 @@ module.exports.deviceComponentMissingExportDays = deviceComponentMissingExportDa
 module.exports.alertComments = alertComments;
 
 module.exports.sequelize = sequelize;
+module.exports.super_user_sequelize = super_user_sequelize;
