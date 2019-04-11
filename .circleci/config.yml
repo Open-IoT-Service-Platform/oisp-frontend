@@ -2,27 +2,132 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
-jobs:
-  build:
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:8.0
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
+version: 2.1
+executors:
+  vm-executor:
+    machine:
+      enabled: true
+      image: ubuntu-1604:201903-01
     working_directory: ~/repo
     environment:
       shell: /bin/bash
       TERM: xterm
-
+      TZ: "Europe/Berlin"
+  docker-executor:
+    docker:
+      - image: circleci/node:8.0
+    working_directory: ~/repo
+    environment:
+      shell: /bin/bash
+      TERM: xterm
+commands:
+  setup-build-environment:
+    description: "Setup build Environment"
+    steps:
+      - run:
+          name: Setup build environment
+          command: |
+            cd platform-launcher/platform-setup
+            sudo ./setup-ubuntu16.04.sh
+  checkout-e2e:
+    description: "Checkout E2E test"
+    parameters:
+      repo:
+        type: string
+    steps:
+      - run:
+          name: Checkout E2E test and adjust << parameters.repo >> repo
+          shell: /bin/bash
+          command: |
+            git clone https://github.com/${CIRCLE_PROJECT_USERNAME}/platform-launcher.git
+            cd platform-launcher
+            git checkout develop
+            git submodule init
+            git submodule update
+            yes | make update
+  check-signed:
+    description: "Check whether latest commit is signed"
+    steps:
+      - run:
+          name: Check whether most recent commit is signed
+          command: |
+            MESSAGE=`git log -1 --pretty=%B`
+            echo "Checking whether signed"
+            if [[ "${MESSAGE}" == *Signed-off-by:*@* ]]; then
+              echo "Commit is signedoff"
+            else
+              echo "Commit is not signedoff"
+              exit 1
+            fi
+  checkout-testbranch:
+    description: "Checks out branch of repository which is to be tested"
+    parameters:
+      repo:
+        type: string
+    steps:
+      - run:
+          name: Checks out branch of to be tested repository
+          command: |
+            CLONE_REPO=https://github.com/${CIRCLE_PROJECT_USERNAME}/<< parameters.repo >>.git
+            CLONE_BRANCH=${CIRCLE_BRANCH}
+            if [ ! -z "${CIRCLE_PULL_REQUEST}" ]; then
+              PR=${CIRCLE_PR_NUMBER}
+              PR_REPO=${CIRCLE_PR_REPONAME}
+              PROJECT_USERNAME=${CIRCLE_PROJECT_USERNAME}
+              URL="https://api.github.com/repos/${PROJECT_USERNAME}/${PR_REPO}/pulls/${PR}"
+              GITHUBDATA=$(curl "$URL")
+              CLONE_REPO=$(echo $GITHUBDATA | jq '.head.repo.clone_url' | tr -d '"')
+              CLONE_BRANCH=$(echo $GITHUBDATA | jq '.head.ref' | tr -d '"')
+              echo Detected Pull Request with clone REPO ${CLONE_REPO} and branch ${CLONE_BRANCH}
+            fi
+            cd platform-launcher
+            rm -rf ${CIRCLE_PROJECT_REPONAME}
+            git clone ${CLONE_REPO}
+            cd ${CIRCLE_PROJECT_REPONAME}
+            git checkout origin/${CLONE_BRANCH}
+  pull-images-and-build-only-testbranch:
+    description: "Pull all images and only build the testbranch"
+    parameters:
+      container:
+        type: string
+    steps:
+      - run:
+          name: Pull all images and only build the testbranch
+          shell: /bin/bash
+          command: |
+            cd platform-launcher
+            docker login  -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+            export DOCKER_TAG="latest"
+            yes | make pull
+            export CONTAINERS="<< parameters.container >>"
+            yes | make build
+  e2e-test:
+    description: "Execute E2E test"
+    steps:
+      - run:
+          name: Execute E2E test
+          shell: /bin/bash
+          command: |
+            export DOCKER_TAG="latest"
+            cd platform-launcher
+            make test
+jobs:
+  e2e-test:
+    executor: vm-executor
+    steps:
+      - checkout-e2e:
+          repo: "oisp-frontend"
+      - checkout-testbranch:
+          repo: "oisp-frontend"
+      - setup-build-environment
+      - pull-images-and-build-only-testbranch:
+          container: "frontend"
+      - e2e-test
+  build-check:
+    executor: docker-executor
     steps:
       - checkout
-
-      - run:
+      - run:        
           name: Check whether most recent commit is signedoff
           shell: /bin/bash
           command: |
@@ -34,19 +139,23 @@ jobs:
               echo "Commit is not signedoff"
               exit 1
             fi
-            
-
       - run:
           shell: /bin/bash
           name: Install dependencies
           command: |
             cd public-interface
             npm install
-
-      # run tests!
       - run:
           shell: /bin/bash
           name: Run linting and tests
           command: |
             cd public-interface
             node_modules/grunt-cli/bin/grunt build-api
+workflows:
+  version: 2.1
+  workflow:
+    jobs:
+      - build-check
+      - e2e-test:
+          requires:
+            - build-check
