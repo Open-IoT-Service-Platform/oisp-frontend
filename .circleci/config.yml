@@ -108,6 +108,10 @@ commands:
           name: Execute E2E test
           shell: /bin/bash
           command: |
+            export NVM_DIR="/opt/circleci/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install v8.16.0
+            nvm alias default v8.16.0
             export DOCKER_TAG="latest"
             cd platform-launcher
             make test
