@@ -25,10 +25,10 @@ CREATE OR REPLACE FUNCTION dashboard.update_device_connection(
 
     DECLARE result "dashboard"."connectionBindings"%rowType;
     DECLARE last_connection timestamp with time zone;
-    DECLARE conn_type_enum "dashboard"."enum_transport_type";
+    DECLARE conn_type_enum "dashboard"."enum_connectionBindings_type";
 
     BEGIN
-        conn_type_enum := conn_type::"dashboard"."enum_transport_type";
+        conn_type_enum := conn_type::"dashboard"."enum_connectionBindings_type";
 
         IF conn_status = TRUE
             THEN
@@ -55,4 +55,3 @@ CREATE OR REPLACE FUNCTION dashboard.update_device_connection(
 $$ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = postgres, pg_temp;
-

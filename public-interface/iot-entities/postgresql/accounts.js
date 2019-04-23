@@ -20,15 +20,11 @@ var cryptoUtils = require('./../../lib/cryptoUtils'),
     config = require('../../config').biz.domain,
     account = require('./models').accounts,
     devices = require('./models').devices,
+    users = require('./models').users,
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').accounts(),
     userInterpreter = require('../../lib/interpreter/postgresInterpreter').users(),
-    sequelize = require('./models').sequelize,
     userModelHelper = require('./helpers/userModelHelper');
-
-var ADD_ACCOUNT_QUERY = 'SELECT * from dashboard.create_account(:id, :name, :healthTimePeriod, :exec_interval, ' +
-    ':base_line_exec_interval, :cd_model_frequency, :cd_execution_frequency, :data_retention, :activation_code, ' +
-    ':activation_code_expire_date, :settings, :attrs, :userId, :role, :created)';
 
 /**
  * Create new account for a user. Returns users with all his accounts, including the created one.
@@ -41,38 +37,44 @@ exports.new = function (accountData, userId, transaction) {
 
     var accountModel = interpreter.toDb(accountData);
 
-    var replacements = {
+    var newAccount = {
         id: accountModel.id,
         name: accountModel.name,
-        healthTimePeriod: accountModel.healthTimePeriod,
-        exec_interval: accountModel.exec_interval,
-        base_line_exec_interval: accountModel.base_line_exec_interval,
-        cd_model_frequency: accountModel.cd_model_frequency,
-        cd_execution_frequency: accountModel.cd_execution_frequency,
-        data_retention: accountModel.data_retention,
+        settings: accountModel.settings,
+        attrs: accountModel.attrs,
         activation_code: accountModel.activation_code,
-        activation_code_expire_date: accountModel.activation_code_expire_date,
-        settings: JSON.stringify(accountModel.settings),
-        attrs: JSON.stringify(accountModel.attrs),
-        userId: userId,
-        role: 'admin',
-        created: accountData.created
+        activation_code_expire_date: accountModel.activation_code_expire_date
     };
 
-    for(var value in replacements){
-        if(undefined === replacements[value]){
-            replacements[value] = null;
+    for(var value in newAccount){
+        if(undefined === newAccount[value]){
+            newAccount[value] = null;
         }
     }
 
-    return sequelize.query(ADD_ACCOUNT_QUERY, {replacements: replacements, transaction: transaction})
-        .then(function (result) {
-            if (result && result.length > 0 && result[0][0]) {
-                var userWithAccounts = userModelHelper.formatUserWithAccounts(result[0]);
-                return interpreterHelper.mapAppResults({dataValues: userWithAccounts}, userInterpreter);
-            } else {
-                return null;
+    return account.create(newAccount, { transaction: transaction })
+        .then(acc => {
+            return acc.addUsers(userId, {
+                through: { role: 'admin' },
+                transaction: transaction
+            });
+        })
+        .then(() => {
+            return users.findAll({
+                where: { id: userId },
+                include: [{ model: account }],
+                transaction: transaction,
+            });
+        })
+        .then(user => {
+            if (!user) {
+                throw "User not found";
             }
+            var userWithAccounts = userModelHelper.formatUserWithAccounts(user);
+            return interpreterHelper.mapAppResults({ dataValues: userWithAccounts }, userInterpreter);
+        })
+        .catch(err => {
+            throw err;
         });
 };
 

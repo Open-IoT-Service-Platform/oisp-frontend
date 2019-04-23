@@ -199,9 +199,9 @@ var deviceComponentsInterpreter = function (lookUpTable, inverseLookUpTable) {
                 values = entity.dataValues;
                 removeDates(values);
 
-                if (values.componentType) {
-                    values.type = values.componentType.dataValues.componentTypeId;
-                    values.componentType = componentTypes().toApp(values.componentType);
+                if (values.component_type) {
+                    values.type = values.component_type.dataValues.componentTypeId;
+                    values.componentType = componentTypes().toApp(values.component_type);
                 }
 
             }
@@ -577,7 +577,6 @@ var actuationsInterpreter = function (lookUpTable, inverseLookUpTable) {
                     entity["accountId"] = entity.device_component.device.dataValues.accountId;
                     entity["deviceId"] = entity.device_component.device.dataValues.id;
                     entity["gatewayId"] = entity.device_component.device.dataValues.gatewayId;
-                    entity["parameters"] = JSON.parse(entity.parameters);
                     removesEmptyFields(entity);
                 }
                 return entity;
@@ -614,14 +613,8 @@ var accounts = function () {
     var lookUpTable = {
         name: 'name',
         public_id: 'id',
-        healthTimePeriod: 'healthTimePeriod',
         created: 'created',
         updated: 'updated',
-        exec_interval: 'exec_interval',
-        base_line_exec_interval: 'base_line_exec_interval',
-        cd_model_frequency: 'cd_model_frequency',
-        cd_execution_frequency: 'cd_execution_frequency',
-        data_retention: 'data_retention',
         attributes: 'attrs',
         settings: 'settings',
         activation_code: 'activation_code',
