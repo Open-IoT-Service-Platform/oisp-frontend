@@ -20,14 +20,14 @@ CREATE OR REPLACE FUNCTION dashboard.create_user(id varchar(255), email varchar(
 RETURNS "dashboard"."users"
 AS $$
 DECLARE result "dashboard"."users"%rowType;
-DECLARE user_type_enum "dashboard"."enum_user_type";
+DECLARE users_type_enum "dashboard"."enum_users_type";
 BEGIN
 
     IF user_type IS NULL
         THEN
-            user_type_enum = 'user'::"dashboard"."enum_user_type";
+            users_type_enum = 'user'::"dashboard"."enum_users_type";
         ELSE
-            user_type_enum = user_type::"dashboard"."enum_user_type";
+            users_type_enum = user_type::"dashboard"."enum_users_type";
     END IF;
 
     EXECUTE 'INSERT INTO "dashboard"."users" ("id",
@@ -54,7 +54,7 @@ BEGIN
         attrs,
         now(),
         now(),
-        user_type_enum
+        users_type_enum
     INTO result;
 
     RETURN result;
@@ -62,4 +62,3 @@ END;
 $$ LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = postgres, pg_temp;
-

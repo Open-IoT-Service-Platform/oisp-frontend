@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION dashboard.add_device_components(components "dashboard
         "deviceComponent_componentType_format" varchar(255),
         "deviceComponent_componentType_measureunit" varchar(255),
         "deviceComponent_componentType_version" varchar(128),
-        "deviceComponent_componentType_type" "dashboard"."enum_componentTypes_type",
+        "deviceComponent_componentType_type" "dashboard"."enum_component_types_type",
         "deviceComponent_componentType_dataType" varchar(50),
         "deviceComponent_componentType_icon" varchar(50),
         "deviceComponent_componentType_min" numeric,
@@ -54,7 +54,7 @@ CREATE OR REPLACE FUNCTION dashboard.add_device_components(components "dashboard
             SELECT (device_components_rows)."componentType" FROM (SELECT unnest(components) AS device_components_rows) q1;
 
         CREATE TEMP TABLE component_ids_temp ON COMMIT DROP AS
-            SELECT "types".id, "types"."componentTypeId" from "dashboard"."componentTypes" AS "types"
+            SELECT "types".id, "types"."componentTypeId" from "dashboard"."component_types" AS "types"
                 WHERE ("types"."accountId" = account_id_uuid AND "types"."componentTypeId" IN  (SELECT * FROM component_types_temp))
                     OR ("types"."accountId" IS NULL AND "types"."componentTypeId" IN  (SELECT * FROM component_types_temp));
 
@@ -116,7 +116,7 @@ CREATE OR REPLACE FUNCTION dashboard.add_device_components(components "dashboard
             LEFT OUTER JOIN "dashboard"."device_attributes" AS "attributes" ON "devices"."id" = "attributes"."deviceId"
             LEFT OUTER JOIN "dashboard"."device_tags" AS "tags" ON "devices"."id" = "tags"."deviceId"
             LEFT OUTER JOIN "dashboard"."device_components" AS "deviceComponents" ON "devices"."id" = "deviceComponents"."deviceId"
-            LEFT OUTER JOIN "dashboard"."componentTypes" AS "deviceComponents.componentType" ON "deviceComponents"."componentTypeId" = "deviceComponents.componentType"."id"
+            LEFT OUTER JOIN "dashboard"."component_types" AS "deviceComponents.componentType" ON "deviceComponents"."componentTypeId" = "deviceComponents.componentType"."id"
             WHERE "devices"."id" = dev_id AND "devices"."accountId" = account_id_uuid;
 
     END;

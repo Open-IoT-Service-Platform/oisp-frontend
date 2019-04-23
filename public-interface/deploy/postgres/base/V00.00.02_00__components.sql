@@ -39,7 +39,7 @@ BEGIN
      LOOP
         BEGIN
 
-            EXECUTE 'INSERT INTO "dashboard"."componentTypes" (
+            EXECUTE 'INSERT INTO "dashboard"."component_types" (
                                             "id",
                                             "componentTypeId",
                                             "dimension",
@@ -65,7 +65,7 @@ BEGIN
                     COALESCE(temp[4], 'integer'),
                     temp[5],
                     COALESCE(temp[6], '1.0'),
-                    COALESCE(temp[7],'sensor')::"dashboard"."enum_componentTypes_type",
+                    COALESCE(temp[7],'sensor')::"dashboard"."enum_component_types_type",
                     COALESCE(temp[8], 'Number'),
                     temp[9]::decimal,
                     temp[10]::decimal,
