@@ -38,6 +38,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.UUID,
             allowNull: false
         },
+        refreshToken: {
+            type: DataTypes.STRING(16),
+            allowNull: false
+        },
         loc: DataTypes.ARRAY(DataTypes.DECIMAL),
         email: {
             type: DataTypes.STRING(255)
@@ -45,7 +49,7 @@ module.exports = function (sequelize, DataTypes) {
         phone: DataTypes.STRING(255),
         status: {
             //Ordering in enum depends on creation date of type, so enum types should be listed in alfabetical order
-            type: DataTypes.ENUM('active', 'created'),
+            type: DataTypes.ENUM('active', 'created', 'revoked'),
             allowNull: false,
             defaultValue: 'created'
         }

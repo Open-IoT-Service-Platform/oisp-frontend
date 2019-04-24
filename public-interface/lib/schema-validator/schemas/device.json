@@ -139,6 +139,17 @@
             }
         }
     },
+    "REFRESH_TOKEN":{
+        "name": "refresh",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "deviceRefreshToken": {
+                "type": "string",
+                "required": true
+            }
+        }
+    },
     "REGISTER":{
         "name":"device",
         "type": "object",

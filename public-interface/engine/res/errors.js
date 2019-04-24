@@ -58,6 +58,9 @@ module.exports = {
             SavingError: {code: 1500, status: 500, message: "Error Saving Device"},
             ActivationError: {code: 1510, status: 500, message: "Error during activation"},
             RegistrationError: {code: 1513, status: 500, message: "Error during registration"},
+            RefreshTokenError: {code: 1514, status: 500, message: "Error when processing refreshToken"},
+            RefreshTokenRevokedError: {code: 1515, status: 500, message: "Error refreshToken was revoked"},
+            RefreshTokenWrongError: {code: 1516, status: 500, message: "Error refreshToken does not match"},
             DeletionError: {code: 1512, status: 500, message: "Device deletion failed"}
         },
         ComplexCommand: {

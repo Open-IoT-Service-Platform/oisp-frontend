@@ -25,7 +25,8 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     errBuilder  = require("../../../lib/errorHandler/index").errBuilder,
     Q = require('q'),
     deviceManager = require('../helpers/deviceManager'),
-    auth = require('../../../lib/security/index').authorization;
+    auth = require('../../../lib/security/index').authorization,
+    cryptoUtils = require('./../../../lib/cryptoUtils');
 
 var cloneObject = function(object) {
     if (!object || typeof(object) !== 'object') {
@@ -62,6 +63,9 @@ var createDevice = function(newDevice) {
 exports.addDevice = function(newDevice, accountId, callback) {
     newDevice.status = Device.status.created;
     newDevice.accountId = accountId;
+
+    /* Generate the RefreshToken for this device */
+    newDevice.refreshToken = cryptoUtils.generate(16);
 
     return createDevice(newDevice)
         .then (function (addedDevice) {
@@ -223,6 +227,40 @@ exports.registerDevice = function (deviceToRegister, activationCode, resultCallb
             resultCallback(errMsg);
         });
 };
+
+
+exports.refreshDeviceToken = function(deviceId, deviceRefreshToken, resultCallback) {
+
+	/* Validate if refresh token is valid for this device and wether it has been revoked or not */
+	return Device.validateRefreshToken(device.deviceId, deviceRefreshToken)
+		.then(function(validationResult) {
+
+			if(validationResult)
+				return validationResult;
+
+			/* Validation was succesful -> Issue new token */
+			var deviceAccount = [{
+				 id: validationResult.accountId,
+				 role: 'device'
+			}];
+
+			return generateToken(device.deviceId, deviceAccount)
+				.then(function(newDeviceToken)
+				{
+					if(!token)
+						throw errBuilder.Errors.Device.RefreshTokenError;
+					resultCallback(null, {deviceToken: newDeviceToken});
+				})
+			})
+        .catch(function(err) {
+            logger.warn('refreshDeviceToken - error occured while refreshing deviceToken: ' + JSON.stringify(err));
+            var errMsg = errBuilder.Errors.Device.RefreshTokenError;
+            if (err && err.code) {
+                errMsg = errBuilder.build(err);
+            }
+            resultCallback(errMsg);
+        });
+}
 
 function runFunctionIfValidCriteria(criteria, queryParameters, resultCallback, deviceFunction) {
     if (criteria) {

@@ -271,8 +271,33 @@ post:
             example:
               {
                 "deviceToken":"eyJ0eX......",
+                "deviceRefreshToken":"dw8sjd......",
                 "accountId":"ed6c80f7-1914-4d21-bc26-47d0bb5fdf4d"
               }
+
+  /refresh_token:
+    put:
+      description: |
+        **Refresh a Device token**
+
+        Request a new device (session) token. This requires (TLS secured) transmission of the deviceRefreshToken
+
+        <meta name="access-roles" path="PUT:/api/devices/{deviceId}/refresh_token">
+      is: [ authorization-header, response-errors-devices, response-errors-generic ]
+      body:
+        type: !include device_REFRESH.json
+        example: |
+          { 
+            "deviceRefreshToken": "dw8sjd......"
+          }
+      responses:
+        200:
+          body:
+            example:
+              {
+                "deviceToken":"eyJ0eX......"
+              }
+
   /components:
     post:
       description: |

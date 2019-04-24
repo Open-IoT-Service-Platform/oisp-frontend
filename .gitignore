@@ -9,6 +9,8 @@ lib-cov
 *.pid
 *.gz
 *.pyc
+*.swp
+.*.swp
 pids
 logs
 results

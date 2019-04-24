@@ -63,5 +63,7 @@ module.exports = {
         
         app.post(VERSION + PATH + '/register', schemaValidator.validateSchema(schemas.device.REGISTER), devices.registerDevice);
         app.post(VERSION + FULL_PATH + '/register', schemaValidator.validateSchema(schemas.device.REGISTER), devices.registerDevice);
+
+        app.post(VERSION + PATH + '/refresh_token', schemaValidator.validateSchema(schemas.device.REFRESH_TOKEN), devices.refreshDeviceToken);
     }
 };

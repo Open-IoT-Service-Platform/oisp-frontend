@@ -241,6 +241,22 @@ exports.confirmActivation = function (deviceId, activationCode) {
         });
 };
 
+exports.validateRefreshToken = function (deviceId, deviceRefreshToken) {
+	return devices.findOne({where: {deviceId: deviceId}})
+		.then(function(result) {
+			if(!result)
+				throw errBuilder.Errors.Device.NotFound;
+
+			if(result.status === 'revoked')
+				throw errBuilder.Errors.Device.RefreshTokenRevokedError;
+
+			if(result.refreshToken !== deviceRefreshToken)
+				throw errBuilder.Errors.Device.RefreshTokenWrongError;
+
+			return {accountId: result.accountId}
+		})
+}
+
 exports.addComponents = function (components, deviceId, accountId, transaction) {
     var componentsModel = deviceModelHelper.formatDeviceComponents(components);
 

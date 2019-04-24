@@ -145,6 +145,24 @@ exports.activateNewDevice = function (req, res, next) {
 };
 
 
+/* Refresh device (session) token */
+exports.refreshDeviceToken = function (req, res, next) {
+
+    var responder = new Response(res, next);
+    var device = {
+        deviceId: req.params.deviceId
+    };
+
+    devices.refreshDeviceToken(device, req.body.deviceRefreshToken, function (err, result) {
+        if (!err) {
+            responder(httpStatuses.OK.code, result);
+        } else {
+            responder(err);
+        }
+    });
+};
+
+
 exports.registerDevice = function (req, res, next) {
     var activationCode = req.body.activationCode,
         device = req.body.device;

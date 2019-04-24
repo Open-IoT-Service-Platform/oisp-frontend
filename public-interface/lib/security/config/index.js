@@ -30,8 +30,8 @@ module.exports = {
     	user: "user",
     	device: "device"
     },
-    default_token_expire: 5256000, // 10 years (in minutes)
-    user_token_expire: 1440, // 24 hours (in minutes)
+    default_token_expire: 60, // 60 minutes
+    user_token_expire: 60, // 60 minutes
     iss: 'http://enableiot.com', // JWT Issuer
     alg: 'RS256', // signature algorithm. Options:  RS256, RS512, PS256, PS512, HS256, HS512,
     supportedAlg: ["RS256", "RS512", "PS256", "PS512", "HS256", "HS512"]
