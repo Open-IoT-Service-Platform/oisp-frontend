@@ -16,7 +16,8 @@
 
 'use strict';
 
-var sequelize = require('./models').sequelize;
+var sequelize = require('./models').sequelize,
+    super_user_sequelize = require('./models').super_user_sequelize;
 
 var ISOLATION_LEVEL = sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED;
 
@@ -50,6 +51,10 @@ DAOs.forEach(function(dao) {
  */
 exports.startTransaction = function() {
     return sequelize.transaction({isolationLevel: ISOLATION_LEVEL});
+};
+
+exports.superUserStartTransaction = function() {
+    return super_user_sequelize.transaction({isolationLevel: ISOLATION_LEVEL});
 };
 
 exports.rollback = function(t) {

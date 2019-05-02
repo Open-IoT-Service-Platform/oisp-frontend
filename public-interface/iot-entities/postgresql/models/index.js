@@ -22,26 +22,7 @@ var contextProvider = require('../../../lib/context-provider'),
     Sequelize = require('sequelize'),
     config = require('../../../config').postgres,
     jaegerConfig = require('../../../config').jaeger,
-    Accounts = require('./accounts'),
-    Settings = require('./settings'),
-    UserAccounts = require('./userAccounts'),
-    Users = require('./users'),
-    ComponentTypes = require('./componentTypes'),
-    ComplexCommands = require('./complexCommands'),
-    Commands = require('./commands'),
-    Rules = require('./rules'),
-    Invites = require('./invites'),
-    Devices = require('./devices'),
-    DeviceAttributes = require('./deviceAttributes'),
-    DeviceTags = require('./deviceTags'),
-    DeviceComponents = require('./deviceComponents'),
-    UserInteractionTokens = require('./userInteractionTokens'),
-    Actuations = require('./actuations'),
-    Alerts = require('./alerts'),
-    AlertComments = require('./alertComments'),
-    ConnectionBindings = require('./connectionBindings'),
-    PurchasedLimits = require('./purchasedLimits'),
-    DeviceComponentMissingExportDays = require('./deviceComponentMissingExportDays'),
+    modelsHelper = require('../helpers/modelsHelper'),
     logger = require('../../../lib/logger').init(),
     fs = require('fs'),
     Q = require('q'),
@@ -54,6 +35,14 @@ var getSequelizeOptions = function() {
     };
     return options;
 };
+
+var super_user_sequelize = new Sequelize(
+    config.database,
+    config.su_username,
+    config.su_password,
+    getSequelizeOptions()
+);
+
 
 var sequelize = new Sequelize(
     config.database,
@@ -102,272 +91,11 @@ if (jaegerConfig.tracing) {
     shimmer.wrap(sequelize, 'query', wrapQuery);
 }
 
-var accounts = new Accounts(sequelize, Sequelize);
-var actuations = new Actuations(sequelize, Sequelize);
-var users = new Users(sequelize, Sequelize);
-var settings = new Settings(sequelize, Sequelize);
-var userAccounts = new UserAccounts(sequelize, Sequelize);
-var componentTypes = new ComponentTypes(sequelize, Sequelize);
-var rules = new Rules(sequelize, Sequelize);
-var complexCommands = new ComplexCommands(sequelize, Sequelize);
-var commands = new Commands(sequelize, Sequelize);
-var devices = new Devices(sequelize, Sequelize);
-var deviceAttributes = new DeviceAttributes(sequelize, Sequelize);
-var deviceTags = new DeviceTags(sequelize, Sequelize);
-var invites = new Invites(sequelize, Sequelize);
-var deviceComponents = new DeviceComponents(sequelize, Sequelize);
-var deviceComponentMissingExportDays = new DeviceComponentMissingExportDays(sequelize, Sequelize);
-var userInteractionTokens = new UserInteractionTokens(sequelize, Sequelize);
-var alerts = new Alerts(sequelize, Sequelize);
-var connectionBindings = new ConnectionBindings(sequelize, Sequelize);
-var purchasedLimits = new PurchasedLimits(sequelize, Sequelize);
-var alertComments = new AlertComments(sequelize, Sequelize);
-
-users.hasMany(settings, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'userId',
-        allowNull: false
-    }
-});
-
-users.hasMany(userInteractionTokens, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'userId',
-        allowNull: false
-    }
-});
-
-settings.belongsTo(accounts, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: true
-    }
-});
-
-userInteractionTokens.belongsTo(users, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'userId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(componentTypes, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(purchasedLimits, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(rules, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(commands, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(invites, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-invites.belongsTo(accounts, {
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(devices, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-accounts.hasMany(alerts, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-complexCommands.hasMany(commands, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'complexCommandId',
-        allowNull: false
-    }
-});
-
-devices.belongsTo(accounts, {
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-devices.hasMany(deviceComponents, {
-    as: 'deviceComponents',
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-devices.hasMany(alerts, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-devices.hasMany(connectionBindings, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-deviceComponents.belongsTo(componentTypes, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'componentTypeId',
-        allowNull: false
-    }
-});
-
-deviceComponents.belongsTo(devices, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-deviceComponents.hasMany(actuations, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'componentId',
-        allowNull: false
-    }
-});
-
-devices.hasMany(deviceAttributes, {
-    as: 'attributes',
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-devices.hasMany(deviceTags, {
-    as: 'tags',
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-rules.hasMany(alerts, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'externalId',
-        allowNull: false,
-    },
-    sourceKey: 'externalId'
-});
-
-
-alerts.belongsTo(accounts, {
-    foreignKey: {
-        name: 'accountId',
-        allowNull: false
-    }
-});
-
-alerts.belongsTo(devices, {
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-deviceTags.belongsTo(devices, {
-    foreignKey: {
-        name: 'deviceId',
-        allowNull: false
-    }
-});
-
-alerts.belongsTo(rules, {
-    foreignKey: {
-        name: 'externalId',
-        allowNull: false,
-    },
-    targetKey: 'externalId'
-});
-
-actuations.belongsTo(deviceComponents, {
-    foreignKey: {
-        name: 'componentId',
-        allowNull: false
-    }
-});
-
-deviceComponents.hasMany(deviceComponentMissingExportDays, {
-    onDelete: 'CASCADE',
-    foreignKey: {
-        name: 'componentId',
-        allowNull: false
-    }
-});
-
-deviceComponentMissingExportDays.belongsTo(deviceComponents, {
-    foreignKey: {
-        name: 'componentId',
-        allowNull: false
-    }
-});
-
-
-accounts.belongsToMany(users, {through: 'user_accounts'});
-users.belongsToMany(accounts, {through: 'user_accounts'});
-alerts.hasMany(alertComments, {as: 'Comments'});
+modelsHelper.fillModels(super_user_sequelize, Sequelize);
+var models = modelsHelper.fillModels(sequelize, Sequelize);
 
 var executeSql = function (sql, transaction) {
-    return sequelize.query(sql, {transaction: transaction});
+    return super_user_sequelize.query(sql, {transaction: transaction});
 };
 
 var executeScriptsFromFiles = function(path, files, transaction) {
@@ -399,7 +127,7 @@ var executeScriptsWithTransaction = function() {
 
     return readScriptsFromFile(path)
         .then(function(files) {
-            return postgresProvider.startTransaction()
+            return postgresProvider.superUserStartTransaction()
                 .then(function(transaction) {
                     return executeScriptsFromFiles(path, files, transaction)
                         .then(function () {
@@ -430,10 +158,37 @@ var executeScriptsWithoutTransaction = function () {
         });
 };
 
+var grantPermissions = function() {
+    var permissionsQuery =
+        'GRANT USAGE ON SCHEMA dashboard TO oisp_user;' +
+        'GRANT USAGE ON ALL SEQUENCES IN SCHEMA dashboard TO oisp_user;' +
+        'GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA dashboard TO oisp_user;';
+
+    return postgresProvider.superUserStartTransaction()
+        .then(transaction => {
+            return executeSql(permissionsQuery, transaction)
+                .then(() => {
+                    return postgresProvider.commit(transaction);
+                })
+                .catch(err => {
+                    return postgresProvider.rollback(transaction).then(() => {
+                        throw err;
+                    });
+                });
+        })
+        .catch(err => {
+            throw err;
+        });
+};
+
+module.exports = models;
+module.exports.super_user_sequelize = super_user_sequelize;
+module.exports.sequelize = sequelize;
+
 module.exports.initSchema = function () {
-    return sequelize.createSchema('dashboard')
+    return super_user_sequelize.createSchema('dashboard')
         .then(() => {
-            return sequelize.sync();
+            return super_user_sequelize.sync();
         })
         .then(() => {
             return executeScriptsWithTransaction();
@@ -442,33 +197,12 @@ module.exports.initSchema = function () {
             return executeScriptsWithoutTransaction();
         })
         .then(() => {
+            return grantPermissions();
+        })
+        .then(() => {
             logger.info('Created database schema');
         })
         .catch(err => {
             logger.error('Unable to create database schema: ' + err);
         });
 };
-
-module.exports.accounts = accounts;
-module.exports.users = users;
-module.exports.settings = settings;
-module.exports.userAccounts = userAccounts;
-module.exports.componentTypes = componentTypes;
-module.exports.rules = rules;
-module.exports.complexCommands = complexCommands;
-module.exports.commands = commands;
-module.exports.invites = invites;
-module.exports.devices = devices;
-module.exports.deviceAttributes = deviceAttributes;
-module.exports.deviceTags = deviceTags;
-module.exports.invites = invites;
-module.exports.deviceComponents = deviceComponents;
-module.exports.userInteractionTokens = userInteractionTokens;
-module.exports.alerts = alerts;
-module.exports.actuations = actuations;
-module.exports.connectionBindings = connectionBindings;
-module.exports.purchasedLimits = purchasedLimits;
-module.exports.deviceComponentMissingExportDays = deviceComponentMissingExportDays;
-module.exports.alertComments = alertComments;
-
-module.exports.sequelize = sequelize;

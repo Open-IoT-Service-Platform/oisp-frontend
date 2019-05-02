@@ -16,16 +16,9 @@
 
 set -e
 
-TEST_DB="test"
 psql=( psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" )
 
 "${psql[@]}" <<-EOSQL
-    CREATE DATABASE $TEST_DB;
-    GRANT ALL PRIVILEGES ON DATABASE $TEST_DB TO $POSTGRES_USER;
-    GRANT CONNECT ON DATABASE $TEST_DB TO oisp_user;
+       CREATE USER oisp_user WITH PASSWORD 'supersecret';
+       GRANT CONNECT ON DATABASE $POSTGRES_DB TO oisp_user;
 EOSQL
-if [ "$(ls -A | grep \\.sql\$)" ]; then
-    for f in /docker-entrypoint-initdb.d/*.sql; do
-        echo "$0: running $f"; "${psql[@]}" --dbname ${TEST_DB} -f "$f"; echo ;
-    done
-fi
