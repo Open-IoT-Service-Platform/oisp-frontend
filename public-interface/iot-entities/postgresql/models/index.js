@@ -26,6 +26,7 @@ var contextProvider = require('../../../lib/context-provider'),
     logger = require('../../../lib/logger').init(),
     fs = require('fs'),
     Q = require('q'),
+    uuid = require('node-uuid'),
     postgresProvider = require('../../postgresql');
 
 var getSequelizeOptions = function() {
@@ -181,6 +182,53 @@ var grantPermissions = function() {
         });
 };
 
+var createDefaultComponentCatalog = function() {
+    var promises = [];
+
+    modelsHelper.defaultComponents.map(function(cmp) {
+        var component = {
+            id: uuid.v4(),
+            componentTypeId: cmp[0],
+            accountId: null,
+            dimension: cmp[1],
+            default: true,
+            display: cmp[2],
+            format: cmp[3],
+            measureunit: cmp[4],
+            version: cmp[5],
+            type: cmp[6],
+            dataType: cmp[7],
+            command: cmp[8],
+            icon: null,
+            min: cmp[9],
+            max: cmp[10]
+        };
+
+        var filter = {
+            where: {
+                componentTypeId: cmp[0],
+                default: true
+            },
+            defaults: component,
+        };
+
+        promises.push(postgresProvider.startTransaction().then(t => {
+            filter.transaction = t;
+            return models.componentTypes.findOrCreate(filter)
+                .then(() => {
+                    return postgresProvider.commit(t);
+                })
+                .catch(err => {
+                    return postgresProvider.rollback(t).then(() => {
+                        throw err;
+                    })
+                })
+        }));
+    });
+
+    return Q.all(promises);
+}
+
 module.exports = models;
 module.exports.super_user_sequelize = super_user_sequelize;
 module.exports.sequelize = sequelize;
@@ -198,6 +246,9 @@ module.exports.initSchema = function () {
         })
         .then(() => {
             return grantPermissions();
+        })
+        .then(() => {
+            return createDefaultComponentCatalog();
         })
         .then(() => {
             logger.info('Created database schema');

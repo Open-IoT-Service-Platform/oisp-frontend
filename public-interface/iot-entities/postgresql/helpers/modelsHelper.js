@@ -1,3 +1,19 @@
+/**
+ * Copyright (c) 2019 Intel Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var Accounts = require('./../models/accounts'),
     Settings = require('./../models/settings'),
     Users = require('./../models/users'),
@@ -19,6 +35,26 @@ var Accounts = require('./../models/accounts'),
     DeviceComponentMissingExportDays = require('./../models/deviceComponentMissingExportDays'),
     PurchasedLimits = require('./../models/purchasedLimits');
 
+const NUMERIC_MAX = 1.7976931348623157e+308,
+    NUMERIC_MIN = -1.7976931348623157e+308;
+
+const powerswitchCommand = {
+    commandString: 'LED.v1.0',
+    parameters: [{ name: 'LED', values: '0,1', display: 'switcher' }]
+};
+
+const components = [
+    ['temperature.v1.0', 'temperature', 'timeSeries', 'float',
+        'Degrees Celsius', '1.0', 'sensor', 'Number', null, NUMERIC_MIN,
+        NUMERIC_MAX, null],
+    ['humidity.v1.0', 'humidity', 'timeSeries', 'float', 'Percent (%)', '1.0',
+        'sensor', 'Number', null, null, null],
+    ['powerswitch.v1.0', 'powerswitch', 'Binary', 'boolean', null, '1.0',
+        'actuator', 'Boolean', powerswitchCommand, null, null]
+];
+
+
+module.exports.defaultComponents = components;
 
 module.exports.fillModels = function (sequelize, DataTypes) {
     var accounts = new Accounts(sequelize, DataTypes),
