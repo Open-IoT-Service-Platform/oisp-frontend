@@ -3,14 +3,14 @@
 
 cmdname=$(basename $0)
 
-echoerr() { if [[ $QUIET -ne 1 ]]; then echo "$@" 1>&2; fi }
+echoerr() { echo "$@" 1>&2 }
 
 usage()
 {
     cat << USAGE >&2
 Usage:
-    $cmdname  osip services [-- command args]
-    osip services : list of services to wait for their heartbeats
+    $cmdname  oisp services [-- command args]
+    oisp services : list of services to wait for their heartbeats
     -- COMMAND ARGS             Execute command with args after the test finishes
 USAGE
     exit 1
@@ -26,7 +26,7 @@ do
         OISP_SERVICES="${OISP_SERVICES} $1"
         shift 1
         ;;
-        
+
         --)
         shift
         CLI="$@"
@@ -46,9 +46,10 @@ do
 done
 
 node ./scripts/wait-for-heartbeat.js ${OISP_SERVICES}
+RESULT=$?
 
 if [[ $CLI != "" ]]; then
-    if [[ $RESULT -ne 0 && $STRICT -eq 1 ]]; then
+    if [[ $RESULT -ne 0 ]]; then
         echoerr "$cmdname: strict mode, refusing to execute subprocess"
         exit $RESULT
     fi

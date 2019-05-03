@@ -18,6 +18,7 @@
 
 var errBuilder = require("./../../lib/errorHandler").errBuilder,
     helper = require('./helpers/queryHelper'),
+    accounts = require('./models').accounts,
     devices = require('./models').devices,
     deviceAttributes = require('./models').deviceAttributes,
     deviceComponents = require('./models').deviceComponents,
@@ -31,7 +32,6 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     deviceModelHelper = require('./helpers/devicesModelHelper'),
     sequelize = require('./models').sequelize;
 
-var ACTIVATE_DEVICE_QUERY = 'SELECT * FROM "dashboard"."activate_device"(:activationCode, :deviceId, :status) AS f(activated boolean, "accountId" uuid)';
 var ADD_COMPONENTS_QUERY = 'SELECT * FROM dashboard.add_device_components(:components, :deviceId, :accountId)';
 var DB_SCHEMA_NAME = helper.escapeValue('dashboard');
 var deviceStatus = {created: "created", active: "active", inactive: "inactive"};
@@ -216,28 +216,32 @@ exports.updateByIdAndAccount = function (deviceId, accountId, updatedObject, tra
  * In case when activation code is expired or invalid throws - Errors.Device.InvalidActivationCode
  */
 exports.confirmActivation = function (deviceId, activationCode) {
-
-    var replacements = {
-        deviceId: deviceId,
-        activationCode: activationCode,
-        status: deviceStatus.active
+    var filter = {
+        where: {
+            activation_code: activationCode
+        }
     };
 
-    return sequelize.query(ACTIVATE_DEVICE_QUERY, {replacements: replacements})
-        .then(function (result) {
-            if (result && result[0][0]) {
-                return Q.resolve(result[0][0]);
-            }
-            throw errBuilder.Errors.Device.RegistrationError;
-        })
-        .catch(function(err) {
-            if (err.message === errBuilder.SqlErrors.Device.AccountNotFound) {
+    return accounts.findOne({where: {activation_code: activationCode}})
+        .then(account => {
+            if (account.id === null) {
                 throw errBuilder.Errors.Account.NotFound;
-            } else if (err.message === errBuilder.SqlErrors.Device.InvalidActivationCode) {
+            } else if (account.activation_code_expire_date < Date.now()) {
                 throw errBuilder.Errors.Device.InvalidActivationCode;
             }
-
-            throw err;
+            filter = {
+                returning: true,
+                where: {
+                    id: deviceId
+                }
+            };
+            return devices.update({ status: deviceStatus.active }, filter);
+        })
+        .then(([updatedRows, [updatedDevice]]) => {
+            if (updatedRows != 1) {
+                throw errBuilder.Errors.Device.RegistrationError;
+            }
+            return Q.resolve(updatedDevice);
         });
 };
 
