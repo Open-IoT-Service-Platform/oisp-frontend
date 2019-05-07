@@ -17,6 +17,7 @@
 'use strict';
 
 module.exports = function (sequelize, DataTypes) {
+
     return sequelize.define('accounts', {
         id: {
             type: DataTypes.UUID,
@@ -26,6 +27,48 @@ module.exports = function (sequelize, DataTypes) {
         name: {
             type: DataTypes.STRING(255),
             allowNull: false
+        },
+        healthTimePeriod: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        exec_interval: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        base_line_exec_interval: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        cd_model_frequency: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        cd_execution_frequency: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
+        },
+        data_retention: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 0
+            }
         },
         activation_code: {
             type: DataTypes.CHAR(8)
@@ -37,5 +80,6 @@ module.exports = function (sequelize, DataTypes) {
         createdAt: 'created',
         updatedAt: 'updated',
         schema: 'dashboard'
-    });
+    }
+    );
 };

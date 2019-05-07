@@ -18,7 +18,7 @@
 
 module.exports = function (sequelize, DataTypes) {
 
-    return sequelize.define('component_types', {
+    return sequelize.define('componentTypes', {
         id: {
             type: DataTypes.UUID,
             primaryKey: true,
@@ -88,7 +88,7 @@ module.exports = function (sequelize, DataTypes) {
         updatedAt: 'updated',
         indexes: [
             {
-                name: 'component_types_accountId_index',
+                name: 'componentTypes_accountId_index',
                 method: 'BTREE',
                 fields: ['accountId']
             }
@@ -97,3 +97,4 @@ module.exports = function (sequelize, DataTypes) {
     }
     );
 };
+
