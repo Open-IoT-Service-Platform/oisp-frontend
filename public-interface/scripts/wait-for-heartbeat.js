@@ -18,8 +18,6 @@
 var kafka = require('kafka-node'),
     config = require('../config'),
     logger = require('../lib/logger').init(),
-
-
     kafkaConsumer,
     topic = config.drsProxy.kafka.topicsHeartbeatName,
     partition = 0,
@@ -30,8 +28,7 @@ var getKafkaOffset = function(topic_, partition_, cb) {
     kafkaOffset.fetchLatestOffsets([topic_], function (error, offsets) {
         if (!error) {
             cb(offsets[topic_][partition_])
-        }
-        else {
+        } else {
             setTimeout( function() {
                 getKafkaOffset(topic_, partition_, cb);
             }, 1000)
@@ -47,7 +44,7 @@ getKafkaOffset(topic, partition, function(offset) {
         kafkaConsumer = new kafka.Consumer(kafkaClient, topics, options)
 
         var oispServicesToMonitor = process.argv.slice(2);
-       
+
         kafkaConsumer.on('message', function (message) {
             if ( kafkaConsumer ) {
                 console.log(message)
@@ -69,11 +66,12 @@ getKafkaOffset(topic, partition, function(offset) {
                 }
             }
         });
-    }
-    else {
-        console.log("Cannot get Kafka offset ")
+    } else {
+        console.log("Cannot get Kafka offset ");
+        if (kafkaConsumer) {
+            kafkaConsumer.close(true);
+            kafkaConsumer = null;
+            process.exit(1);
+        }
     }
 });
-
-
-

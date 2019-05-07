@@ -39,7 +39,8 @@ var http = require('http'),
     models = require('./iot-entities/postgresql/models'),
     systemUsers = require('./lib/dp-users/systemUsers'),
     forceSSL = require('express-force-ssl'),
-    heartBeat = require('./lib/heartbeat');
+    heartBeat = require('./lib/heartbeat'),
+    tracer = require('./lib/express-jaeger').tracer;
 const cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
@@ -49,6 +50,25 @@ var XSS = iotRoutes.cors,
     api_port = config.api.port || 4001,
     maxSockets = config.api.socket || 1024,
     ENV = process.env.NODE_ENV || 'PRD';
+
+function gracefulShutdown() {
+    models.sequelize.close();
+    tracer.close();
+    heartBeat.stop();
+    process.exit(1);
+}
+
+process.on('uncaughtException', function(err) {
+    console.log('Uncaught exception: ', err.message);
+    console.log('Stack: ', err.stack);
+    gracefulShutdown();
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled rejection at: ', promise);
+    console.log('Reason: ', reason);
+    gracefulShutdown();
+});
 
 /* We set the global agent to 1024 this is for
  how many concurrent sockets the agent can have open per origin
@@ -119,12 +139,6 @@ appServer.use(errorHandler.middleware(errors));
 if (appServer.get("env") === 'local'){
     appServer.use(nodeErrorHandler({ dumpExceptions:true, showStack:true }));
 }
-
-process.on("uncaughtException", function(err) {
-    console.log("Uncaught exception:", err.message);
-    console.log(err.stack);
-    process.exit(1);
-});
 
 monitor.start();
 commServer.init(httpServer, IotWsAuth);

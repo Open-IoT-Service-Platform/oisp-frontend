@@ -62,7 +62,7 @@ exports.new = function(data, resultCallback){
         });
 };
 
-exports.deleteByUserIdAndType = function(userId, type, callback){
+exports.deleteByUserIdAndType = function(userId, type, callback) {
     var filter = {
         where: {
             userId: userId,
@@ -71,10 +71,14 @@ exports.deleteByUserIdAndType = function(userId, type, callback){
     };
     userInteractionTokens.destroy(filter)
         .then(function (deletedCounter) {
-            callback(null, deletedCounter);
+            if (callback) {
+                callback(null, deletedCounter);
+            }
         })
         .catch(function (err) {
-            callback(err);
+            if (callback) {
+                callback(err);
+            }
         });
 };
 
