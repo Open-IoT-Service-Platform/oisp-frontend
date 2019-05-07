@@ -69,9 +69,8 @@ function wrapQuery(original) {
         const context = contextProvider.instance();
         var fatherSpan = context.get(spanContext.parent);
         // Track if request coming from express
-        if (!fatherSpan) {
-            fatherSpan = {};
-        }
+        if (!fatherSpan)
+        {fatherSpan = {};}
         var span = tracer.startSpan('postgres-call', { childOf: fatherSpan.span });
         span.log({
             event: 'postgres query',
@@ -304,9 +303,8 @@ rules.hasMany(alerts, {
     onDelete: 'CASCADE',
     foreignKey: {
         name: 'externalId',
-        allowNull: false,
-    },
-    sourceKey: 'externalId'
+        allowNull: false
+    }
 });
 
 
@@ -334,9 +332,8 @@ deviceTags.belongsTo(devices, {
 alerts.belongsTo(rules, {
     foreignKey: {
         name: 'externalId',
-        allowNull: false,
-    },
-    targetKey: 'externalId'
+        allowNull: false
+    }
 });
 
 actuations.belongsTo(deviceComponents, {
@@ -430,21 +427,13 @@ var executeScriptsWithoutTransaction = function () {
         });
 };
 
-module.exports.initSchema = function () {
-    return sequelize.createSchema('dashboard')
-        .then(() => {
-            return sequelize.sync();
-        })
-        .then(() => {
-            return executeScriptsWithTransaction();
-        })
-        .then(() => {
+
+exports.initSchema = function () {
+    return executeScriptsWithTransaction()
+        .then(function() {
             return executeScriptsWithoutTransaction();
         })
-        .then(() => {
-            logger.info('Created database schema');
-        })
-        .catch(err => {
+        .catch(function (err) {
             logger.error('Unable to create database schema: ' + err);
         });
 };

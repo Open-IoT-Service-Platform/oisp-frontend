@@ -32,9 +32,6 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.ENUM('mqtt', 'ws'),
             allowNull: false
         },
-        conditions: {
-            type: DataTypes.JSON
-        },
         parameters: {
             type: DataTypes.JSON
         },
@@ -55,3 +52,4 @@ module.exports = function (sequelize, DataTypes) {
         schema: 'dashboard'
     });
 };
+

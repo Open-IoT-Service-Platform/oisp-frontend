@@ -94,3 +94,4 @@ CREATE OR REPLACE FUNCTION dashboard.create_account(account_id varchar(255), nam
     $$ LANGUAGE plpgsql
     SECURITY DEFINER
     SET search_path = postgres, pg_temp;
+

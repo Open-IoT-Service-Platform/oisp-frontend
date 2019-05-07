@@ -28,11 +28,12 @@ module.exports = function (sequelize, DataTypes) {
         //In postgres we will use uuid for drafts
         externalId: {
             type: DataTypes.STRING(40),
-            unique: true,
+            unique: 'rules_accountId_externalId_unique',
             allowNull: false
         },
         accountId: {
             type: DataTypes.UUID,
+            unique: 'rules_accountId_externalId_unique',
             allowNull: false
         },
         status: {
