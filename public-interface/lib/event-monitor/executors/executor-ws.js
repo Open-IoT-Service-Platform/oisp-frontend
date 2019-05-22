@@ -18,8 +18,7 @@
 
 var WSConnector = require('./../../../lib/websocket/connector'),
     logger = require('../../../lib/logger').init(),
-    postgresProvider = require('../../../iot-entities/postgresql'),
-    connectionBindings = postgresProvider.connectionBindings,
+    WsBindings = require('../../../iot-entities/redis').InitProvider().WsBindings,
     config = require('../../../config');
 
 var getPort = function(serverId) {
@@ -39,7 +38,8 @@ var getConnectionConf = function(serverId) {
 
 var connectWithWebsocket = function (serverId) {
     var connectionConfig = getConnectionConf(serverId);
-    logger.debug('Connecting with Websocket server: ' + JSON.stringify(connectionConfig));
+    logger.debug('Connecting with Websocket server: ' +
+        JSON.stringify(connectionConfig));
     return new WSConnector.WebSocketClient(connectionConfig, logger);
 };
 
@@ -48,25 +48,25 @@ module.exports = function() {
     return {
         execute: function (message, done) {
             var deviceId = message.content.deviceId;
-            return connectionBindings.find(deviceId, connectionBindings.TYPE.WEBSOCKET)
-                .then(function (bind) {
-                    if (!bind || !bind.server) {
-                        throw new Error('Device not connected to any websocket server');
+            WsBindings.getServerAddress(deviceId)
+                .then(server => {
+                    if (!server) {
+                        throw ('Device is not using WS: ' + deviceId);
                     }
-
-                    logger.debug("Device " + bind.deviceId + " was connected last time to " + bind.server + " websocket server");
-
-                    logger.info("Sending message to Websocket. Message: " + JSON.stringify(message));
-                    var connector = connectWithWebsocket(bind.server);
+                    logger.debug("Device " + deviceId + " was connected last " +
+                        "time to " + server + " websocket server");
+                    logger.info("Sending message to Websocket. Message: " +
+                        JSON.stringify(message));
+                    var connector = connectWithWebsocket(server);
                     connector.publish(message);
-                })
-                .catch(function (err) {
-                    // If device is not connected to websocket server, we do not send actuation anywhere
-                    logger.info("Not sending message to Websocket server. Device is not using WS:" + deviceId + ', err: ' + JSON.stringify(err));
-                })
-                .finally(function() {
                     done();
-                });
+                })
+                .catch(err => {
+                    logger.info(err);
+                    logger.info("Can't connect with redis client");
+                    done();
+                })
+                .done();
         }
     };
 };

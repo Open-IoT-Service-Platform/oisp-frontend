@@ -24,6 +24,7 @@ var config = require('../../config'),
     tracer = require('../../lib/express-jaeger').tracer,
     spanContext = require('../../lib/express-jaeger').spanContext,
     contextProvider = require('../../lib/context-provider'),
+    promisify = require('util').promisify,
     client;
 
 
@@ -75,6 +76,8 @@ exports.redisClient = function () {
     } else {
         client = redis.createClient();
     }
+    client.getAsync = promisify(client.get).bind(client);
+    client.setAsync = promisify(client.set).bind(client);
 
     client.on("error", function (err) {
         logger.error("Redis client error " + err);

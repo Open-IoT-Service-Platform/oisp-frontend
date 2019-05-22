@@ -18,6 +18,7 @@
 var RateLimits = require('./rateLimits'),
     PurchasedLimits = require('./purchasedLimits'),
     UserLocks = require('./userLocks'),
+    WsBindings = require('./wsBindings'),
     client =  require('./client'),
     redisClient;
 
@@ -28,6 +29,7 @@ exports.InitProvider = function(){
     return {
         RateLimits : new RateLimits(redisClient),
         PurchasedLimits :  new PurchasedLimits(redisClient),
-        UserLocks : new UserLocks(redisClient)
+        UserLocks : new UserLocks(redisClient),
+        WsBindings : new WsBindings(redisClient)
     };
 };

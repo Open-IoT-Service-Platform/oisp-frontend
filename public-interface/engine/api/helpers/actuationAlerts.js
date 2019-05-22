@@ -21,6 +21,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     Device = postgresProvider.devices,
     ComplexCommand = postgresProvider.complexCommands,
     Actuations = postgresProvider.actuations,
+    WsBindings = require('../../../iot-entities/redis').InitProvider().WsBindings,
     connectionBindings = postgresProvider.connectionBindings,
     async = require('async'),
     Q = require('q'),
@@ -28,6 +29,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     commands = require('../v1/commands');
 
 var ACTUATION_TYPE = 'actuation';
+
 /**
  * Returns protocol, which should be used for sending actuation. It compares device last connection time and select
  * protocol which was used recently. If there is no info about device connection status, method throws Error.
@@ -35,13 +37,25 @@ var ACTUATION_TYPE = 'actuation';
  * @returns {*}
  */
 var getProtocolForActuation = function (deviceId) {
-    return connectionBindings.findLatestConnection(deviceId)
-        .then(function(connectionBinding) {
+    return WsBindings.getServerAddress(deviceId)
+        .then(reply => {
+            if (reply) {
+                return Q.resolve({ type: connectionBindings.TYPE.WEBSOCKET });
+            } else {
+                return connectionBindings.findLatestConnection(deviceId);
+            }
+        })
+        .then(connectionBinding => {
             if (connectionBinding) {
                 return Q.resolve(connectionBinding.type);
             } else {
                 throw new Error('Unable to get connection status for device - ' + deviceId);
             }
+        })
+        .catch(err => {
+            logger.warn(err);
+            logger.warn('Unable to get connection status for device - ' + deviceId);
+            return null;
         });
 };
 
