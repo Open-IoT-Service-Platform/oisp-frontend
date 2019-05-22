@@ -31,11 +31,8 @@ var config = require('../../config'),
 function wrapSend(original) {
     return function wrappedSend(commandObj) {
         const context = contextProvider.instance();
-        var fatherSpan = context.get(spanContext.parent);
-        // Track if request coming from express
-        if (!fatherSpan)
-        {fatherSpan = {};}
-        var span = tracer.startSpan('redis-call', { childOf: fatherSpan.span });
+        var fatherSpan = context.get(spanContext.active);
+        var span = tracer.startSpan('redis-call', { childOf: fatherSpan });
         span.log({
             event: 'redis command',
             command: commandObj.command
