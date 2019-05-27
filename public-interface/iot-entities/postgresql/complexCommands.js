@@ -25,7 +25,7 @@ var complexCommands = require('./models').complexCommands,
     interpreter = require('../../lib/interpreter/postgresInterpreter').complexCommands();
 
 exports.findByAccountAndId = function (accountId, id, resultCallback) {
-    return complexCommands.find({where: {accountId: accountId, name: id}, include: [commands]})
+    return complexCommands.findOne({where: {accountId: accountId, name: id}, include: [commands]})
         .then(function (foundComplexCommand) {
             return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
         })

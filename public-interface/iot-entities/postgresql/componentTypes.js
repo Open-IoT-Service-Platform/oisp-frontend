@@ -46,7 +46,8 @@ exports.all = function (accountId, detailed, resultCallback) {
                     accountId: accountId
                 },
                 {
-                    accountId: null
+                    accountId: null,
+                    default: true
                 }
             ]
         },

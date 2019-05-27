@@ -56,6 +56,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         type: {
             type: DataTypes.ENUM('system', 'user'),
+            allowNull: false,
             defaultValue: 'user'
         }
     }, {

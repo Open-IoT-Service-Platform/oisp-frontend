@@ -29,7 +29,7 @@ module.exports.getLimitForRoute = function (identity, route, method, resultCallb
         }
     };
 
-    purchasedLimits.find(query)
+    purchasedLimits.findOne(query)
         .then(function (result) {
             resultCallback(null, result);
         }).catch(function (err) {

@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.13_00_alert_comments.sql

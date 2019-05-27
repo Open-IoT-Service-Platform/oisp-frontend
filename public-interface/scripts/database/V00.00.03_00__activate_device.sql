@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.03_00__activate_device.sql

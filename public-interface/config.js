@@ -60,32 +60,30 @@ var getOISPConfig = (function () {
 })();
 
 var postgres_config = getOISPConfig("postgresConfig"),
-	backendHost_config = getOISPConfig("backendHostConfig"),
-	smtp_config = getOISPConfig("smtpConfig"),
-	mail_config = getOISPConfig("mailConfig"),
-	websocketUser_config = getOISPConfig("websocketUserConfig"),
-	recaptcha_config = getOISPConfig("recaptchaConfig"),
-	redis_config = getOISPConfig("redisConfig"),
-	ruleEngine_config = getOISPConfig("ruleEngineConfig"),
-	gateway_config = getOISPConfig("gatewayConfig"),
-	dashboardSecurity_config = getOISPConfig("dashboardSecurityConfig")
-	kafka_config = getOISPConfig("kafkaConfig"),
-	jaeger_enabled = getOISPConfig("jaegerTracing"),
+    backendHost_config = getOISPConfig("backendHostConfig"),
+    smtp_config = getOISPConfig("smtpConfig"),
+    mail_config = getOISPConfig("mailConfig"),
+    websocketUser_config = getOISPConfig("websocketUserConfig"),
+    recaptcha_config = getOISPConfig("recaptchaConfig"),
+    redis_config = getOISPConfig("redisConfig"),
+    ruleEngine_config = getOISPConfig("ruleEngineConfig"),
+    gateway_config = getOISPConfig("gatewayConfig"),
+    dashboardSecurity_config = getOISPConfig("dashboardSecurityConfig")
+    kafka_config = getOISPConfig("kafkaConfig"),
+    jaeger_enabled = getOISPConfig("jaegerTracing"),
     winston = require('winston');
 
 // Get replica information from the postgres config,
 // Done this way to avoid compatibility problems with other services
-var	postgresReadReplicas = [],
-	postgresWriteConf = {};
+var postgresReadReplicas = [],
+    postgresWriteConf = {};
 
 if (postgres_config.readReplicas) {
 	postgresReadReplicas = postgres_config.readReplicas;
 } else if (postgres_config.readHostname) {
 	postgresReadReplicas.push({
 		host: postgres_config.readHostname,
-		port: postgres_config.readPort,
-		username: postgres_config.readUsername,
-		password: postgres_config.readPassword
+		port: postgres_config.readPort
 	});
 } else {
 	// Use default db config as read
@@ -95,9 +93,7 @@ if (postgres_config.readReplicas) {
 if (postgres_config.writeHostname) {
 	postgresWriteConf = {
 		host: postgres_config.writeHostname,
-		port: postgres_config.writePort,
-		username: postgres_config.writeUsername,
-		password: postgres_config.writePassword,
+		port: postgres_config.writePort
 	};
 }
 
@@ -161,16 +157,19 @@ var config = {
     },
     postgres: {
         database: postgres_config.dbname,
-        username: postgres_config.username,
-        password: postgres_config.password,
+        su_username: postgres_config.username,
+        su_password: postgres_config.password,
+        username: 'oisp_user',
+        password: 'supersecret',
         options: {
             host: postgres_config.hostname,
             port: postgres_config.port,
             dialect: 'postgres',
-			replication: {
-				read: postgresReadReplicas,
-				write: postgresWriteConf
-			},
+            databaseVersion: '9.4.21',
+            replication: {
+                read: postgresReadReplicas,
+                write: postgresWriteConf
+            },
             pool: {
                 max: 12,
                 min: 0,

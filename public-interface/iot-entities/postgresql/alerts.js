@@ -41,7 +41,7 @@ exports.new = function (newAlert, callback) {
     delete alertModel.id;
     return alerts.create(alertModel)
         .then(function (alert) {
-            return alerts.find({where: {id: alert.id}})
+            return alerts.findOne({where: {id: alert.id}})
                 .then(function (alertFound) {
                     alertFound.externalId = newAlert.ruleId;
                     interpreterHelper.mapAppResults(alertFound, interpreter, callback);
@@ -117,7 +117,7 @@ exports.findByExternalId = function (accountId, alertId, callback) {
         order: [[{model: alertComments, as: 'Comments'}, 'created', 'ASC']]
     };
 
-    return alerts.find(filter)
+    return alerts.findOne(filter)
         .then(function (alert) {
             interpreterHelper.mapAppResults(alert, interpreter, callback);
         })

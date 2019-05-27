@@ -27,7 +27,7 @@ var deviceComponents = require('./models').deviceComponents,
 var filterByAccountId = function(accountId) {
     return {
         include: [
-            {model: componentTypes, as: 'componentType'},
+            { model: componentTypes, as: 'componentType' },
             {
                 model: devices,
                 where: {
@@ -135,7 +135,7 @@ exports.findComponentsAndTypesForDevice = function(deviceId, resultCallback) {
         },
         include: [
             {
-                model: componentTypes
+                model: componentTypes, as: 'componentType'
             }]
     };
     deviceComponents.findAll(filter)
@@ -154,7 +154,7 @@ exports.updateLastObservationTS = function (componentId, date, resultCallback) {
             componentId: componentId
         }
     };
-    deviceComponents.find(filter).then(function (comp) {
+    deviceComponents.findOne(filter).then(function (comp) {
         filter.where.last_observation_time = {
             $lt: new Date(date)
         };

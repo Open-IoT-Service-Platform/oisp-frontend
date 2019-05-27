@@ -28,16 +28,15 @@ module.exports = function (sequelize, DataTypes) {
         //In postgres we will use uuid for drafts
         externalId: {
             type: DataTypes.STRING(40),
-            unique: 'rules_accountId_externalId_unique',
+            unique: true,
             allowNull: false
         },
         accountId: {
             type: DataTypes.UUID,
-            unique: 'rules_accountId_externalId_unique',
             allowNull: false
         },
         status: {
-            type: DataTypes.ENUM('Active', 'Archived', 'Draft', 'On-hold', 'Deleted'),
+            type: DataTypes.ENUM('Active', 'Archived', 'Draft', 'Deleted', 'On-hold'),
             allowNull: false
         },
         name: {
@@ -80,7 +79,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.TEXT
         },
         synchronizationStatus: {
-            type: DataTypes.ENUM('NotSync','Sync')
+            type: DataTypes.ENUM('NotSync','Sync'),
+            default: 'NotSync'
         }
     },
     {
@@ -91,6 +91,11 @@ module.exports = function (sequelize, DataTypes) {
                 name: 'rules_accountId_index',
                 method: 'BTREE',
                 fields: ['accountId']
+            },
+            {
+                name: 'rules_status_index',
+                method: 'BTREE',
+                fields: ['status', 'synchronizationStatus']
             }
         ],
         schema: 'dashboard'

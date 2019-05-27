@@ -72,7 +72,7 @@ exports.findById = function (userId, accountId, category, settingId, resultCallb
             ]
         }
     };
-    settings.find(filter)
+    settings.findOne(filter)
         .then(function (setting) {
             interpreterHelper.mapAppResults(setting, interpreter, resultCallback);
         })

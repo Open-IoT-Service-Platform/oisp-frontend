@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.04_00__add_device_components.sql

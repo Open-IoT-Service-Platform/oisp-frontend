@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.12_00__add_support_for_incremental_export.sql

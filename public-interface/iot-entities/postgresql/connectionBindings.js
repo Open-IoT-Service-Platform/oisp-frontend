@@ -38,7 +38,7 @@ exports.find = function(deviceId, type) {
         }
     };
 
-    return connectionBindings.find(filter);
+    return connectionBindings.findOne(filter);
 };
 
 exports.findLatestConnection = function(deviceId) {
