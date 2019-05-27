@@ -54,7 +54,7 @@ exports.findByExternalIdAndAccount = function (externalId, accountId) {
             externalId: externalId
         }
     };
-    return rules.find(filter)
+    return rules.findOne(filter)
         .then(function (rule) {
             if (!rule) {
                 throw errBuilder.Errors.Rule.NotFound;

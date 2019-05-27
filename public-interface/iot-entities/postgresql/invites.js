@@ -63,7 +63,7 @@ exports.findByEmailAndAccountId = function (email, accountId, resultCallback) {
         },
         include: [accounts]
     };
-    invites.find(filter)
+    invites.findOne(filter)
         .then(function (foundInvite) {
             return interpreterHelper.mapAppResults(foundInvite, interpreter, resultCallback);
         })
@@ -81,7 +81,7 @@ exports.findById = function (inviteId, transaction) {
         transaction: transaction
     };
 
-    return invites.find(filter)
+    return invites.findOne(filter)
         .then(function(invite) {
             return interpreterHelper.mapAppResults(invite, interpreter);
         });
@@ -90,7 +90,7 @@ exports.findById = function (inviteId, transaction) {
 exports.new = function (accountId, data, resultCallback) {
     return invites.create(data)
         .then(function (invite) {
-            return invites.find({where: {id: invite.id}, include: [accounts]})
+            return invites.findOne({where: {id: invite.id}, include: [accounts]})
                 .then(function (inviteWithAccount) {
                     return interpreterHelper.mapAppResults(inviteWithAccount, interpreter, resultCallback);
                 });

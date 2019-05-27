@@ -34,7 +34,7 @@ exports.findByUserInteractionTokenId = function(id, resultCallback){
             id: id
         }
     };
-    userInteractionTokens.find(filter)
+    userInteractionTokens.findOne(filter)
         .then(function(result) {
             resultCallback(null, interpreter.toApp(result));
         })

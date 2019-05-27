@@ -58,47 +58,47 @@ exports.getIdsFromQueryResult = function (devices) {
     return ids;
 };
 
-exports.formatAddComponentsResult = function (result, accountId) {
+exports.formatAddComponentsResult = function (result) {
 
-    var tagsParser = function (row, tags){
-        if (row.tag_id) {
-            tags[row.tag_id] = {
-                value: row.tag_value
+    var tagsParser = function(row, tags) {
+        if (row.id) {
+            tags[row.id] = {
+                value: row.value
             };
         }
     };
 
-    var attributesParser = function (row, attributes) {
-        if (row.attribute_id) {
-            attributes[row.attribute_id] = {
-                key: row.attribute_key,
-                value: row.attribute_value
+    var attributesParser = function(row, attributes) {
+        if (row.id) {
+            attributes[row.id] = {
+                key: row.key,
+                value: row.value
             };
         }
     };
 
     var componentsParser = function(row, components) {
-        if (row.deviceComponent_componentId) {
-            components[row.deviceComponent_componentId] = {
+        if (row.componentId) {
+            components[row.componentId] = {
                 dataValues: {
-                    componentId: row.deviceComponent_componentId,
-                    name: row.deviceComponent_name,
-                    deviceId: row.id,
+                    componentId: row.componentId,
+                    name: row.name,
+                    deviceId: row.deviceId,
                     componentType: {
                         dataValues: {
-                            componentTypeId: row.deviceComponent_componentType_componentTypeId,
-                            accountId: row.deviceComponent_componentType_accountId,
-                            dimension: row.deviceComponent_componentType_dimension,
-                            version: row.deviceComponent_componentType_version,
-                            type: row.deviceComponent_componentType_type,
-                            dataType: row.deviceComponent_componentType_dataType,
-                            format: row.deviceComponent_componentType_format,
-                            min: row.deviceComponent_componentType_min,
-                            max: row.deviceComponent_componentType_max,
-                            measureunit: row.deviceComponent_componentType_measureunit,
-                            display: row.deviceComponent_componentType_display,
-                            default: row.deviceComponent_componentType_default,
-                            icon: row.deviceComponent_componentType_icon
+                            componentTypeId: row.componentType.componentTypeId,
+                            accountId: row.componentType.accountId,
+                            dimension: row.componentType.dimension,
+                            version: row.componentType.version,
+                            type: row.componentType.type,
+                            dataType: row.componentType.dataType,
+                            format: row.componentType.format,
+                            min: row.componentType.min,
+                            max: row.componentType.max,
+                            measureunit: row.componentType.measureunit,
+                            display: row.componentType.display,
+                            default: row.componentType.default,
+                            icon: row.componentType.icon,
                         }
                     }
                 }
@@ -108,18 +108,18 @@ exports.formatAddComponentsResult = function (result, accountId) {
 
     var device = null;
 
-    if (result && Array.isArray(result) && result[0]) {
+    if (result) {
         device = {
-            id: result[0].id,
-            gatewayId: result[0].gatewayId,
-            accountId: accountId,
-            name: result[0].name,
-            loc: result[0].loc,
-            description: result[0].description,
-            status: result[0].status,
-            components: helper.parseCollection(result, componentsParser),
-            tags: helper.parseCollection(result, tagsParser),
-            attributes: helper.parseCollection(result, attributesParser)
+            id: result.id,
+            gatewayId: result.gatewayId,
+            accountId: result.accountId,
+            name: result.name,
+            loc: result.loc,
+            description: result.description,
+            status: result.status,
+            components: helper.parseCollection(result.deviceComponents, componentsParser),
+            tags: helper.parseCollection(result.tags, tagsParser),
+            attributes: helper.parseCollection(result.attributes, attributesParser)
         };
     }
     return device;

@@ -16,25 +16,29 @@
 
 'use strict';
 
-var sequelize = require('./models').sequelize,
+var devices = require('./models').devices,
     deviceTags = require('./models').deviceTags;
 
 
 exports.all = function (accountId, resultCallback) {
-    var query = 'SELECT * FROM "dashboard"."deviceTagsView" where "accountId" = :accountId';
-    sequelize.query(query,  {model: deviceTags, replacements: {accountId: accountId}, type: sequelize.QueryTypes.SELECT})
-        .then(function (result) {
+    var filters = {
+        where: {
+            accountId: accountId
+        },
+        include: [{ model: deviceTags, as: 'tags'}]
+    };
+
+    devices.findAll(filters)
+        .then(results => {
             var formattedResult = [];
-            if (result && Array.isArray(result)) {
-                result.forEach(function(tag) {
+            results.forEach(device => {
+                device.tags.forEach(tag => {
                     formattedResult.push(tag.value);
                 });
-            }
+            });
             resultCallback(null, formattedResult);
         })
-        .catch (function(err) {
+        .catch(err => {
             resultCallback(err);
         });
 };
-
-

@@ -37,7 +37,6 @@ var http = require('http'),
     contextProvider = require('./lib/context-provider'),
     google = require('./lib/google'),
     models = require('./iot-entities/postgresql/models'),
-    systemUsers = require('./lib/dp-users/systemUsers'),
     forceSSL = require('express-force-ssl'),
     heartBeat = require('./lib/heartbeat'),
     tracer = require('./lib/express-jaeger').tracer;
@@ -145,19 +144,15 @@ commServer.init(httpServer, IotWsAuth);
 
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
-    return models.initSchema()
-        .then(function() {
-            return systemUsers.create()
-                .then (function() {
-                    if (!module.parent) {
-                        httpServer.listen(api_port, function () {
-                            console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
-                            heartBeat.start();
-
-                        });
-                    } else {
-                        module.exports.server = appServer;
-                    }
+    models.initSchema()
+        .then(() => {
+            if (!module.parent) {
+                httpServer.listen(api_port, function () {
+                    console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
+                    heartBeat.start();
                 });
+            } else {
+                module.exports.server = appServer;
+            }
         });
 });

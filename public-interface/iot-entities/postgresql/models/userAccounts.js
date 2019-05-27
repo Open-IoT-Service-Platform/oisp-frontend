@@ -22,8 +22,17 @@ module.exports = function (sequelize, DataTypes) {
         role: {
             type: DataTypes.ENUM('admin', 'user'),
             allowNull: false
+        },
+        userId: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            unique: 'userId_accountId_unique'
+        },
+        accountId: {
+            type: DataTypes.UUID,
+            allowNUll: false,
+            unique: 'userId_accountId_unique'
         }
-
     }, {
         createdAt: 'created',
         updatedAt: 'updated',

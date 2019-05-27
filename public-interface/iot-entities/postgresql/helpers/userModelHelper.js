@@ -34,11 +34,9 @@ exports.formatUserWithAccounts = function(userWithAccounts) {
     };
 
     var result = null;
-    if (userWithAccounts && Array.isArray(userWithAccounts) && userWithAccounts[0]) {
-        result = userWithAccounts[0];
-
-        result.accounts = helper.parseCollection(userWithAccounts, accountsParser);
-
+    if (userWithAccounts) {
+        result = userWithAccounts;
+        result.accounts = helper.parseCollection(userWithAccounts.accounts, accountsParser);
         delete result.accountId;
         delete result.role;
     }

@@ -31,9 +31,6 @@ var users = require('./models').users,
 exports.TEST_ACCOUNT_PATTERN = '(^test-[0-9]+@(test|example)\\.com$)|(^gateway@intel.com$)';
 exports.USER_TYPES = {system: 'system', user: 'user'};
 
-var ADD_USER_QUERY = 'SELECT * from dashboard.create_user(:id, :email, :password, :salt, :termsAndConditions, :verified, :provider, :attrs, :type)';
-var UPDATE_USER_QUERY = 'SELECT * from dashboard.update_user(:id, :email, :password, :salt, :termsAndConditions, :verified, :provider, :attrs, :accountId, :role)';
-
 var getReplacementsForQuery = function (userModel, id) {
     var accountId = null;
     var role = null;
@@ -71,19 +68,28 @@ var getReplacementsForQuery = function (userModel, id) {
 
 exports.new = function (userData, transaction) {
     var userModel = interpreter.toDb(userData);
-    var replacements = getReplacementsForQuery(userModel, uuid.v4());
-
-    return sequelize.query(ADD_USER_QUERY,
-        {replacements: replacements, transaction: transaction})
-        .then(function (result) {
-            if (result && result.length > 0 && result[0][0]) {
-                var user = result[0][0];
-                return Q.resolve(interpreterHelper.mapAppResults({dataValues: user}, interpreter));
+    userModel = getReplacementsForQuery(userModel, uuid.v4());
+    if (userModel.accountId) {
+        delete userModel.accountId;
+    }
+    if (userModel.role) {
+        delete userModel.role;
+    }
+    var defaultValueFields = ['termsAndConditions', 'verified', 'type'];
+    defaultValueFields.forEach(field => {
+        if (userModel[field] === null) {
+            delete userModel[field];
+        }
+    });
+    return users.create(userModel, { transaction: transaction })
+        .then(result => {
+            if (result) {
+                return Q.resolve(interpreterHelper.mapAppResults(result, interpreter));
             } else {
-                throw errBuilder.Errors.User.SavingError;
+                throw errBuilder.Errors.Users.SavingError;
             }
         })
-        .catch(function (err) {
+        .catch(err => {
             if (err && err.name === errBuilder.SqlErrors.AlreadyExists) {
                 throw errBuilder.Errors.User.AlreadyExists;
             }
@@ -238,28 +244,94 @@ exports.removeAccount = function (userId, accountId, transaction) {
 };
 
 var updateUser = function(userData, transaction) {
+    var accountId = null;
+    var role = null;
     var userModel = interpreter.toDb(userData);
-    var replacements = getReplacementsForQuery(userModel, userData.id);
-    return sequelize.query(UPDATE_USER_QUERY, {replacements: replacements, transaction: transaction})
-        .then(function (result) {
-            if (result && result.length > 0 && result[0][0]) {
+    userModel = getReplacementsForQuery(userModel, userData.id);
+    if (userModel.accountId) {
+        accountId = userModel.accountId;
+        delete userModel.accountId;
+    }
+    if (userModel.role) {
+        role = userModel.role;
+        delete userModel.role;
+    }
+
+    return Q.fcall(() => {
+        if (userModel.id) {
+            return Q.resolve({ id: userModel.id });
+        }
+        var filters = {
+            where: {
+                email: userModel.email
+            },
+            transaction: transaction
+        };
+        return users.findOne(filters);
+    })
+        .then(result => {
+            var editableFields = ['password', 'salt', 'termsAndConditions',
+                'verified', 'provider', 'attrs'];
+            var edited = [];
+            editableFields.forEach(field => {
+                if (userModel[field]) {
+                    edited.push(field);
+                }
+            });
+            userModel.id = result.id;
+            return users.update(userModel, {
+                fields: edited,
+                where: { id: userModel.id }
+            });
+        })
+        .then(() => {
+            if (accountId && role) {
+                var filters = {
+                    where: {
+                        userId: userModel.id,
+                        accountId: accountId
+                    },
+                    transaction: transaction
+                };
+                return userAccounts.findOne(filters).then(result => {
+                    if (result && result.role === 'admin' && role !== 'admin') {
+                        throw errBuilder.Errors.User.CannotReduceAdminPriviliges;
+                    }
+                    var userAccount = {
+                        role: role,
+                        userId: userModel.id,
+                        accountId: accountId
+                    };
+                    return userAccounts.upsert(userAccount, { transaction: transaction });
+                });
+            }
+            return Q.resolve();
+        })
+        .then(() => {
+            var filters = {
+                where: {
+                    id: userModel.id
+                },
+                include: [ accounts ],
+                transaction: transaction
+            };
+            return users.findAll(filters);
+        })
+        .then(result => {
+            if (result) {
                 var userWithAccounts = userModelHelper.formatUserWithAccounts(result[0]);
-                return interpreterHelper.mapAppResults({dataValues: userWithAccounts}, interpreter);
+                return  interpreterHelper.mapAppResults(userWithAccounts, interpreter);
             } else {
                 return null;
             }
         })
-        .catch(function(err) {
-            if (err.message === errBuilder.SqlErrors.User.CannotReduceAdminPrivileges) {
-                throw errBuilder.Errors.User.CannotReduceAdminPrivileges;
-            }
+        .catch(err => {
             throw err;
         });
 };
 
 exports.update = function (userData, transaction) {
     return updateUser(userData, transaction);
-
 };
 
 exports.updateByEmail = function (userData, transaction) {

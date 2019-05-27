@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.08_00__update_device_connection.sql

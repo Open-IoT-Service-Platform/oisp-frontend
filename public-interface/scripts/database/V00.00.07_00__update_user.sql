@@ -1,1 +1,0 @@
-./public-interface/deploy/postgres/base/V00.00.07_00__update_user.sql

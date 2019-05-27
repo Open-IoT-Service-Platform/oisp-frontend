@@ -18,6 +18,7 @@
 
 var errBuilder = require("./../../lib/errorHandler").errBuilder,
     helper = require('./helpers/queryHelper'),
+    accounts = require('./models').accounts,
     devices = require('./models').devices,
     deviceAttributes = require('./models').deviceAttributes,
     deviceComponents = require('./models').deviceComponents,
@@ -31,8 +32,8 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     deviceModelHelper = require('./helpers/devicesModelHelper'),
     sequelize = require('./models').sequelize;
 
-var ACTIVATE_DEVICE_QUERY = 'SELECT * FROM "dashboard"."activate_device"(:activationCode, :deviceId, :status) AS f(activated boolean, "accountId" uuid)';
-var ADD_COMPONENTS_QUERY = 'SELECT * FROM dashboard.add_device_components(:components, :deviceId, :accountId)';
+const Op = sequelize.Op;
+
 var DB_SCHEMA_NAME = helper.escapeValue('dashboard');
 var deviceStatus = {created: "created", active: "active", inactive: "inactive"};
 exports.status = deviceStatus;
@@ -54,10 +55,10 @@ var createDeviceTags = function (tags, device, transaction) {
 };
 
 var getDeviceRelations = function () {
-    return [
-        {model: deviceAttributes, as: 'attributes'},
-        {model: deviceTags, as: 'tags'},
-        {model: deviceComponents, as: 'deviceComponents', include: [componentTypes]}
+    return [{ model: deviceAttributes, as: 'attributes' },
+        { model: deviceTags, as: 'tags' },
+        { model: deviceComponents, as: 'deviceComponents',
+            include: [{ model: componentTypes, as: 'componentType' }]}
     ];
 };
 
@@ -146,7 +147,7 @@ exports.findByIdAndAccount = function (deviceId, accountId, transaction) {
     if (accountId) {
         filter.where.accountId = accountId;
     }
-    return devices.find(filter)
+    return devices.findOne(filter)
         .then(function (device) {
             return interpreterHelper.mapAppResults(device, interpreter);
         });
@@ -216,58 +217,106 @@ exports.updateByIdAndAccount = function (deviceId, accountId, updatedObject, tra
  * In case when activation code is expired or invalid throws - Errors.Device.InvalidActivationCode
  */
 exports.confirmActivation = function (deviceId, activationCode) {
-
-    var replacements = {
-        deviceId: deviceId,
-        activationCode: activationCode,
-        status: deviceStatus.active
+    var filter = {
+        where: {
+            activation_code: activationCode
+        }
     };
 
-    return sequelize.query(ACTIVATE_DEVICE_QUERY, {replacements: replacements})
-        .then(function (result) {
-            if (result && result[0][0]) {
-                return Q.resolve(result[0][0]);
-            }
-            throw errBuilder.Errors.Device.RegistrationError;
-        })
-        .catch(function(err) {
-            if (err.message === errBuilder.SqlErrors.Device.AccountNotFound) {
+    return accounts.findOne({where: {activation_code: activationCode}})
+        .then(account => {
+            if (account.id === null) {
                 throw errBuilder.Errors.Account.NotFound;
-            } else if (err.message === errBuilder.SqlErrors.Device.InvalidActivationCode) {
+            } else if (account.activation_code_expire_date < Date.now()) {
                 throw errBuilder.Errors.Device.InvalidActivationCode;
             }
-
-            throw err;
+            filter = {
+                returning: true,
+                where: {
+                    id: deviceId
+                }
+            };
+            return devices.update({ status: deviceStatus.active }, filter);
+        })
+        .then(([updatedRows, [updatedDevice]]) => {
+            if (updatedRows !== 1) {
+                throw errBuilder.Errors.Device.RegistrationError;
+            }
+            return Q.resolve(updatedDevice);
         });
 };
 
-exports.addComponents = function (components, deviceId, accountId, transaction) {
-    var componentsModel = deviceModelHelper.formatDeviceComponents(components);
+exports.addComponents = function(components, deviceId, accountId, transaction) {
+    var types = [];
+    components.forEach(component => {
+        types.push({
+            accountId: null,
+            default: true,
+            componentTypeId: component.type
+        });
+        types.push({
+            accountId: accountId,
+            componentTypeId: component.type
+        });
+    });
 
-    var replacements = {
-        components: componentsModel,
-        deviceId: deviceId,
-        accountId: accountId
+    var filters = {
+        where: {
+            [Op.or]: types
+        },
+        attributes: ['id', 'componentTypeId'],
+        transaction: transaction
     };
 
-    return sequelize.query(ADD_COMPONENTS_QUERY, {replacements: replacements,transaction: transaction})
-        .then(function(result) {
-            if (result && result.length > 0 && result[0][0]) {
+    return componentTypes.findAll(filters)
+        .then(types => {
+            var typeToId = {};
+            types.forEach(type => {
+                typeToId[type.componentTypeId] = type.id;
+            });
+            var typeNotFound = false;
+            var records = components.map(component => {
+                if (!typeToId[component.type]) {
+                    typeNotFound = true;
+                } else {
+                    return {
+                        componentId: component.cid,
+                        name: component.name,
+                        componentTypeId: typeToId[component.type],
+                        deviceId: deviceId,
+                    };
+                }
+            });
+            if (typeNotFound) {
+                throw errBuilder.Errors.Device.Component.TypeNotFound;
+            }
+            return deviceComponents.bulkCreate(records, { validate: true, transaction: transaction });
+        })
+        .then(() => {
+            filters = {
+                where: {
+                    id: deviceId,
+                    accountId: accountId
+                },
+                include: getDeviceRelations(),
+                transaction: transaction
+            };
+            return devices.findAll(filters);
+        })
+        .then(result => {
+            if (result && result.length > 0 && result[0]) {
                 var deviceWithComponents = deviceModelHelper.formatAddComponentsResult(result[0], accountId);
                 return interpreterHelper.mapAppResults({dataValues: deviceWithComponents}, interpreter);
             }
         })
-        .catch(function (err) {
+        .catch(err => {
             if (err.name === errBuilder.SqlErrors.AlreadyExists) {
                 throw errBuilder.Errors.Device.Component.AlreadyExists;
-            }
-            if (err.message === errBuilder.SqlErrors.Device.NotFound) {
+            } else if (err.name === errBuilder.SqlErrors.ForeignKeyNotFound) {
                 throw errBuilder.Errors.Device.NotFound;
+            } else {
+                throw err;
             }
-            if (err.message === errBuilder.SqlErrors.Device.ComponentTypeNotFound) {
-                throw errBuilder.Errors.Device.Component.TypeNotFound;
-            }
-            throw err;
         });
 };
 
@@ -424,7 +473,7 @@ exports.findByAccountIdAndComponentId = function (accountId, componentIds, resul
                 where: { componentId: componentIds },
                 include: [
                     {
-                        model: componentTypes
+                        model: componentTypes, as: 'componentType'
                     }
                 ]
             }

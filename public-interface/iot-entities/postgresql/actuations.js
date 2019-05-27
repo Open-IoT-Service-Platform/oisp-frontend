@@ -39,7 +39,7 @@ exports.findById = function (id, resultCallback) {
         }
     };
 
-    return actuations.find(filter)
+    return actuations.findOne(filter)
         .then(function (actuation) {
             actuation = interpreter.toApp(actuation);
             resultCallback(null, actuation);
@@ -73,7 +73,7 @@ exports.new = function (data, resultCallback) {
     var actuationModel = interpreter.toDb(data);
     return actuations.create(actuationModel)
         .then(function (actuation) {
-            return actuations.find({
+            return actuations.findOne({
                 where: {id: actuation.id},
                 include: getActuationRelations()})
                 .then(function (actuation) {
@@ -98,4 +98,3 @@ exports.deleteByDeviceId = function (deviceId, resultCallback) {
             resultCallback();
         });
 };
-

@@ -39,20 +39,19 @@ CreateDB.prototype.create = function(){
             return client.query(query);
         })
         .then(() => {
-	    return models.initSchema();
+            return models.createDatabase();
         })
         .then(function() {
             return systemUsers.create();
         })
-    	.then(function() {
-            return models.sequelize.close();
+        .then(function() {
+            models.sequelize.close();
+            models.super_user_sequelize.close();
+            return tracer.close();
         })
         .then(() => {
-	    return tracer.close();
-        })
-        .then(() => {
-	    console.log('Database created succesfully');
-	    return client.end();
+            console.log('Database created succesfully');
+            return client.end();
         })
         .catch(err => {
             console.error('Can not create postgres DB');

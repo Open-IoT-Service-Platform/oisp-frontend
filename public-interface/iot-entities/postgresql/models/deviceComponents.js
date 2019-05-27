@@ -25,7 +25,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         name: {
             type: DataTypes.STRING(255),
-            allowNull: false
+            allowNull: false,
+            unique: 'device_components_deviceId_name_unique'
         },
         componentTypeId: {
             type: DataTypes.UUID,
@@ -33,7 +34,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         deviceId: {
             type: DataTypes.STRING(255),
-            allowNull: false
+            allowNull: false,
+            unique: 'device_components_deviceId_name_unique'
         },
         last_observation_time: {
             type: DataTypes.DATE

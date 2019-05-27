@@ -348,14 +348,13 @@ exports.addComponents = function(deviceId, components, accountId) {
     if(!arrayReceived) {
         components = [ components ];
     }
-    var cids = {}, types = {}, uniqueIds = true, duplicates = {};
+    var cids = {}, uniqueIds = true, duplicates = {};
 
 
     components.forEach(function(item) {
         if(!cids[item.cid]) {
             cids[item.cid] = true;
             item.type = item.type.toLowerCase();
-            types[item.type] = true;
             item.deviceId = deviceId;
             delete item.attributes;
         } else {
@@ -368,8 +367,6 @@ exports.addComponents = function(deviceId, components, accountId) {
         error.message += Object.keys(duplicates).join(', ');
         return Q.reject(errBuilder.build(error));
     }
-
-    types = Object.keys(types);
 
     return postgresProvider.startTransaction()
         .then(function(transaction) {
