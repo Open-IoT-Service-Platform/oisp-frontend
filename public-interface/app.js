@@ -39,8 +39,9 @@ var http = require('http'),
     models = require('./iot-entities/postgresql/models'),
     forceSSL = require('express-force-ssl'),
     heartBeat = require('./lib/heartbeat'),
-    tracer = require('./lib/express-jaeger').tracer;
-const cbor = require("./lib/cbor");
+    tracer = require('./lib/express-jaeger').tracer,
+    grafana = require("./grafana"),
+    cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
     appServer = express(),
@@ -126,7 +127,6 @@ appServer.use('/v1', function setUUID (req, res, next) {
     next();
 });
 
-
 /* Modules that registered his routes
  shall be unique or will be override
  */
@@ -135,9 +135,17 @@ uiRoutes.register(appServer);
 iotRoutes.register(appServer);
 
 appServer.use(errorHandler.middleware(errors));
-if (appServer.get("env") === 'local'){
+if (appServer.get("env") === 'local') {
     appServer.use(nodeErrorHandler({ dumpExceptions:true, showStack:true }));
 }
+
+grafana.reverseProxyDataSource.listen(config.grafana.dataSourceProxyPort, () => {
+    console.log('OpenTSDB Reverse Proxy listening on port ' + config.grafana.dataSourceProxyPort);
+});
+
+grafana.reverseProxyGrafana.listen(config.grafana.proxyPort, () => {
+    console.log('Grafana Reverse Proxy listening on port ' + config.grafana.proxyPort);
+});
 
 monitor.start();
 commServer.init(httpServer, IotWsAuth);
@@ -145,6 +153,9 @@ commServer.init(httpServer, IotWsAuth);
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
     models.initSchema()
+        .then(() => {
+            grafana.getViewerToken();
+        })
         .then(() => {
             if (!module.parent) {
                 httpServer.listen(api_port, function () {

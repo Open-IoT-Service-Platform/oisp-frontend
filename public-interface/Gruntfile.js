@@ -32,7 +32,8 @@ module.exports = function (grunt) {
                 'iot-entities/**/*.js',
                 'engine/**/*.js',
                 'lib/**/*.js',
-		        'doc/api/*.js'],
+                'doc/api/*.js',
+                'grafana/*.js'],
             codeCoverageExclude: [
                 "**/iot-entities/*","**/iot-entities/postgresql/*",
                 "**/iot-entities/redis/*",

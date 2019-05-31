@@ -18,7 +18,6 @@
 // Returns empty object if the config can not be found
 var getOISPConfig = (function () {
 	if (!process.env.OISP_FRONTEND_CONFIG) {
-		console.log("Root config environment variable (OISP_FRONTEND_CONFIG) is missing...");
 		return function () { return {}; };
 	}
 	var frontendConfig = JSON.parse(process.env.OISP_FRONTEND_CONFIG);
@@ -71,6 +70,7 @@ var postgres_config = getOISPConfig("postgresConfig"),
     dashboardSecurity_config = getOISPConfig("dashboardSecurityConfig")
     kafka_config = getOISPConfig("kafkaConfig"),
     jaeger_enabled = getOISPConfig("jaegerTracing"),
+    grafana_config = getOISPConfig("grafanaConfig"),
     winston = require('winston');
 
 // Get replica information from the postgres config,
@@ -274,6 +274,16 @@ var config = {
         samplerType: 'probabilistic',
         samplerParam: 0.1,
 		tracing: jaeger_enabled
+    },
+    grafana : {
+        host: 'grafana',
+        port: grafana_config.port,
+        adminUser: grafana_config.adminUser,
+        adminPassword: grafana_config.adminPassword,
+        dataSourceHost: grafana_config.dataSourceHost,
+        dataSourcePort: grafana_config.dataSourcePort,
+        proxyPort: grafana_config.proxyPort || 4002,
+        dataSourceProxyPort: grafana_config.dataSourceProxyPort || 4003
     }
 };
 
