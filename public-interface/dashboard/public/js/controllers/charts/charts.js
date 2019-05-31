@@ -643,6 +643,26 @@ iotController.controller('ChartCtrl', function( $scope,
         scheduleRefresh();
     };
 
+    $scope.openGrafana = function() {
+        var baseUrl = window.location.protocol + '//' + window.location.hostname +
+            '/ui/grafana/dashboard/script/dashscript.js';
+        // odd indexes save the name of component, even indexes save the id
+        var metrics = getFilters().metrics.filter(function (id, index) {
+            if (index % 2 === 0) {
+                return true;
+            }
+            return false;
+        });
+        var acc = sessionService.getCurrentAccount();
+        var metricsParam = '';
+        for (var i = 0; i < metrics.length - 1; i++) {
+            metricsParam = metricsParam + acc.id + '.' + metrics[0].id + ',';
+        }
+        metricsParam = metricsParam + acc.id + '.' + metrics[metrics.length - 1].id;
+
+        window.open(baseUrl + '?rows=1&name=' + acc.name + '&metrics=' + metricsParam);
+    };
+
     $scope.downloadCsv = function() {
         if($scope.noMetrics()) {
             return;
