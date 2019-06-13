@@ -56,11 +56,16 @@ function refreshViewerToken() {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                simple: false,
+                resolveWithFullResponse: true
             };
             return request(options).then(res => {
                 if (res.statusCode !== 200) {
-                    throw 'API Token already taken and can not delete it';
+                    if (res.statusCode < 500) {
+                        throw 'API Token already taken and can not delete it';
+                    }
+                    return null;
                 }
                 return refreshViewerToken();
             });

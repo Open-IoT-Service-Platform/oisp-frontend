@@ -25,6 +25,13 @@ proxy.on('proxyReq', function(proxyReq, req) {
     }
 });
 
+proxy.on('error', function(err, req, res) {
+    res.writeHead(500, {
+        'Content-Type': 'text/plain'
+    });
+    res.end('Can\'t reach to grafana');
+});
+
 app.all('(/*)?', function (req, res) {
     req.url = req.url.replace(urlRegex, '');
     if (req.cookies.jwt) {

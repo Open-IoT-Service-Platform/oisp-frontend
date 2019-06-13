@@ -58,6 +58,13 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
     });
 });
 
+proxy.on('error', function(err, req, res) {
+    res.writeHead(500, {
+        'Content-Type': 'text/plain'
+    });
+    res.end('Can\'t reach to datasource');
+});
+
 app.all('(/*)?', function (req, res) {
     if (req.cookies.jwt) {
         tokenInfo(req.cookies.jwt, null, function() {
