@@ -24,10 +24,10 @@ var CreateDB = function(){};
 
 CreateDB.prototype.create = function(){
     const client = new Client({
-        user: config.postgres.username,
+        user: config.postgres.su_username,
         host: config.postgres.options.replication.write.host,
         database: 'postgres',
-        password: config.postgres.password,
+        password: config.postgres.su_password,
         port: config.postgres.options.replication.write.port,
     });
     const query = {text: 'CREATE DATABASE ' +
@@ -37,6 +37,21 @@ CreateDB.prototype.create = function(){
         .then(function() {
             console.log("Connected to postgres");
             return client.query(query);
+        })
+        .then(function() {
+            query.text = 'CREATE USER ' + config.postgres.username +
+                ' WITH PASSWORD ' + config.postgres.password + ';' +
+                ' GRANT CONNECT ON DATABASE ' + config.postgres.database +
+                ' TO ' + config.postgres.username + ';';
+            return client.query();
+        })
+        .then(function() {
+            query.text = 'CREATE DATABASE test; ' +
+                'GRANT ALL PRIVILEGES ON DATABASE test TO ' +
+                config.postgres.su_username + '; ' +
+                'GRANT CONNECT ON DATABASE test TO ' +
+                config.postgres.username + ';';
+            return client.query();
         })
         .then(() => {
             return models.createDatabase();
