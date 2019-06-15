@@ -39,8 +39,8 @@ var parseCborBody = function(req, res, next) {
                         value: item.value
                     });
                     item.value = binValuesIndex.toString();
-                    binValuesIndex++;
                 }
+                binValuesIndex++;
             });
         }
         if (binaryValues.length > 0) {
