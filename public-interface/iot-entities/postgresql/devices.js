@@ -222,7 +222,7 @@ exports.confirmActivation = function (deviceId, activationCode) {
             activation_code: activationCode
         }
     };
-
+    var accountId;
     return accounts.findOne({where: {activation_code: activationCode}})
         .then(account => {
             if (account.id === null) {
@@ -230,18 +230,21 @@ exports.confirmActivation = function (deviceId, activationCode) {
             } else if (account.activation_code_expire_date < Date.now()) {
                 throw errBuilder.Errors.Device.InvalidActivationCode;
             }
+            accountId = account.id;
             filter = {
                 returning: true,
                 where: {
-                    id: deviceId
+                    id: deviceId,
+                    accountId: accountId
                 }
             };
             return devices.update({ status: deviceStatus.active }, filter);
         })
         .then(([updatedRows, [updatedDevice]]) => {
             if (updatedRows !== 1) {
-                throw errBuilder.Errors.Device.RegistrationError;
+                return Q.resolve({ activated: false, accountId: accountId });
             }
+            updatedDevice.activated = true;
             return Q.resolve(updatedDevice);
         });
 };
