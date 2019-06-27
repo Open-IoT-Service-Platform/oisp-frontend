@@ -38,16 +38,16 @@ var getKafkaOffset = function(topic_, partition_, cb) {
 
 getKafkaOffset(topic, partition, function(offset) {
     if ( offset >= 0 ) {
-        var topics = [{ topic: topic, offset: offset+1, partition: partition}]
+        var topics = [{ topic: topic, offset: offset+1, partition: partition }];
         var options = { autoCommit: true, fromOffset: true};
 
-        kafkaConsumer = new kafka.Consumer(kafkaClient, topics, options)
+        kafkaConsumer = new kafka.Consumer(kafkaClient, topics, options);
 
         var oispServicesToMonitor = process.argv.slice(2);
 
         kafkaConsumer.on('message', function (message) {
             if ( kafkaConsumer ) {
-                console.log(message)
+                console.log(message);
                 var now = new Date().getTime();
                 var i=0;
                 for(i=0; i<oispServicesToMonitor.length; i++) {
@@ -69,8 +69,11 @@ getKafkaOffset(topic, partition, function(offset) {
     } else {
         console.log("Cannot get Kafka offset ");
         if (kafkaConsumer) {
-            kafkaConsumer.close(true);
-            kafkaConsumer = null;
+            kafkaConsumer.close(false, function() {
+                kafkaConsumer = null;
+                process.exit(1);
+            });
+        } else {
             process.exit(1);
         }
     }
