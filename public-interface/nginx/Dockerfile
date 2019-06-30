@@ -1,4 +1,5 @@
-FROM oisp/frontend
+ARG DOCKER_TAG=latest
+FROM oisp/frontend:${DOCKER_TAG}
 
 FROM nginx:1.13.1-alpine
 
