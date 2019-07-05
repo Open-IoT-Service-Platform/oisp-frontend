@@ -18,7 +18,7 @@ description: |
   This section handles the device managent. E.g. add or register devices, remove devices, component management, search for devices. In many cases the *{accountId}* is clear implicitly since a Device is assigned to at most one account. Therefore, the respective *accountId* does not need to be given when **access role** is **device**. Instead a short version of the path, omiting ``accounts/{accountId}``, can be used. For example,  there is a short version of the path ``/v1/api/accounts/{accountId}/devices/{deviceId}``, which is ``/v1/api/devices/{deviceId}``.
 
   A special case is the ``*/activation`` method, which can be used by a new device to be added to an account, even though it does not (yet) belong to this account.
-  
+
 uriParameters:
   accountId:
     description: |
@@ -27,7 +27,7 @@ uriParameters:
 get:
   description: |
     **List Devices**
-    
+
     If no query paramters are given, then it will retrieve a list of all devices for the specified account, with minimal data for each device. Otherwise, the query parameters will filter the desired result.
 
     <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices">
@@ -49,7 +49,7 @@ get:
       minimum: 0
       required: false
       example: 5
-    skip: 
+    skip:
       description: |
         Returned list offset - if 10 provided, result won't contain first 10 list elements retrieved from database. Default is 0
       type: integer
@@ -83,24 +83,24 @@ get:
         application/json:
           example:
             [
-            { 
+            {
               "deviceId": "24-a5-80-21-5b-29",
               "gatewayId": "24-a5-80-21-5b-29",
-              "name": "Device #1",  
+              "name": "Device #1",
               "tags": ["Israel", "Tel Aviv"],
               "status": "created",
             },
-            { 
+            {
               "deviceId": "24-a5-80-21-5b-30",
               "gatewayId": "24-a5-80-21-5b-30",
-              "name": "Device #2",  
+              "name": "Device #2",
               "tags": ["US", "Oregon", "Portland"],
               "status": "active",
             },
-            { 
+            {
               "deviceId": "24-a5-80-21-5b-3a",
               "gatewayId": "24-a5-80-21-5b-3a",
-              "name": "Device #3",  
+              "name": "Device #3",
               "tags": ["US", "California", "Folsom"],
               "status": "created",
             }
@@ -123,10 +123,10 @@ post:
     application/json:
       type: !include device_POST.json
       example: |
-        { 
+        {
           "deviceId": "24-a5-80-21-5b-29",
           "gatewayId": "24-a5-80-21-5b-29",
-          "name": "Device #1",            
+          "name": "Device #1",
           "tags": ["US", "California", "Sacramento"],
           "loc": [ 45.5434085, -122.654422, 124.3 ],
           "attributes": {
@@ -146,10 +146,10 @@ post:
       body:
         application/json:
           example: |
-            { 
+            {
               "deviceId": "24-a5-80-21-5b-29",
               "gatewayId": "24-a5-80-21-5b-29",
-              "name": "Device #1",            
+              "name": "Device #1",
               "tags": ["US", "California", "Sacramento"],
               "loc": [ 45.5434085, -122.654422, 124.3 ],
               "created": 1354741966688,
@@ -160,7 +160,7 @@ post:
                 "os": "linux"
               }
             }
-      
+
 /{deviceId}:
   uriParameters:
     deviceId:
@@ -213,8 +213,8 @@ post:
           {
             "gatewayId": "24-a5-80-21-5b-29",
             "name": "Device #1",
-            "loc": [ 45.5434085, -122.654422, 124.3 ],  
-            "tags": ["Arizona", "Phoenix"],            
+            "loc": [ 45.5434085, -122.654422, 124.3 ],
+            "tags": ["Arizona", "Phoenix"],
             "attributes": {
               "vendor": "intel",
               "platform": "x86",
@@ -229,8 +229,8 @@ post:
               {
                 "gatewayId": "24-a5-80-21-5b-29",
                 "name": "Device #1",
-                "loc": [ 45.5434085, -122.654422, 124.3 ],  
-                "tags": ["Arizona", "Phoenix"],            
+                "loc": [ 45.5434085, -122.654422, 124.3 ],
+                "tags": ["Arizona", "Phoenix"],
                 "attributes": {
                   "vendor": "intel",
                   "platform": "x86",
@@ -249,7 +249,7 @@ post:
     responses:
       204:
         description: Deleted
-        
+
   /activation:
     put:
       description: |
@@ -262,7 +262,7 @@ post:
       body:
         type: !include device_ACTIVATION.json
         example: |
-          { 
+          {
             "activationCode": "jq4h6d2b"
           }
       responses:
@@ -285,7 +285,7 @@ post:
       body:
         type: !include device-component_SINGLE.json
         example: |
-          { 
+          {
             "cid": "436e7e74-6771-4898-9057-26932f5eb7e1",
             "name": "temp",
             "type": "temperature.v1.0"
@@ -295,7 +295,7 @@ post:
           description: CREATED
           body:
             example:
-              { 
+              {
                 "cid": "436e7e74-6771-4898-9057-26932f5eb7e1",
                 "name": "Temperature Sensor 1",
                 "type": "temperature.v1.0"
@@ -328,7 +328,7 @@ post:
       200:
         body:
           example:
-            [     
+            [
               "tag",
               "tag2"
             ]
@@ -448,5 +448,29 @@ post:
               "tags": [
               "test"
               ]
+            }
+            ]
+/totals:
+  get:
+    description: |
+      **Summary of all devices**
+
+      Count active/inactive/created devices of an account.
+
+      <meta name="access-roles" path="GET:/api/accounts/{accountId}/devices/totals">
+    is: [ authorization-header ]
+    responses:
+      200:
+        body:
+          example:
+            [
+            {
+              "state": {
+                "active": 2,
+                "created": 1,
+                "total": 3
+              },
+              "total": 4,
+              "current": 2
             }
             ]
