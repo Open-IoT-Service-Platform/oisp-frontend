@@ -331,24 +331,23 @@ exports.getTotals = function (accountId, resultCallback) {
         }
     };
 
+    var result = {};
+
     devices.count(filter)
         .then(function (allDevicesCount) {
+            result.allDevices = allDevicesCount;
             filter.where.status = deviceStatus.active;
-            return devices.count(filter)
-                .then(function (activeDevicesCount) {
-                    filter.where.status = deviceStatus.created;
-                    return devices.count(filter)
-                        .then(function (createdDevicesCount) {
-                            return devices.count({where: {lastVisit: { $not: null}, status: deviceStatus.active}})
-                                .then(function (currentDevicesCount) {
-                                    resultCallback(null, deviceModelHelper.createTotalsResponse({activeDevices: activeDevicesCount,
-                                        createdDevices: createdDevicesCount,
-                                        allDevices: allDevicesCount,
-                                        currentDevices: currentDevicesCount})
-                                    );
-                                });
-                        });
-                });
+            return devices.count(filter);
+        })
+        .then(activeDevicesCount => {
+            result.activeDevices = activeDevicesCount;
+            result.currentDevices = activeDevicesCount;
+            filter.where.status = deviceStatus.created;
+            return devices.count(filter);
+        })
+        .then(function (createdDevicesCount) {
+            result.createdDevices = createdDevicesCount;
+            resultCallback(null, deviceModelHelper.createTotalsResponse(result));
         })
         .catch(function (err) {
             resultCallback(err);
