@@ -41,6 +41,7 @@ var http = require('http'),
     heartBeat = require('./lib/heartbeat'),
     tracer = require('./lib/express-jaeger').tracer,
     grafana = require("./grafana"),
+    systemUsers = require('./lib/dp-users/systemUsers'),
     cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
@@ -153,6 +154,9 @@ commServer.init(httpServer, IotWsAuth);
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
     models.initSchema()
+        .then(function() {
+            systemUsers.create();
+        })
         .then(() => {
             grafana.getViewerToken();
         })
