@@ -200,6 +200,9 @@ module.exports.initSchema = function () {
             return grantPermissions();
         })
         .then(() => {
+            return createDefaultComponentCatalog();
+        })
+        .then(() => {
             logger.info('Database schema created');
         })
         .catch(err => {
