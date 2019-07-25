@@ -20,13 +20,12 @@ var users = require('./models').users,
     accounts = require('./models').accounts,
     sequelize = require('./models').sequelize,
     Q = require('q'),
-    helper = require('./helpers/queryHelper'),
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').users(),
     errBuilder  = require("../../lib/errorHandler").errBuilder,
     uuid = require('node-uuid'),
+    modelsHelper = require('./helpers/modelsHelper'),
     userModelHelper = require('./helpers/userModelHelper');
-
 
 exports.TEST_ACCOUNT_PATTERN = '(^test-[0-9]+@(test|example)\\.com$)|(^gateway@intel.com$)';
 exports.USER_TYPES = {system: 'system', user: 'user'};
@@ -129,28 +128,21 @@ var getUsersWithAllAccounts = function(users) {
 };
 
 exports.getUsers = function (accountId, queryParameters, resultCallback) {
-    helper.parseFilters(queryParameters, users.attributes, function (err, filters) {
-        if (err) {
-            resultCallback(err);
-        } else {
-            filters.include = [
-                {
-                    model: accounts,
-                    where: {id: accountId}
-                }
-            ];
-            users.findAll(filters)
-                .then(function (users) {
-                    return getUsersWithAllAccounts(users)
-                        .then(function(usersWithAccount) {
-                            return resultCallback(null, usersWithAccount);
-                        });
-                })
-                .catch(function (err) {
-                    return resultCallback(err);
+    var filters = modelsHelper.setQueryParameters(queryParameters, users.attributes, {});
+    filters.include = [{
+        model: accounts,
+        where: {id: accountId}
+    }];
+    users.findAll(filters)
+        .then(function (users) {
+            return getUsersWithAllAccounts(users)
+                .then(function(usersWithAccount) {
+                    return resultCallback(null, usersWithAccount);
                 });
-        }
-    });
+        })
+        .catch(function (err) {
+            return resultCallback(err);
+        });
 };
 
 exports.findById = function (id, transaction) {
@@ -164,14 +156,14 @@ exports.findById = function (id, transaction) {
         transaction: transaction
     };
 
-    return users.find(filter)
+    return users.findOne(filter)
         .then(function (user) {
             return interpreterHelper.mapAppResults(user, interpreter);
         });
 };
 
 exports.findByEmail = function (email, resultCallback) {
-    users.find({where: {email: email}, include: [
+    users.findOne({where: {email: email}, include: [
         accounts
     ]})
         .then(function (user) {
@@ -183,7 +175,7 @@ exports.findByEmail = function (email, resultCallback) {
 };
 
 exports.find = function (email, accountId, resultCallback) {
-    users.find({where: {email: email}, include: [
+    users.findOne({where: {email: email}, include: [
         {
             model: accounts,
             where: {id: accountId}
@@ -198,7 +190,7 @@ exports.find = function (email, accountId, resultCallback) {
 };
 
 exports.findByIdWithAccountDetails = function (id, resultCallback) {
-    users.find({where: {id: id}, include: [
+    users.findOne({where: {id: id}, include: [
         accounts
     ]})
         .then(function (user) {

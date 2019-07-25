@@ -16,7 +16,6 @@
 
 "use strict";
 var connectionBindings = require('./models').connectionBindings,
-    sequelize = require('./models').sequelize,
     Q = require('q');
 
 var TYPE = {
@@ -25,10 +24,6 @@ var TYPE = {
 };
 
 exports.TYPE = TYPE;
-
-var LATEST_CONNECTION_QUERY = 'SELECT * FROM dashboard."connectionBindings" ' +
-    'WHERE "deviceId" = :deviceId ' +
-    'ORDER BY "lastConnectedAt" ASC LIMIT 1';
 
 exports.find = function(deviceId, type) {
     var filter = {
@@ -42,14 +37,18 @@ exports.find = function(deviceId, type) {
 };
 
 exports.findLatestConnection = function(deviceId) {
-    var replacements = {
-        deviceId: deviceId
+    var filter = {
+        where: {
+            deviceId: deviceId,
+        },
+        order: [['lastConnectedAt', 'ASC']],
+        limit: 1
     };
 
-    return sequelize.query(LATEST_CONNECTION_QUERY, {replacements: replacements})
-        .then(function(result) {
-            if (result && result[0][0]) {
-                return Q.resolve(result[0][0]);
+    return connectionBindings.findOne(filter)
+        .then(result => {
+            if (result) {
+                return Q.resolve(result);
             }
             return null;
         });

@@ -34,6 +34,9 @@ var Accounts = require('./../models/accounts'),
     ConnectionBindings = require('./../models/connectionBindings'),
     PurchasedLimits = require('./../models/purchasedLimits');
 
+const DESC = "DESC",
+    ASC = "ASC";
+
 const NUMERIC_MAX = 1.7976931348623157e+308,
     NUMERIC_MIN = -1.7976931348623157e+308;
 
@@ -325,4 +328,30 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         purchasedLimits: purchasedLimits,
         alertComments: alertComments
     };
+};
+
+module.exports.setQueryParameters = function(queryParameters, attributes, filter) {
+    if (queryParameters.sort && queryParameters.sort in attributes) {
+        var order =  queryParameters.order === "desc" ? DESC : ASC;
+        filter.order = [['Device', attributes[queryParameters.sort].fieldName, order]];
+    }
+    if (queryParameters.limit) {
+        filter.limit = queryParameters.limit;
+    }
+    if (queryParameters.skip) {
+        filter.offset = queryParameters.skip;
+    }
+    if (!filter.where) {
+        filter.where = {};
+    }
+    for (var f in queryParameters) {
+        if (f in attributes) {
+            try {
+                filter.where[attributes[f].fieldName] = JSON.parse(queryParameters[f]);
+            } catch (e) {
+                filter.where[attributes[f].fieldName] = queryParameters[f];
+            }
+        }
+    }
+    return filter;
 };
