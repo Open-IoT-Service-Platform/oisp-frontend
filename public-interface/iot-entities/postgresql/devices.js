@@ -17,7 +17,6 @@
 'use strict';
 
 var errBuilder = require("./../../lib/errorHandler").errBuilder,
-    helper = require('./helpers/queryHelper'),
     accounts = require('./models').accounts,
     devices = require('./models').devices,
     deviceAttributes = require('./models').deviceAttributes,
@@ -28,13 +27,19 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').devices(),
     deviceComponentsInterpreter = require('../../lib/interpreter/postgresInterpreter').deviceComponents(),
+    modelsHelper = require('./helpers/modelsHelper'),
     componentTypeInerpreter = require('../../lib/interpreter/postgresInterpreter').componentTypes(),
     deviceModelHelper = require('./helpers/devicesModelHelper'),
     sequelize = require('./models').sequelize;
 
-const Op = sequelize.Op;
+const Op = sequelize.Op,
+    EXISTS = "exists",
+    IN = "in",
+    EQ = "eq",
+    NEQ = "neq",
+    LIKE = "like",
+    ALL = 'all';
 
-var DB_SCHEMA_NAME = helper.escapeValue('dashboard');
 var deviceStatus = {created: "created", active: "active", inactive: "inactive"};
 exports.status = deviceStatus;
 
@@ -60,6 +65,14 @@ var getDeviceRelations = function () {
         { model: deviceComponents, as: 'deviceComponents',
             include: [{ model: componentTypes, as: 'componentType' }]}
     ];
+};
+
+var getIntersection = function (arr1, arr2) {
+    return arr2.filter(entry => arr2.indexOf(entry) !== -1);
+};
+
+var getDifference = function (arr1, arr2) {
+    return arr1.filter(entry => arr2.indexOf(entry) === -1);
 };
 
 exports.new = function (newDevice, transaction) {
@@ -101,25 +114,19 @@ exports.all = function (accountId, resultCallback) {
 };
 
 exports.getDevices = function (accountId, queryParameters, resultCallback) {
-
     var queryParametersModel = interpreter.toDb(queryParameters);
     queryParametersModel = interpreter.toDbValues(queryParametersModel);
-    helper.parseFilters(queryParametersModel, devices.attributes, function (err, filters) {
-        if (err) {
-            resultCallback(errBuilder.build(errBuilder.Errors.Data.InvalidData));
-        } else {
-            filters.include = getDeviceRelations();
-            filters.where.accountId = accountId;
+    var filters = modelsHelper.setQueryParameters(queryParametersModel, devices.attributes, {});
+    filters.include = getDeviceRelations();
+    filters.where.accountId = accountId;
 
-            devices.findAll(filters)
-                .then(function (devices) {
-                    interpreterHelper.mapAppResults(devices, interpreter, resultCallback);
-                })
-                .catch(function (err) {
-                    resultCallback(err);
-                });
-        }
-    });
+    devices.findAll(filters)
+        .then(function (devices) {
+            interpreterHelper.mapAppResults(devices, interpreter, resultCallback);
+        })
+        .catch(function (err) {
+            resultCallback(err);
+        });
 };
 
 exports.delete = function (deviceId, transaction) {
@@ -324,15 +331,12 @@ exports.addComponents = function(components, deviceId, accountId, transaction) {
 };
 
 exports.getTotals = function (accountId, resultCallback) {
-
     var filter = {
         where: {
             accountId: accountId
         }
     };
-
     var result = {};
-
     devices.count(filter)
         .then(function (allDevicesCount) {
             result.allDevices = allDevicesCount;
@@ -354,86 +358,336 @@ exports.getTotals = function (accountId, resultCallback) {
         });
 };
 
-var criteriaQueryWrapper = function (criteria, queryParameters, resultCallback, dbFunction) {
-    var filters;
-    var criteriaModel = interpreter.toDb(criteria);
-    var queryParametersModel = interpreter.toDb(queryParameters);
-    helper.parseFiltersToSql(queryParametersModel, devices.attributes, function (err, resultFilters) {
-        if (err) {
-            resultCallback(errBuilder.build(errBuilder.Errors.Data.InvalidData));
+var getSingleCondition = function(operator, value) {
+    switch (operator) {
+    case IN:
+        if (typeof value === 'string') {
+            value = value.split(",");
+        }
+        if (value && Array.isArray(value) && value.length > 0) {
+            return { [Op.in]: value };
+        }
+        break;
+    case LIKE:
+        if (value) {
+            return { [Op.like]: '%' + value + '%' };
+        }
+        break;
+    case EQ:
+        if (value) {
+            return { [Op.eq]: value };
+        }
+        break;
+    case NEQ:
+        if (value) {
+            return { [Op.ne]: value };
+        }
+        break;
+    default:
+        return null;
+    }
+};
+
+var getTagsFilterGroupedByDevice = function(parameters) {
+    if (!parameters || !parameters.operator || !parameters.value ||
+            parameters.value.length === 0) {
+        return null;
+    }
+    var tagsFilter = {
+        group: 'deviceId',
+        attributes: ['deviceId']
+    };
+    switch (parameters.operator) {
+    case EXISTS:
+        break;
+    case LIKE:
+        if (typeof parameters.value === 'string') {
+            parameters.value = parameters.value.split(",");
+        }
+        if (Array.isArray(parameters.value)) {
+            tagsFilter.where = {
+                value: {
+                    [Op.like]: {
+                        [Op.any]: parameters.value.map(val => '%' + val + '%')
+                    }
+                }
+            };
         } else {
-            filters = resultFilters;
-
-            if (!criteriaModel.properties) {
-                criteriaModel.properties = criteriaModel.attributes;
+            tagsFilter.required = false;
+        }
+        break;
+    case ALL:
+        if (typeof parameters.value === 'string') {
+            parameters.value = parameters.value.split(",");
+        }
+        if (Array.isArray(parameters.value) && parameters.value.length > 0) {
+            tagsFilter.having = sequelize.where(sequelize.fn('count',
+                sequelize.col('deviceId')), Op.eq, parameters.value.length);
+            tagsFilter.where = {
+                value: {
+                    [Op.in]: parameters.value
+                }
+            };
+        } else {
+            tagsFilter.required = false;
+        }
+        break;
+    case EQ:
+        tagsFilter.where = {
+            value: {
+                [Op.eq]: parameters.value
             }
-            var propertiesQuery = helper.parsePropertiesQuery(criteriaModel.properties, DB_SCHEMA_NAME + '.' + helper.escapeValue(deviceAttributes.name));
-            var tagQuery = helper.parseTagsQuery(criteriaModel.tags, DB_SCHEMA_NAME + '.' + helper.escapeValue(deviceTags.name));
-            var componentsQuery = helper.parseComponentsQuery(criteriaModel.deviceComponents, DB_SCHEMA_NAME + '.' + helper.escapeValue(deviceComponents.name));
-
-            delete criteriaModel.tags;
-            delete criteriaModel.properties;
-            delete criteriaModel.attributes;
-            delete criteriaModel.deviceComponents;
-
-            var parsedQuery = helper.parseQuery(criteriaModel);
-            parsedQuery = helper.joinQueries([parsedQuery, propertiesQuery, tagQuery, componentsQuery]);
-
-            if (parsedQuery) {
-                dbFunction(parsedQuery, filters);
-            } else {
-                resultCallback(errBuilder.build(errBuilder.Errors.Data.InvalidData));
+        };
+        break;
+    case NEQ:
+        tagsFilter.where = {
+            value: {
+                [Op.ne]: parameters.value
             }
+        };
+        break;
+    case IN:
+        if (typeof parameters.value === 'string') {
+            parameters.value = parameters.value.split(",");
+        }
+        if (Array.isArray(parameters.value)) {
+            tagsFilter.having = sequelize.where(sequelize.fn('count',
+                sequelize.col('deviceId')), Op.eq, 0);
+            tagsFilter.where = {
+                value: {
+                    [Op.notIn]: parameters.value
+                }
+            };
+        } else {
+            tagsFilter.required = false;
+        }
+        break;
+    default:
+        break;
+    }
+    return tagsFilter;
+};
+
+var getComponentsFilterGroupedByDeviceId = function(parameters) {
+    if (!parameters || Object.keys(parameters).length === 0) {
+        return null;
+    }
+    var cmpsFilter = {
+        group: 'deviceId',
+        attributes: ['deviceId']
+    };
+    if (parameters.operator === EXISTS) {
+        return cmpsFilter;
+    }
+    if (parameters.value !== Object(parameters.value)) {
+        return null;
+    }
+    cmpsFilter.where = {};
+    Object.keys(parameters.value).forEach(property => {
+        var condition = getSingleCondition(parameters.operator, parameters.value[property]);
+        if (condition) {
+            cmpsFilter.where[property] = condition;
         }
     });
+    return cmpsFilter;
+};
+
+var getAttributesFilterGroupedByDeviceId = function(parameters) {
+    if (!parameters || Object.keys(parameters).length === 0) {
+        return null;
+    }
+    if ((parameters.operator && !parameters.value) ||
+            (!parameters.operator && parameters.value)) {
+        return null;
+    }
+    var attrsFilter = {
+        group: 'deviceId',
+        attributes: ['deviceId']
+    };
+    var filters = [];
+    if (parameters.operator === EXISTS) {
+        return attrsFilter;
+    } else if (parameters.operator === IN) {
+        if (typeof parameters.value === 'string') {
+            parameters.value = parameters.value.split(",");
+        }
+        if (!Array.isArray(parameters.value)) {
+            return null;
+        }
+        parameters.value.forEach(property => {
+            if (property !== Object(property)) {
+                return;
+            }
+            for (var key in property) {
+                if (property.hasOwnProperty(key)) {
+                    filters.push({
+                        [Op.and]: [{ key: key }, { value: property[key] }]
+                    });
+                }
+            }
+        });
+        attrsFilter.where = {
+            [Op.or]: filters
+        };
+        return attrsFilter;
+    }
+    var defaultOperator = EQ;
+    if (parameters.value && parameters.value === Object(parameters.value)) {
+        defaultOperator = parameters.operator;
+        parameters = parameters.value;
+    }
+    Object.keys(parameters).forEach(key => {
+        var operator = parameters[key].operator ? parameters[key].operator : defaultOperator;
+        var k = parameters[key].name ? parameters[key].name : key;
+        var condition = getSingleCondition(operator, parameters[key].value);
+        if (condition) {
+            filters.push({
+                [Op.and]: [{ key: k }, { value: condition }]
+            });
+        }
+    });
+    attrsFilter.where = {
+        [Op.or]: filters
+    };
+    attrsFilter.having = sequelize.where(sequelize.fn('count',
+        sequelize.col('deviceId')), Op.eq, Object.keys(parameters).length);
+    return attrsFilter;
+};
+
+var criteriaQuery = function (criteria, queryParameters) {
+    var criteriaModel = interpreter.toDb(criteria);
+    var queryParametersModel = interpreter.toDb(queryParameters);
+    if (!criteriaModel.properties) {
+        criteriaModel.properties = criteriaModel.attributes;
+    }
+    var filter = {
+        where: {},
+        include: [],
+        group: ['devices.id']
+    };
+    filter = modelsHelper.setQueryParameters(queryParametersModel, devices.attributes, filter);
+
+    var tagsCriteria = criteriaModel.tags;
+    var componentsCriteria = criteriaModel.components;
+    var propertiesCriteria = criteriaModel.properties;
+    var devicesCriteria = criteriaModel;
+    delete criteriaModel.tags;
+    delete criteriaModel.properties;
+    delete criteriaModel.attributes;
+    delete criteriaModel.deviceComponents;
+
+    var cmpsFilter = getComponentsFilterGroupedByDeviceId(componentsCriteria);
+    var attrsFilter = getAttributesFilterGroupedByDeviceId(propertiesCriteria);
+    var tagsFilter = getTagsFilterGroupedByDevice(tagsCriteria);
+
+    Object.keys(devicesCriteria).forEach(criteria => {
+        var condition = getSingleCondition(criteriaModel[criteria].operator,
+            criteriaModel[criteria].value);
+        if (condition) {
+            filter.where[criteria] = condition;
+        }
+    });
+    var subCondition = {
+        deviceId: null
+    };
+
+    return devices.findAll(filter)
+        .then(result => {
+            var devIds = result.map(entry => entry.id);
+            if (cmpsFilter) {
+                subCondition.deviceId = { [Op.in]: devIds };
+                cmpsFilter.where = sequelize.and(cmpsFilter.where, subCondition);
+                return deviceComponents.findAll(cmpsFilter)
+                    .then(result => {
+                        result = result.map(entry => entry.deviceId);
+                        if (componentsCriteria.operator === EXISTS &&
+                                componentsCriteria.value === false) {
+                            return getDifference(devIds, result);
+                        }
+                        return getIntersection(devIds, result);
+                    });
+            }
+            return Q.resolve(devIds);
+        })
+        .then(devIds => {
+            if (tagsFilter) {
+                subCondition.deviceId = { [Op.in]: devIds };
+                tagsFilter.where = sequelize.and(tagsFilter.where, subCondition);
+                return deviceTags.findAll(tagsFilter)
+                    .then(result => {
+                        result = result.map(entry => entry.deviceId);
+                        if (tagsCriteria.operator === EXISTS &&
+                                tagsCriteria.value === false) {
+                            return getDifference(devIds, result);
+                        }
+                        return getIntersection(devIds, result);
+                    });
+            }
+            return Q.resolve(devIds);
+        })
+        .then(devIds => {
+            if (attrsFilter) {
+                subCondition.deviceId = { [Op.in]: devIds };
+                attrsFilter.where = sequelize.and(attrsFilter.where, subCondition);
+                return deviceAttributes.findAll(attrsFilter)
+                    .then(result => {
+                        result = result.map(entry => entry.deviceId);
+                        if (propertiesCriteria.operator === EXISTS &&
+                                propertiesCriteria.value === false) {
+                            return getDifference(devIds, result);
+                        }
+                        return getIntersection(devIds, result);
+                    });
+            }
+            return Q.resolve(devIds);
+        });
 };
 
 exports.findByCriteria = function (criteria, queryParameters, resultCallback) {
-    criteriaQueryWrapper(criteria, queryParameters, resultCallback,
-        function (dbQuery, filters) {
-            var query = 'SELECT d.id FROM "dashboard"."devices" d ' +
-                'WHERE ' + dbQuery;
-            if (filters) {
-                query += (filters);
+    criteriaQuery(criteria, queryParameters)
+        .then(devIds => {
+            if (devIds) {
+                var filter = {
+                    where: {
+                        id: {
+                            [Op.in]: devIds
+                        }
+                    },
+                    include: getDeviceRelations()
+                };
+                return devices.findAll(filter);
             }
-            return sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
-                .then(function (result) {
-                    if (result) {
-                        var filters = {
-                            where: {id: deviceModelHelper.getIdsFromQueryResult(result)},
-                            include: getDeviceRelations()
-                        };
-                        return devices.findAll(filters)
-                            .then(function (result) {
-                                interpreterHelper.mapAppResults(result, interpreter, resultCallback);
-                            });
-                    } else {
-                        resultCallback(null);
-                    }
-                })
-                .catch(function (err) {
-                    resultCallback(err);
-                });
+            return Q.resolve(null);
+        })
+        .then(result => {
+            if (result) {
+                interpreterHelper.mapAppResults(result, interpreter, resultCallback);
+            } else {
+                resultCallback(null);
+            }
+        })
+        .catch(err => {
+            resultCallback(err);
         });
 };
 
 exports.countByCriteria = function (criteria, queryParameters, resultCallback) {
-    criteriaQueryWrapper(criteria, queryParameters, resultCallback,
-        function (dbQuery) {
-            var query = 'SELECT  count(distinct d.id) FROM "dashboard"."devices" d ' +
-                'WHERE ' + dbQuery;
-            sequelize.query(query, {type: sequelize.QueryTypes.SELECT})
-                .then(function (result) {
-                    var count = 0;
-                    if (result && result[0]) {
-                        count = parseInt(result[0].count);
+    criteriaQuery(criteria, queryParameters)
+        .then(devIds => {
+            var filter = {
+                where: {
+                    id: {
+                        [Op.in]: devIds
                     }
-                    resultCallback(null, count);
-                })
-                .catch(function (err) {
-                    resultCallback(err);
-                });
-
+                },
+            };
+            return devices.count(filter);
+        })
+        .then(count => {
+            resultCallback(null, count);
+        })
+        .catch(err => {
+            resultCallback(err);
         });
 };
 
