@@ -28,54 +28,53 @@ exports.usage = function(req, res){
     res.status(httpStatuses.OK.code).send();
 };
 
-exports.getInvites = function (req, res) {
+exports.getInvites = function (req, res, next) {
     if(!req.params || !req.params.accountId){
-        return res.status(errors.Generic.InvalidRequest.code).send( errors.Generic.InvalidRequest.message);
+        return next(errBuilder.build(errors.Generic.InvalidRequest));
     }
     invites.getInvites(req.params.accountId, function(err, invites) {
         if (!err && invites) {
-            return res.status(httpStatuses.OK.code).send( invites);
+            return res.status(httpStatuses.OK.code).send(invites);
         }
-        return res.status(errors.Invite.NotFound.code).send( errors.Invite.NotFound.message);
+        return next(errBuilder.build(errors.Invite.NotFound));
     });
 };
 
-exports.getUserInvites = function (req, res) {
+exports.getUserInvites = function (req, res, next) {
     if(!req.params || !req.params.email || !req.identity){
-        return res.status(errors.Generic.InvalidRequest.code).send( errors.Generic.InvalidRequest.message);
+        return next(errBuilder.build(errors.Generic.InvalidRequest));
     }
     user.getUser(req.identity, function(err, user){
         if (!err && user) {
             if (user.email === req.params.email) {
                 invites.getUserInvites(req.params.email, function (err, invites) {
                     if (!err && invites) {
-                        return res.status(httpStatuses.OK.code).send( invites);
+                        return res.status(httpStatuses.OK.code).send(invites);
                     }
-                    return res.status(errors.Invite.NotFound.code).send( errors.Invite.NotFound.message);
+                    return next(errBuilder.build(errors.Invite.NotFound));
                 });
             } else {
-                res.status(errors.Generic.NotAuthorized.code).send(errors.Generic.NotAuthorized.message);
+                return next(errBuilder.build(errors.Generic.NotAuthorized));
             }
         } else {
-            res.status(errors.User.NotFound.code).send( errors.User.NotFound.message);
+            return next(errBuilder.build(errors.User.NotFound));
         }
     });
 };
 
-exports.addInvite = function (req, res) {
+exports.addInvite = function (req, res, next) {
     var data = req.body;
     if(!data || !data.email || !req.params || !req.params.accountId) {
-        res.status(errors.Generic.InvalidRequest.code).send( errors.Generic.InvalidRequest.message);
-        return;
+        return next(errBuilder.build(errors.Generic.InvalidRequest));
     }
     invites.addInvite(req.params.accountId, req.forwardedHeaders.baseUrl, data.email, function(err, inv){
         if (!err) {
-            return res.status(httpStatuses.Created.code).send( inv);
+            return res.status(httpStatuses.Created.code).send(inv);
         }
-        if (res.code && res.status) {
-            return res.status(err.code).send( err.status);
+        if (err.code && err.status) {
+            return next(err);
         }
-        return res.status(errors.Generic.InternalServerError.code).send( errors.Generic.InternalServerError.message);
+        return next(errBuilder.build(errors.Generic.InternalServerError));
     });
 };
 
@@ -94,7 +93,7 @@ exports.deleteUser = function (req, res, next) {
                 return Q.nfcall(user.isUserSoleAdminForAccount, foundUser.id, accountId)
                     .then(function(isUserSoleAdmin){
                         if (isUserSoleAdmin) {
-                            throw errBuilder.build(errBuilder.Errors.Account.LeavingError.IsSoleAdminForAccount);
+                            throw errBuilder.build(errors.Account.LeavingError.IsSoleAdminForAccount);
                         }
                     });
             }
@@ -118,12 +117,12 @@ exports.deleteUser = function (req, res, next) {
         });
 };
 
-exports.updateInviteStatus = function (req, res) {
+exports.updateInviteStatus = function (req, res, next) {
     var data = req.body;
     if (!data || !req.params || !req.params.inviteId || !req.identity) {
-        return res.status(errors.Generic.InvalidRequest.code).send( errors.Generic.InvalidRequest.message);
+        return next(errBuilder.build(errors.Generic.InvalidRequest));
     }
-    
+
     invites.updateInviteStatus(req.params.inviteId, data.accept, req.identity, function(err, inv) {
     		if (!err) {
         		var resBody = inv;
