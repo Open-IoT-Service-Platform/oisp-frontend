@@ -359,21 +359,6 @@ var updateRuleSynchronizationStatus = function (synchronizationStatus, rulesExte
         });
 };
 
-var addRuleExecution = function (ruleId, ruleExecutions) {
-
-    return Rule.addRuleExecution(ruleId, ruleExecutions)
-        .then(function (savedRule) {
-            return savedRule;
-        })
-        .catch(function (err) {
-            var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
-            if (err && err.code) {
-                errMsg = errBuilder.build(err);
-            }
-            throw errMsg;
-        });
-};
-
 var addRuleAsDraft = function (options, callback) {
     var rule = options.rule;
     return User.findById(options.userId)
@@ -473,7 +458,6 @@ module.exports = {
     deleteDraft: deleteDraft,
     deleteRule: deleteRule,
     getRulesByStatus: getRulesByStatus,
-    addRuleExecution: addRuleExecution,
     groupByComponentId: groupByComponentId,
     updateRuleSynchronizationStatus: updateRuleSynchronizationStatus
 };

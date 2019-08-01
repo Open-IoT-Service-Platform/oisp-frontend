@@ -33,7 +33,6 @@ module.exports = {
         app.post(VERSION + PATH + '/clone/:ruleId', schemaValidator.validateSchema(schemas.rule.CLONE_RULE), rules.cloneRule);
         app.put(VERSION + PATH + '/:ruleId', schemaValidator.validateSchema(schemas.rule.POST) , rules.updateRule);
         app.put(VERSION + PATH + '/:ruleId/status', schemaValidator.validateSchema(schemas.rule.PUTStatus), rules.updateRuleStatus);
-        app.post(VERSION + PATH + '/:ruleId/execution', schemaValidator.validateSchema(schemas.rule.EXECUTION), rules.addRuleExecution);
         app.post(VERSION + '/components/rules', schemaValidator.validateSchema(schemas.rule.STATUS), rules.groupByComponentId);
         app.put(VERSION + '/rules/synchronization_status/:statusId', schemaValidator.validateSchema(schemas.rule.PUTSynchronizationStatus), rules.updateRulesSynchronizationStatus);
     }
