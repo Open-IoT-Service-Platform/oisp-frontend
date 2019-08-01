@@ -131,19 +131,6 @@ var updateRulesSynchronizationStatus = function(req, res, next){
         });
 };
 
-var addRuleExecution = function (req, res, next) {
-    var ruleId = req.params.ruleId,
-        executions = req.body;
-
-    rules.addRuleExecution(ruleId, executions)
-        .then(function() {
-            res.status(httpStatuses.Created.code).send();
-        })
-        .catch(function(err) {
-            next(err);
-        });
-};
-
 var addRuleAsDraft = function(req, res, next){
     var options = {
         domainId: req.params.accountId,
@@ -214,7 +201,6 @@ module.exports = {
     deleteDraft: deleteDraft,
     deleteRule: deleteRule,
     getRulesByStatus: getRulesByStatus,
-    addRuleExecution: addRuleExecution,
     groupByComponentId: groupByComponentId,
     updateRulesSynchronizationStatus: updateRulesSynchronizationStatus
 };
