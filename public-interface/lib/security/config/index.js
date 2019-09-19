@@ -30,6 +30,7 @@ module.exports = {
     	user: "user",
     	device: "device"
     },
+    refresh_token_expire: 525948, // 1 year (in minutes)
     default_token_expire: 5256000, // 10 years (in minutes)
     user_token_expire: 1440, // 24 hours (in minutes)
     iss: 'http://enableiot.com', // JWT Issuer

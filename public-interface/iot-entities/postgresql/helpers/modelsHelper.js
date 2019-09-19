@@ -32,7 +32,8 @@ var Accounts = require('./../models/accounts'),
     Actuations = require('./../models/actuations'),
     AlertComments = require('./../models/alertComments'),
     ConnectionBindings = require('./../models/connectionBindings'),
-    PurchasedLimits = require('./../models/purchasedLimits');
+    PurchasedLimits = require('./../models/purchasedLimits'),
+    RefreshTokens = require('./../models/refreshTokens');
 
 const DESC = "DESC",
     ASC = "ASC";
@@ -77,7 +78,8 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         alerts = new Alerts(sequelize, DataTypes),
         connectionBindings = new ConnectionBindings(sequelize, DataTypes),
         purchasedLimits = new PurchasedLimits(sequelize, DataTypes),
-        alertComments = new AlertComments(sequelize, DataTypes);
+        alertComments = new AlertComments(sequelize, DataTypes),
+        refreshTokens = new RefreshTokens(sequelize, DataTypes);
 
     users.hasMany(settings, {
         onDelete: 'CASCADE',
@@ -94,7 +96,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
             allowNull: false
         }
     });
-
+    
     settings.belongsTo(accounts, {
         onDelete: 'CASCADE',
         foreignKey: {
@@ -326,6 +328,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         actuations: actuations,
         connectionBindings: connectionBindings,
         purchasedLimits: purchasedLimits,
+        refreshTokens: refreshTokens,
         alertComments: alertComments
     };
 };

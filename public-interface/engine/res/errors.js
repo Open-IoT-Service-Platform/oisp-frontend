@@ -223,6 +223,11 @@ module.exports = {
         Invite: {
             NotFound: {code:10404, status: 404, message: "Invitation not found"},
             DeleteError: {code:10500, status: 500, message: "Invitation deletion failed"}
-        }
+        },
+        RefreshToken: {
+            RefreshError: {code: 15000, status: 500, message: "Error Refreshing Access Token"},
+            ExpireError: {code: 15001, status: 401, message: "Refresh token has expired"},
+            InvalidToken: {code: 15001, status: 401, message: "Refresh token does not exist"}
+        },
     }
 };

@@ -55,7 +55,7 @@
     get:
       description: |
         Get info about the JWT token
-        
+
         <meta name="access-roles" path="GET:/auth/tokenInfo">
       is: [  authorization-header ]
       responses:
@@ -80,7 +80,7 @@
     get:
       description: |
         Get user information about the owner of the JWT token
-        
+
         <meta name="access-roles" path="GET:/auth/me">
       is: [  authorization-header ]
       responses:
@@ -97,3 +97,60 @@
                   "verified": true
                 }
 
+  /refresh:
+    post:
+      description: |
+        Creates a new refresh token for the owner of the JWT token
+
+        <meta name="access-roles" path="POST:/api/auth/refresh">
+      is: [  authorization-header ]
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "refreshToken" : "cxATGMQzKPTrtpUg"
+                }
+    put:
+      description: |
+        Gives a new JWT token and a refresh token for the owner of the JWT token. This can be used to refresh the jwt token.
+
+        <meta name="access-roles" path="PUT:/api/auth/refresh">
+      is: [  authorization-header ]
+      body:
+        application/json:
+          example: |
+            {
+              "refreshToken": "zSbTGMQzKPTrtpUg",
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "jwt" : "eyJ0eXAi...",
+                  "refreshToken" : "cxATGMQzKPTrtpUg"
+                }
+
+  /refresh/revoke:
+    delete:
+      description: |
+        Revokes(deletes) the refresh token from use.
+
+        <meta name="access-roles" path="DELETE:/api/auth/refresh/revoke">
+      is: [ authorization-header ]
+      body:
+        application/json:
+          example:
+            {
+              "refreshToken": "zSbTGMQzKPTrtpUg",
+            }
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                }
