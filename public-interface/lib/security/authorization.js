@@ -83,6 +83,16 @@ function findDeletedAccounts(tokenAccounts, accountIds){
     return accountsArray;
 }
 
+module.exports.decodeToken = function(token) {
+    var jws = new jsjws.JWS();
+    try {
+        jws.verifyJWSByKey(utils.getBearerToken(token), keyPem.pub_key(), supportedAlg);
+        return jws.getParsedPayload();
+    } catch(e) {
+        return null;
+    }
+};
+
 var getTokenInfo = function(token, req, callback){
     var jws = new jsjws.JWS();
     try {

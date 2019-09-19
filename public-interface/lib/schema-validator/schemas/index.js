@@ -27,6 +27,7 @@ var device = require('./device.json'),
     user = require('./user.json'),
     command = require('./command.json'),
     authorization = require('./authorization.json'),
+    refreshToken = require('./refreshToken.json'),
     test = require('./test.json');
 
 module.exports = {
@@ -41,5 +42,6 @@ module.exports = {
     command: command,
     user: user,
     authorization: authorization,
+    refreshToken: refreshToken,
     test : test
 };

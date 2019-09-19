@@ -1,0 +1,30 @@
+{
+    "CREATE" : {
+        "name" : "refreshToken",
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {}
+    },
+    "REVOKE" : {
+        "name" : "refreshToken",
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+            "refreshToken" : {
+                "type" : "string",
+                "required" : true
+            }
+        }
+    },
+    "REFRESH" : {
+        "name" : "refreshToken",
+        "type" : "object",
+        "additionalProperties" : false,
+        "properties" : {
+            "refreshToken" : {
+                "type" : "string",
+                "required" : true
+            }
+        }
+    }
+}

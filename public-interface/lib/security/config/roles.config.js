@@ -27,7 +27,8 @@ module.exports = {
         "api:public",
         "account:create",
         "user:admin",
-        "auth:read"
+        "auth:read",
+        "auth:refresh"
     ],
     user: [
         "data:read",
@@ -47,7 +48,8 @@ module.exports = {
         "alert:write",
         "alert:read",
 
-        "auth:read"
+        "auth:read",
+        "auth:refresh"
     ],
     admin:[
         "data:read",
@@ -69,7 +71,8 @@ module.exports = {
         "alert:write",
         "alert:read",
 
-        "auth:read"
+        "auth:read",
+        "auth:refresh"
     ],
     device:[
         "data:write",
@@ -82,7 +85,8 @@ module.exports = {
 
         "api:public",
 
-        "auth:read"
+        "auth:read",
+        "auth:refresh"
     ],
     sysadmin: [
         "user:admin",
@@ -92,7 +96,8 @@ module.exports = {
         "account:read",
         "catalog:read",
 
-        "auth:read"
+        "auth:read",
+        "auth:refresh"
     ],
     system: [
         "alert:write",
@@ -109,6 +114,7 @@ module.exports = {
 
         "api:public",
         "auth:read",
+        "auth:refresh",
         "rules:admin"
     ]
 };
