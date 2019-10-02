@@ -25,10 +25,11 @@ commands:
     description: "Setup build Environment"
     steps:
       - run:
+          shell: /bin/bash
           name: Setup build environment
           command: |
-            cd platform-launcher/platform-setup
-            sudo ./setup-ubuntu16.04.sh
+            cd platform-launcher/util && \
+            bash setup-ubuntu18.04.sh
   checkout-e2e:
     description: "Checkout E2E test"
     parameters:
@@ -94,13 +95,25 @@ commands:
       - run:
           name: Pull all images and only build the testbranch
           shell: /bin/bash
+          # debugger container is also built
+          # because on k8s the tests run inside the debug contianer
           command: |
             cd platform-launcher
-            docker login  -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
+            export CONTAINERS="<< parameters.container >> debugger"
             export DOCKER_TAG="latest"
-            yes | make pull
-            export CONTAINERS="<< parameters.container >>"
+            if docker login  -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD};
+            then
+                docker-compose pull
+            else
+                export CONTAINERS=""
+            fi
             yes | make build
+            # Tag built "latest" images as "test"
+            images=$(docker images --format "{{.Repository}}:{{.Tag}}"| grep :latest)
+            for image in $images; do
+              newimage=$(echo $image | sed -r "s/:latest/:test/g");
+              docker tag $image $newimage;
+            done
   e2e-test:
     description: "Execute E2E test"
     steps:
@@ -108,12 +121,12 @@ commands:
           name: Execute E2E test
           shell: /bin/bash
           command: |
-            export NVM_DIR="/opt/circleci/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install v8.16.0
-            nvm alias default v8.16.0
-            export DOCKER_TAG="latest"
             cd platform-launcher
+            export PATH=$PATH:/snap/bin
+            make import-images DOCKER_TAG=test DEBUG=true
+            npm install nodemailer
+            export NODOCKERLOGIN=true
+            make deploy-oisp-test DOCKER_TAG=test
             make test
 jobs:
   e2e-test:
@@ -131,7 +144,7 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
-      - run:        
+      - run:
           name: Check whether most recent commit is signedoff
           shell: /bin/bash
           command: |
