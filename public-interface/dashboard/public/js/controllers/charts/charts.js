@@ -656,7 +656,7 @@ iotController.controller('ChartCtrl', function( $scope,
         var acc = sessionService.getCurrentAccount();
         var metricsParam = '';
         for (var i = 0; i < metrics.length - 1; i++) {
-            metricsParam = metricsParam + acc.id + '.' + metrics[0].id + ',';
+            metricsParam = metricsParam + acc.id + '.' + metrics[i].id + ',';
         }
         metricsParam = metricsParam + acc.id + '.' + metrics[metrics.length - 1].id;
 
