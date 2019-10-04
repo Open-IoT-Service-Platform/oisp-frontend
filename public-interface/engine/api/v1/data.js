@@ -28,6 +28,8 @@ var DevicesAPI = require('./devices'),
     secConfig = require('../../../lib/security/config'),
     mailer = require('../../../lib/mailer'),
     ValuesValidator = require('../helpers/componentValuesValidator'),
+    ValuesTransformer = require('../helpers/componentValuesTransformer'),
+    ReturnValuesTransformer = require('../helpers/componentReturnValuesTransformer'),
     entityProvider = require('../../../iot-entities/postgresql/index'),
     Component = entityProvider.deviceComponents,
     Devices = entityProvider.devices;
@@ -83,6 +85,7 @@ exports.collectData = function(options, resultCallback) {
                         if (new ValuesValidator(cmp.componentType.dataType, item.value).validate() === true) {
                             foundComponents.push(cmp.cid);
                             item.dataType = cmp.componentType.dataType;
+                            item.value = new ValuesTransformer(cmp.componentType.dataType, item.value).transform();
                             return true;
                         } else {
                             err = errBuilder.build(
@@ -174,10 +177,11 @@ function DataInquiryResponse(data, deviceLookUp, queryMeasureLocation) {
         serie.attributes = data.attributes || {};
         serie.points = [];
         component.samples.forEach(function(point) {
+	    var returnValue = new ReturnValuesTransformer(serie.componentType.dataType, point[1]).transform();
             if (queryMeasureLocation) {
-                serie.points.push({ts:point[0], value:point[1], lat:point[2], lon:point[3], alt:point[4]});
+                serie.points.push({ts:point[0], value:returnValue, lat:point[2], lon:point[3], alt:point[4]});
             } else {
-                serie.points.push({ts:point[0], value:point[1]});
+                serie.points.push({ts:point[0], value:returnValue});
             }
         });
         _self.series.push(serie);
@@ -307,9 +311,18 @@ exports.searchAdvanced = function (accountId, searchRequest, resultCallback) {
             delete searchRequest.gatewayIds;
             delete searchRequest.componentIds;
             delete searchRequest.devCompAttributeFilter;
-
             proxy.dataInquiryAdvanced(searchRequest, function (err, result, isBinary) {
                 if (!err) {
+		    // Some error happens in this part, it is not about parsing
+		    result.data.forEach(function (dataItem) {
+                        dataItem.components.forEach(function (cmp) {
+                            if ("samples" in cmp) {
+                                cmp.samples.forEach(function (sample) {
+                                    sample[1] = new ReturnValuesTransformer(cmp.dataType, sample[1]).transform();
+			        });
+                            }
+                        });
+		    });
                     resultCallback(null, result, isBinary);
                 } else if (result) {
                     resultCallback(err, result);
