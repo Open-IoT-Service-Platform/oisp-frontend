@@ -100,15 +100,14 @@ commands:
           command: |
             cd platform-launcher
             export CONTAINERS="<< parameters.container >> debugger"
-            export DOCKER_TAG="latest"
             if docker login  -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD};
             then
-                docker-compose pull
+                DOCKER_TAG="latest" docker-compose pull
             else
-                export CONTAINERS=""
+                unset CONTAINERS
             fi
-            yes | make build
-            # Tag built "latest" images as "test"
+            yes | make build DOCKER_TAG="test" DEBUG=true
+            # Tag pulled "latest" images as "test"
             images=$(docker images --format "{{.Repository}}:{{.Tag}}"| grep :latest)
             for image in $images; do
               newimage=$(echo $image | sed -r "s/:latest/:test/g");
