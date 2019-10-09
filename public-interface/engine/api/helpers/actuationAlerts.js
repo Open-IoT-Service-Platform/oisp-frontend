@@ -34,13 +34,13 @@ var ACTUATION_TYPE = 'actuation';
  * @param deviceId
  * @returns {*}
  */
-var getProtocolForActuation = function (deviceId) {
-    return connectionBindings.findLatestConnection(deviceId)
+var getProtocolForActuation = function (deviceUID) {
+    return connectionBindings.findLatestConnection(deviceUID)
         .then(function(connectionBinding) {
             if (connectionBinding) {
                 return Q.resolve(connectionBinding.type);
             } else {
-                throw new Error('Unable to get connection status for device - ' + deviceId);
+                throw new Error('Unable to get connection status for device - ' + deviceUID);
             }
         });
 };
@@ -102,8 +102,7 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
         var parseAllCommands = complexCommands.commands.map(function (command) {
             return Q.nfcall(Device.findByAccountIdAndComponentId, accountId, command.componentId)
                 .then(function deviceFound(device) {
-
-                    return getProtocolForActuation(device.deviceId)
+                    return getProtocolForActuation(device.uid)
                         .then(function (protocol) {
                             var message = {
                                 type: commands.MESSAGE_TYPE_COMMAND,
@@ -111,6 +110,7 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
                                 content: {
                                     transport: protocol,
                                     domainId: accountId,
+                                    deviceUID: device.uid,
                                     deviceId: device.deviceId,
                                     gatewayId: device.gatewayId,
                                     componentId: command.componentId,
@@ -128,7 +128,6 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
                     /*jshint +W098 */
                 });
         });
-
         return Q.all(parseAllCommands)
             .then(function parsed() {
                 deferred.resolve(commandsMessages);
@@ -158,11 +157,10 @@ var addCommandsToActuationActions = function (accountId, rule) {
                                 messages = messages.concat(message);
                             });
                     });
-            }))
-                .then(function commandsFound() {
-                    action.messages = messages.slice();
-                    messages.length = 0;
-                });
+            })).then(function commandsFound() {
+                action.messages = messages.slice();
+                messages.length = 0;
+            });
         } else {
             return new Q();
         }

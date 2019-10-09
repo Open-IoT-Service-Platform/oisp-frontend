@@ -47,14 +47,14 @@ module.exports = function() {
 
     return {
         execute: function (message, done) {
-            var deviceId = message.content.deviceId;
-            return connectionBindings.find(deviceId, connectionBindings.TYPE.WEBSOCKET)
+            var deviceUID = message.content.deviceUID;
+            return connectionBindings.find(deviceUID, connectionBindings.TYPE.WEBSOCKET)
                 .then(function (bind) {
                     if (!bind || !bind.server) {
                         throw new Error('Device not connected to any websocket server');
                     }
 
-                    logger.debug("Device " + bind.deviceId + " was connected last time to " + bind.server + " websocket server");
+                    logger.debug("Device " + bind.deviceUID + " was connected last time to " + bind.server + " websocket server");
 
                     logger.info("Sending message to Websocket. Message: " + JSON.stringify(message));
                     var connector = connectWithWebsocket(bind.server);
@@ -62,7 +62,7 @@ module.exports = function() {
                 })
                 .catch(function (err) {
                     // If device is not connected to websocket server, we do not send actuation anywhere
-                    logger.info("Not sending message to Websocket server. Device is not using WS:" + deviceId + ', err: ' + JSON.stringify(err));
+                    logger.info("Not sending message to Websocket server. Device is not using WS:" + deviceUID + ', err: ' + JSON.stringify(err));
                 })
                 .finally(function() {
                     done();

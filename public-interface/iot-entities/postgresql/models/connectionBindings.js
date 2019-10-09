@@ -24,10 +24,10 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4
         },
-        deviceId: {
-            type: DataTypes.STRING(255),
+        deviceUID: {
+            type: DataTypes.UUID,
             allowNull: false,
-            unique: 'connectionBindings_deviceId_type_unique'
+            unique: 'connectionBindings_deviceUID_type_unique'
         },
         lastConnectedAt: {
             type: DataTypes.DATE,
@@ -46,7 +46,7 @@ module.exports = function (sequelize, DataTypes) {
             //Ordering in enum depends on creation date of type, so enum types should be listed in alfabetical order
             type: DataTypes.ENUM('mqtt', 'ws'),
             allowNull: false,
-            unique: 'connectionBindings_deviceId_type_unique'
+            unique: 'connectionBindings_deviceUID_type_unique'
         }
     },
     {
@@ -54,9 +54,9 @@ module.exports = function (sequelize, DataTypes) {
         updatedAt: 'updated',
         indexes: [
             {
-                name: 'connectionBindings_deviceId_index',
+                name: 'connectionBindings_deviceUID_index',
                 method: 'BTREE',
-                fields: ['deviceId']
+                fields: ['deviceUID']
             },
             {
                 name: 'connectionBindings_type_index',

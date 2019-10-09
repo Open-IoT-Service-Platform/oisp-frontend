@@ -30,9 +30,10 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     modelsHelper = require('./helpers/modelsHelper'),
     componentTypeInerpreter = require('../../lib/interpreter/postgresInterpreter').componentTypes(),
     deviceModelHelper = require('./helpers/devicesModelHelper'),
+    Sequelize = require('sequelize'),
     sequelize = require('./models').sequelize;
 
-const Op = sequelize.Op,
+const Op = Sequelize.Op,
     EXISTS = "exists",
     IN = "in",
     EQ = "eq",
@@ -45,7 +46,7 @@ exports.status = deviceStatus;
 
 var createDeviceAttributes = function (attributes, device, transaction) {
     if (attributes && device) {
-        return deviceAttributes.bulkCreate(deviceModelHelper.formatDeviceAttributes(attributes, device.id), {transaction: transaction});
+        return deviceAttributes.bulkCreate(deviceModelHelper.formatDeviceAttributes(attributes, device.uid), {transaction: transaction});
     } else {
         return Q.resolve();
     }
@@ -53,7 +54,7 @@ var createDeviceAttributes = function (attributes, device, transaction) {
 
 var createDeviceTags = function (tags, device, transaction) {
     if (tags && Array.isArray(tags) && device) {
-        return deviceTags.bulkCreate(deviceModelHelper.formatDeviceTags(tags, device.id), {transaction: transaction});
+        return deviceTags.bulkCreate(deviceModelHelper.formatDeviceTags(tags, device.uid), {transaction: transaction});
     } else {
         return Q.resolve();
     }
@@ -129,9 +130,9 @@ exports.getDevices = function (accountId, queryParameters, resultCallback) {
         });
 };
 
-exports.delete = function (deviceId, transaction) {
+exports.delete = function (accountId, deviceId, transaction) {
     var filter = {
-        where: {id: deviceId},
+        where: {id: deviceId, accountId: accountId},
         transaction: transaction
     };
 
@@ -147,13 +148,11 @@ exports.findByIdAndAccount = function (deviceId, accountId, transaction) {
     var filter = {
         include: getDeviceRelations(),
         where: {
-            id: deviceId
+            id: deviceId,
+            accountId: accountId
         },
         transaction: transaction
     };
-    if (accountId) {
-        filter.where.accountId = accountId;
-    }
     return devices.findOne(filter)
         .then(function (device) {
             return interpreterHelper.mapAppResults(device, interpreter);
@@ -162,7 +161,7 @@ exports.findByIdAndAccount = function (deviceId, accountId, transaction) {
 
 var updateDeviceAttributes = function (attributes, device, transaction) {
     if (attributes) {
-        return deviceAttributes.destroy({where: {deviceId: device.id}, transaction: transaction})
+        return deviceAttributes.destroy({where: {deviceUID: device.uid}, transaction: transaction})
             .then(function () {
                 return createDeviceAttributes(attributes, device, transaction);
             });
@@ -173,7 +172,7 @@ var updateDeviceAttributes = function (attributes, device, transaction) {
 
 var updateDeviceTags = function (tags, device, transaction) {
     if (tags) {
-        return deviceTags.destroy({where: {deviceId: device.id}, transaction: transaction})
+        return deviceTags.destroy({where: {deviceUID: device.uid}, transaction: transaction})
             .then(function () {
                 return createDeviceTags(tags, device, transaction);
             });
@@ -278,56 +277,61 @@ exports.addComponents = function(components, deviceId, accountId, transaction) {
         transaction: transaction
     };
 
-    return componentTypes.findAll(filters)
-        .then(types => {
-            var typeToId = {};
-            types.forEach(type => {
-                typeToId[type.componentTypeId] = type.id;
-            });
-            var typeNotFound = false;
-            var records = components.map(component => {
-                if (!typeToId[component.type]) {
-                    typeNotFound = true;
-                } else {
-                    return {
-                        componentId: component.cid,
-                        name: component.name,
-                        componentTypeId: typeToId[component.type],
-                        deviceId: deviceId,
-                    };
-                }
-            });
-            if (typeNotFound) {
-                throw errBuilder.Errors.Device.Component.TypeNotFound;
-            }
-            return deviceComponents.bulkCreate(records, { validate: true, transaction: transaction });
-        })
-        .then(() => {
-            filters = {
-                where: {
-                    id: deviceId,
-                    accountId: accountId
-                },
-                include: getDeviceRelations(),
-                transaction: transaction
-            };
-            return devices.findAll(filters);
-        })
-        .then(result => {
-            if (result && result.length > 0 && result[0]) {
-                var deviceWithComponents = deviceModelHelper.formatAddComponentsResult(result[0], accountId);
-                return interpreterHelper.mapAppResults({dataValues: deviceWithComponents}, interpreter);
-            }
-        })
-        .catch(err => {
-            if (err.name === errBuilder.SqlErrors.AlreadyExists) {
-                throw errBuilder.Errors.Device.Component.AlreadyExists;
-            } else if (err.name === errBuilder.SqlErrors.ForeignKeyNotFound) {
-                throw errBuilder.Errors.Device.NotFound;
+    var deviceUID = null;
+    return devices.findOne({
+        where: {
+            accountId: accountId,
+            id: deviceId
+        }
+    }).then(device => {
+        deviceUID = device.uid;
+        return componentTypes.findAll(filters);
+    }).then(types => {
+        var typeToId = {};
+        types.forEach(type => {
+            typeToId[type.componentTypeId] = type.id;
+        });
+        var typeNotFound = false;
+        var records = components.map(component => {
+            if (!typeToId[component.type]) {
+                typeNotFound = true;
             } else {
-                throw err;
+                return {
+                    componentId: component.cid,
+                    name: component.name,
+                    componentTypeId: typeToId[component.type],
+                    deviceUID: deviceUID,
+                };
             }
         });
+        if (typeNotFound || deviceUID === null) {
+            throw errBuilder.Errors.Device.Component.TypeNotFound;
+        }
+        return deviceComponents.bulkCreate(records, { validate: true, transaction: transaction });
+    }).then(() => {
+        filters = {
+            where: {
+                id: deviceId,
+                accountId: accountId
+            },
+            include: getDeviceRelations(),
+            transaction: transaction
+        };
+        return devices.findAll(filters);
+    }).then(result => {
+        if (result && result.length > 0 && result[0]) {
+            var deviceWithComponents = deviceModelHelper.formatAddComponentsResult(result[0], accountId);
+            return interpreterHelper.mapAppResults({dataValues: deviceWithComponents}, interpreter);
+        }
+    }).catch(err => {
+        if (err.name === errBuilder.SqlErrors.AlreadyExists) {
+            throw errBuilder.Errors.Device.Component.AlreadyExists;
+        } else if (err.name === errBuilder.SqlErrors.ForeignKeyNotFound) {
+            throw errBuilder.Errors.Device.NotFound;
+        } else {
+            throw err;
+        }
+    });
 };
 
 exports.getTotals = function (accountId, resultCallback) {
@@ -394,8 +398,8 @@ var getTagsFilterGroupedByDevice = function(parameters) {
         return null;
     }
     var tagsFilter = {
-        group: 'deviceId',
-        attributes: ['deviceId']
+        group: 'deviceUID',
+        attributes: ['deviceUID']
     };
     switch (parameters.operator) {
     case EXISTS:
@@ -422,7 +426,7 @@ var getTagsFilterGroupedByDevice = function(parameters) {
         }
         if (Array.isArray(parameters.value) && parameters.value.length > 0) {
             tagsFilter.having = sequelize.where(sequelize.fn('count',
-                sequelize.col('deviceId')), Op.eq, parameters.value.length);
+                sequelize.col('deviceUID')), Op.eq, parameters.value.length);
             tagsFilter.where = {
                 value: {
                     [Op.in]: parameters.value
@@ -452,7 +456,7 @@ var getTagsFilterGroupedByDevice = function(parameters) {
         }
         if (Array.isArray(parameters.value)) {
             tagsFilter.having = sequelize.where(sequelize.fn('count',
-                sequelize.col('deviceId')), Op.eq, 0);
+                sequelize.col('deviceUID')), Op.eq, 0);
             tagsFilter.where = {
                 value: {
                     [Op.notIn]: parameters.value
@@ -473,8 +477,8 @@ var getComponentsFilterGroupedByDeviceId = function(parameters) {
         return null;
     }
     var cmpsFilter = {
-        group: 'deviceId',
-        attributes: ['deviceId']
+        group: 'deviceUID',
+        attributes: ['deviceUID']
     };
     if (parameters.operator === EXISTS) {
         return cmpsFilter;
@@ -501,8 +505,8 @@ var getAttributesFilterGroupedByDeviceId = function(parameters) {
         return null;
     }
     var attrsFilter = {
-        group: 'deviceId',
-        attributes: ['deviceId']
+        group: 'deviceUID',
+        attributes: ['deviceUID']
     };
     var filters = [];
     if (parameters.operator === EXISTS) {
@@ -550,7 +554,7 @@ var getAttributesFilterGroupedByDeviceId = function(parameters) {
         [Op.or]: filters
     };
     attrsFilter.having = sequelize.where(sequelize.fn('count',
-        sequelize.col('deviceId')), Op.eq, Object.keys(parameters).length);
+        sequelize.col('deviceUID')), Op.eq, Object.keys(parameters).length);
     return attrsFilter;
 };
 
@@ -563,7 +567,7 @@ var criteriaQuery = function (criteria, queryParameters) {
     var filter = {
         where: {},
         include: [],
-        group: ['devices.id']
+        group: ['devices.uid']
     };
     filter = modelsHelper.setQueryParameters(queryParametersModel, devices.attributes, filter);
 
@@ -588,69 +592,69 @@ var criteriaQuery = function (criteria, queryParameters) {
         }
     });
     var subCondition = {
-        deviceId: null
+        deviceUID: null
     };
 
     return devices.findAll(filter)
         .then(result => {
-            var devIds = result.map(entry => entry.id);
+            var devUIDs = result.map(entry => entry.uid);
             if (cmpsFilter) {
-                subCondition.deviceId = { [Op.in]: devIds };
+                subCondition.deviceUID = { [Op.in]: devUIDs };
                 cmpsFilter.where = sequelize.and(cmpsFilter.where, subCondition);
                 return deviceComponents.findAll(cmpsFilter)
                     .then(result => {
-                        result = result.map(entry => entry.deviceId);
+                        result = result.map(entry => entry.deviceUID);
                         if (componentsCriteria.operator === EXISTS &&
                                 componentsCriteria.value === false) {
-                            return getDifference(devIds, result);
+                            return getDifference(devUIDs, result);
                         }
-                        return getIntersection(devIds, result);
+                        return getIntersection(devUIDs, result);
                     });
             }
-            return Q.resolve(devIds);
+            return Q.resolve(devUIDs);
         })
-        .then(devIds => {
+        .then(devUIDs => {
             if (tagsFilter) {
-                subCondition.deviceId = { [Op.in]: devIds };
+                subCondition.deviceUIDs = { [Op.in]: devUIDs };
                 tagsFilter.where = sequelize.and(tagsFilter.where, subCondition);
                 return deviceTags.findAll(tagsFilter)
                     .then(result => {
-                        result = result.map(entry => entry.deviceId);
+                        result = result.map(entry => entry.deviceUID);
                         if (tagsCriteria.operator === EXISTS &&
                                 tagsCriteria.value === false) {
-                            return getDifference(devIds, result);
+                            return getDifference(devUIDs, result);
                         }
-                        return getIntersection(devIds, result);
+                        return getIntersection(devUIDs, result);
                     });
             }
-            return Q.resolve(devIds);
+            return Q.resolve(devUIDs);
         })
-        .then(devIds => {
+        .then(devUIDs => {
             if (attrsFilter) {
-                subCondition.deviceId = { [Op.in]: devIds };
+                subCondition.deviceUID = { [Op.in]: devUIDs };
                 attrsFilter.where = sequelize.and(attrsFilter.where, subCondition);
                 return deviceAttributes.findAll(attrsFilter)
                     .then(result => {
-                        result = result.map(entry => entry.deviceId);
+                        result = result.map(entry => entry.deviceUID);
                         if (propertiesCriteria.operator === EXISTS &&
                                 propertiesCriteria.value === false) {
-                            return getDifference(devIds, result);
+                            return getDifference(devUIDs, result);
                         }
-                        return getIntersection(devIds, result);
+                        return getIntersection(devUIDs, result);
                     });
             }
-            return Q.resolve(devIds);
+            return Q.resolve(devUIDs);
         });
 };
 
 exports.findByCriteria = function (criteria, queryParameters, resultCallback) {
     criteriaQuery(criteria, queryParameters)
-        .then(devIds => {
-            if (devIds) {
+        .then(devUIDs => {
+            if (devUIDs) {
                 var filter = {
                     where: {
-                        id: {
-                            [Op.in]: devIds
+                        uid: {
+                            [Op.in]: devUIDs
                         }
                     },
                     include: getDeviceRelations()
@@ -673,11 +677,11 @@ exports.findByCriteria = function (criteria, queryParameters, resultCallback) {
 
 exports.countByCriteria = function (criteria, queryParameters, resultCallback) {
     criteriaQuery(criteria, queryParameters)
-        .then(devIds => {
+        .then(devUIDs => {
             var filter = {
                 where: {
-                    id: {
-                        [Op.in]: devIds
+                    uid: {
+                        [Op.in]: devUIDs
                     }
                 },
             };
@@ -751,15 +755,18 @@ exports.findByAccountIdAndComponentId = function (accountId, componentIds, resul
         });
 };
 
-exports.deleteComponent = function (deviceId, componentId, transaction) {
+exports.deleteComponent = function (accountId, deviceId, componentId, transaction) {
     var filter = {
         where: {
             componentId: componentId,
-            deviceId: deviceId
         },
         transaction: transaction
     };
-    return deviceComponents.destroy(filter)
+    return exports.findByIdAndAccount(deviceId, accountId, transaction)
+        .then(device => {
+            filter.where.deviceUID = device.uid;
+            return deviceComponents.destroy(filter);
+        })
         .then(function (deletedCounter) {
             if (deletedCounter && deletedCounter < 1) {
                 throw errBuilder.Errors.Device.Component.NotFound;

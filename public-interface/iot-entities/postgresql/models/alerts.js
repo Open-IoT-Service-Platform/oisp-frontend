@@ -32,8 +32,8 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING(40),
             allowNull: false
         },
-        deviceId: {
-            type: DataTypes.STRING(255),
+        deviceUID: {
+            type: DataTypes.UUID,
             allowNull: false
         },
         reset: {
@@ -87,9 +87,9 @@ module.exports = function (sequelize, DataTypes) {
                 fields: ['externalId']
             },
             {
-                name: 'alerts_deviceId_index',
+                name: 'alerts_deviceUID_index',
                 method: 'BTREE',
-                fields: ['deviceId']
+                fields: ['deviceUID']
             },
             {
                 name: 'alerts_status_index',

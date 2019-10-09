@@ -57,10 +57,10 @@ module.exports = {
 
         app.post(VERSION + PATH + '/:deviceId/components', devices.addComponents);
         app.post(VERSION + FULL_PATH + '/:deviceId/components', devices.addComponents);
-        
+
         app.put(VERSION + PATH + '/:deviceId/activation', schemaValidator.validateSchema(schemas.device.ACTIVATION), devices.activateNewDevice);
         app.put(VERSION + FULL_PATH + '/:deviceId/activation', schemaValidator.validateSchema(schemas.device.ACTIVATION), devices.activateNewDevice);
-        
+
         app.post(VERSION + PATH + '/register', schemaValidator.validateSchema(schemas.device.REGISTER), devices.registerDevice);
         app.post(VERSION + FULL_PATH + '/register', schemaValidator.validateSchema(schemas.device.REGISTER), devices.registerDevice);
     }

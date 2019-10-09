@@ -116,8 +116,8 @@ exports.updateDevice = function (deviceId, device, accountId) {
         });
 };
 
-var deleteDeviceInternal = function(deviceId, transaction) {
-    return Device.delete(deviceId, transaction)
+var deleteDeviceInternal = function(accountId, deviceId, transaction) {
+    return Device.delete(accountId, deviceId, transaction)
         .catch(function(err) {
             logger.error("Devices - could not delete device from db: " + JSON.stringify(err));
             throw errBuilder.Errors.Device.DeletionError;
@@ -132,7 +132,7 @@ exports.deleteDevice = function (deviceId, accountId, resultCallback) {
                 throw errBuilder.Errors.Device.NotFound;
             }
 
-            return deleteDeviceInternal(deviceId);
+            return deleteDeviceInternal(accountId, deviceId);
         })
         .then(function() {
             resultCallback(null);
@@ -325,7 +325,7 @@ exports.deleteComponent = function (deviceId, componentId, accountId) {
                     // we need to save new components list
                     retrievedDevice.components = newComponents;
 
-                    return Device.deleteComponent(deviceId, componentId, transaction)
+                    return Device.deleteComponent(accountId, deviceId, componentId, transaction)
                         .then(function() {
                             return postgresProvider.commit(transaction);
                         });

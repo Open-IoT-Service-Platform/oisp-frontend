@@ -16,7 +16,8 @@
 
 'use strict';
 
-var deviceComponents = require('./models').deviceComponents,
+var errBuilder = require("./../../lib/errorHandler").errBuilder,
+    deviceComponents = require('./models').deviceComponents,
     componentTypes = require('./models').componentTypes,
     deviceTags = require('./models').deviceTags,
     devices = require('./models').devices,
@@ -123,29 +124,36 @@ exports.getByCustomFilter = function(accountId, customFilter, resultCallback) {
             interpreterHelper.mapAppResults(result, interpreter, resultCallback);
         })
         .catch (function(err) {
-            console.log(err);
             resultCallback(err);
         });
 };
 
-exports.findComponentsAndTypesForDevice = function(deviceId, resultCallback) {
+exports.findComponentsAndTypesForDevice = function(accountId, deviceId, resultCallback) {
     var filter = {
         where: {
-            deviceId: deviceId
-        },
-        include: [
-            {
-                model: componentTypes, as: 'componentType'
-            }]
+            accountId: accountId,
+            id: deviceId
+        }
     };
-    deviceComponents.findAll(filter)
-        .then(function(result) {
-            interpreterHelper.mapAppResults(result, interpreter, resultCallback);
-        })
-        .catch(function(err) {
-            console.log(err);
-            resultCallback(err);
-        });
+    devices.findOne(filter).then(device => {
+        if (!device) {
+            return resultCallback(errBuilder.Errors.Generic.NotAuthorized);
+        }
+        filter = {
+            where: {
+                deviceUID: device.uid
+            },
+            include: [
+                {
+                    model: componentTypes, as: 'componentType'
+                }]
+        };
+        return deviceComponents.findAll(filter);
+    }).then(function(result) {
+        interpreterHelper.mapAppResults(result, interpreter, resultCallback);
+    }).catch(function(err) {
+        resultCallback(err);
+    });
 };
 
 exports.updateLastObservationTS = function (componentId, date, resultCallback) {

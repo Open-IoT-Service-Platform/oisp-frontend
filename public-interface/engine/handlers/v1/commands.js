@@ -98,7 +98,7 @@ var getCommands = function (req, res, next) {
         to: isNaN(to) ? undefined : parseInt(to)
     };
 
-    return commandsApi.getActuations(req.params.deviceId, dateFilterParams)
+    return commandsApi.getActuations(accountId, deviceId, dateFilterParams)
         .then(function (actuations) {
             res.status(httpStatuses.OK.code).send( actuations);
         })

@@ -19,9 +19,15 @@
 module.exports = function (sequelize, DataTypes) {
 
     return sequelize.define('devices', {
+        uid: {
+            type: DataTypes.UUID,
+            primaryKey: true,
+            defaultValue: DataTypes.UUIDV4
+        },
         id: {
             type: DataTypes.STRING(255),
-            primaryKey: true
+            allowNull: false,
+            unique: 'deviceId_accountId_unique'
         },
         name: {
             type: DataTypes.STRING(255),
@@ -36,7 +42,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         accountId: {
             type: DataTypes.UUID,
-            allowNull: false
+            allowNull: false,
+            unique: 'deviceId_accountId_unique'
         },
         loc: DataTypes.ARRAY(DataTypes.DECIMAL),
         email: {
