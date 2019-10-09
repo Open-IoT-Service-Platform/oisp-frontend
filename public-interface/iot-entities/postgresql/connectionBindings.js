@@ -25,10 +25,10 @@ var TYPE = {
 
 exports.TYPE = TYPE;
 
-exports.find = function(deviceId, type) {
+exports.find = function(deviceUID, type) {
     var filter = {
         where: {
-            deviceId: deviceId,
+            deviceUID: deviceUID,
             type: type
         }
     };
@@ -36,10 +36,10 @@ exports.find = function(deviceId, type) {
     return connectionBindings.findOne(filter);
 };
 
-exports.findLatestConnection = function(deviceId) {
+exports.findLatestConnection = function(deviceUID) {
     var filter = {
         where: {
-            deviceId: deviceId,
+            deviceUID: deviceUID,
         },
         order: [['lastConnectedAt', 'ASC']],
         limit: 1

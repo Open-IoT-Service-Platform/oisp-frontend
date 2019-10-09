@@ -26,16 +26,16 @@ module.exports = function (sequelize, DataTypes) {
         name: {
             type: DataTypes.STRING(255),
             allowNull: false,
-            unique: 'device_components_deviceId_name_unique'
+            unique: 'device_components_deviceUID_name_unique'
         },
         componentTypeId: {
             type: DataTypes.UUID,
             allowNull: false
         },
-        deviceId: {
-            type: DataTypes.STRING(255),
+        deviceUID: {
+            type: DataTypes.UUID,
             allowNull: false,
-            unique: 'device_components_deviceId_name_unique'
+            unique: 'device_components_deviceUID_name_unique'
         },
         last_observation_time: {
             type: DataTypes.DATE
@@ -49,9 +49,9 @@ module.exports = function (sequelize, DataTypes) {
         updatedAt: 'updated',
         indexes: [
             {
-                name: 'device_components_deviceId_index',
+                name: 'device_components_deviceUID_index',
                 method: 'BTREE',
-                fields: ['deviceId']
+                fields: ['deviceUID']
             },
             {
                 name: 'device_components_componentTypeId_index',

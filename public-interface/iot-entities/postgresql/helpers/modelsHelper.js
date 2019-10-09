@@ -193,7 +193,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         as: 'deviceComponents',
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -201,7 +201,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
     devices.hasMany(alerts, {
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -209,7 +209,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
     devices.hasMany(connectionBindings, {
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -226,7 +226,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
     deviceComponents.belongsTo(devices, {
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -243,7 +243,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         as: 'attributes',
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -252,7 +252,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         as: 'tags',
         onDelete: 'CASCADE',
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
@@ -276,14 +276,14 @@ module.exports.fillModels = function (sequelize, DataTypes) {
 
     alerts.belongsTo(devices, {
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });
 
     deviceTags.belongsTo(devices, {
         foreignKey: {
-            name: 'deviceId',
+            name: 'deviceUID',
             allowNull: false
         }
     });

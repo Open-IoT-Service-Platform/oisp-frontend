@@ -36,6 +36,7 @@ function getComponentsInfo(accountId, commands, resultCallback){
         return Q.nfcall(Device.findByAccountIdAndComponentId, accountId, command.componentId)
             .then(function (device) {
                 command.gatewayId = device.gatewayId;
+                command.deviceUID = device.uid;
                 command.deviceId = device.deviceId;
                 command.component  = device.components[0].componentType;
                 mapCallback(null, command);
@@ -125,6 +126,7 @@ var command = function (accountId, commands, complexCommands, resultCallback) {
             transport: command.transport,
             content: {
                 accountId: accountId,
+                deviceUID: command.deviceUID,
                 deviceId: command.deviceId,
                 gatewayId: command.gatewayId,
                 componentId: command.componentId,
@@ -241,10 +243,10 @@ var parseDatesFromRequest = function (dateFilterParams) {
     return dateFilter;
 };
 
-var getActuations = function (deviceId, dateFilterParams) {
+var getActuations = function (accountId, deviceId, dateFilterParams) {
     var limit = config.actuation.limitPerRequest;
     var dateFilter = parseDatesFromRequest(dateFilterParams);
-    return Q.nfcall(Actuations.findByDeviceId, deviceId, limit, dateFilter)
+    return Q.nfcall(Actuations.findByDeviceId, accountId, deviceId, limit, dateFilter)
         .catch(function (err) {
             logger.error('commands.getActuations - unable to find actuations for device: ' + deviceId + ', err: ' + JSON.stringify(err));
             throw (err || errBuilder.build(errBuilder.Errors.Actuation.SearchError));

@@ -34,14 +34,14 @@ module.exports = function(config) {
         execute: function(data, done) {
 
             var re = /{\w+}/;
-            var deviceId = data.content.deviceId;
+            var deviceUID = data.content.deviceUID;
 
-            connectionBindings.find(deviceId, connectionBindings.TYPE.MQTT)
+            connectionBindings.find(deviceUID, connectionBindings.TYPE.MQTT)
                 .then(function (bind) {
                     if (!bind || !bind.broker) {
                         throw new Error('Device is not using MQTT');
                     }
-                    logger.debug("Device " + bind.deviceId + " was connected last time to " + bind.broker + " broker");
+                    logger.debug("Device " + bind.deviceUID + " was connected last time to " + bind.broker + " broker");
                     var selectedBroker = config.controlChannel.mqtt[bind.broker];
                     if (bind.broker in connectors && selectedBroker.topic) {
                         var topic = selectedBroker.topic.replace(re, data.content.gatewayId);
@@ -50,13 +50,13 @@ module.exports = function(config) {
                         var connector = connectors[bind.broker];
                         connector.publish(topic, message);
                     } else {
-                        logger.info("Not sending message to MQTT. Device:" + deviceId +
+                        logger.info("Not sending message to MQTT. Device:" + deviceUID +
                             " is subscribed to a broker " + bind.broker + " which is not specified in config file");
                     }
                 })
                 .catch(function(err) {
                     // If device is not connected to MQTT, we do not send actuation anywhere
-                    logger.debug("Not sending message to MQTT. Device is not using MQTT:" + deviceId + ', err: ' + JSON.stringify(err));
+                    logger.debug("Not sending message to MQTT. Device is not using MQTT:" + deviceUID + ', err: ' + JSON.stringify(err));
                 })
                 .finally(function() {
                     done();

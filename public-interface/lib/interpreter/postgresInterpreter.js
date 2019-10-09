@@ -208,7 +208,7 @@ var deviceComponentsInterpreter = function (lookUpTable, inverseLookUpTable) {
 
             return helper.translate(inverseLookUpTable, values, function (entity) {
 
-                delete entity.deviceId;
+                delete entity.deviceUID;
                 return entity;
             });
         },
@@ -223,7 +223,7 @@ var deviceComponents = function() {
     var lookUpTable = {
         cid: 'componentId',
         name: 'name',
-        deviceId: 'deviceId'
+        deviceUID: 'deviceUID'
     };
 
     return deviceComponentsInterpreter(lookUpTable, helper.inverse(lookUpTable));
@@ -331,6 +331,7 @@ var deviceInterpreter = function (lookUpTable, inverseLookUpTable) {
 
 var devices = function () {
     var lookUpTable = {
+        uid: 'uid',
         deviceId: 'id',
         gatewayId: 'gatewayId',
         domainId: 'accountId',
@@ -713,7 +714,7 @@ var alerts = function () {
         alertId: 'id',
         ruleId: 'externalId',
         accountId: 'accountId',
-        deviceId: 'deviceId',
+        deviceUID: 'deviceUID',
         reset: 'reset',
 
         // rule_engine received timestamp value

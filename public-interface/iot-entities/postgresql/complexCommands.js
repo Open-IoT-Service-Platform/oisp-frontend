@@ -29,9 +29,6 @@ exports.findByAccountAndId = function (accountId, id, resultCallback) {
         .then(function (foundComplexCommand) {
             return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
         })
-        .catch(function (err) {
-            throw err;
-        })
         .nodeify(resultCallback);
 };
 

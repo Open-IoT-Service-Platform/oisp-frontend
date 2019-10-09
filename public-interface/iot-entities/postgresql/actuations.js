@@ -46,12 +46,12 @@ exports.findById = function (id, resultCallback) {
         });
 };
 
-exports.findByDeviceId = function (deviceId, limit, dateFilter, resultCallback) {
+exports.findByDeviceId = function (accountId, deviceId, limit, dateFilter, resultCallback) {
     var filter = {
         include: getActuationRelations(),
         order:[['created','DESC']]
     };
-    filter.include[0].include["where"] = {id: deviceId};
+    filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
 
     if (dateFilter) {
         filter["where"] = {
@@ -86,12 +86,12 @@ exports.new = function (data, resultCallback) {
         });
 };
 
-exports.deleteByDeviceId = function (deviceId, resultCallback) {
+exports.deleteByDeviceId = function (accountId, deviceId, resultCallback) {
     var filter = {
         include: getActuationRelations(),
 
     };
-    filter.include[0].include["where"] = {id: deviceId};
+    filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
 
     actuations.destroy(filter)
         .then(function(){

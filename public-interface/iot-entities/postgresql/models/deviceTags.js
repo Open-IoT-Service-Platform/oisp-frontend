@@ -24,8 +24,8 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true,
             defaultValue: DataTypes.UUIDV4
         },
-        deviceId: {
-            type: DataTypes.STRING(255),
+        deviceUID: {
+            type: DataTypes.UUID,
             allowNull: false,
             unique: 'tag_device_unique'
         },
@@ -40,9 +40,9 @@ module.exports = function (sequelize, DataTypes) {
         updatedAt: 'updated',
         indexes: [
             {
-                name: 'devicetags_deviceId_index',
+                name: 'devicetags_deviceUID_index',
                 method: 'BTREE',
-                fields: ['deviceId']
+                fields: ['deviceUID']
             }
         ],
         schema: 'dashboard'

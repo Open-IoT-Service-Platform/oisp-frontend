@@ -26,13 +26,13 @@ exports.usage = function(req, res) {
 };
 
 exports.collectData = function (req, res, next) {
-
     var options = {
         deviceId: req.params.deviceId,
         data: req.body,
         forwarded: req.headers['forwarded'] || false,
         identity: req.identity,
-        type: req.tokenInfo.payload.type
+        type: req.tokenInfo.payload.type,
+        isAdmin: false
     };
 
     // copy binaryValues back to body.data
@@ -60,7 +60,9 @@ exports.collectDataAdmin = function (req, res, next) {
         deviceId: req.params.deviceId,
         data: req.body,
         forwarded: req.headers['forwarded'],
-        gatewayId: req.params.deviceId
+        gatewayId: req.params.deviceId,
+        type: req.tokenInfo.payload.type,
+        isAdmin: true
     };
 
     data.collectData(options, function(err) {

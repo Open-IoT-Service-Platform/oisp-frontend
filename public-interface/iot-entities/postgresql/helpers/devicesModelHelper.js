@@ -18,21 +18,21 @@
 
 var helper = require('./helper');
 
-exports.formatDeviceAttributes = function (attributes, deviceId) {
+exports.formatDeviceAttributes = function (attributes, deviceUID) {
     return Object.keys(attributes).map(function (key) {
         return {
             key: key,
             value: attributes[key],
-            deviceId: deviceId
+            deviceUID: deviceUID
         };
     });
 };
 
-exports.formatDeviceTags = function (tags, deviceId) {
+exports.formatDeviceTags = function (tags, deviceUID) {
     return tags.map(function (tag) {
         return {
             value: tag,
-            deviceId: deviceId
+            deviceUID: deviceUID
         };
     });
 };
@@ -48,29 +48,24 @@ exports.formatDeviceComponents = function (components) {
     return '{' + rows.join() + '}';
 };
 
-exports.getIdsFromQueryResult = function (devices) {
-    var ids = [];
-    if (devices && Array.isArray(devices)) {
-        ids = devices.map(function (device) {
-            return device.id;
-        });
-    }
-    return ids;
-};
-
 exports.formatAddComponentsResult = function (result) {
+    if (!result) {
+        return null;
+    }
+
+    var deviceId = result.id;
 
     var tagsParser = function(row, tags) {
-        if (row.id) {
-            tags[row.id] = {
+        if (deviceId) {
+            tags[deviceId] = {
                 value: row.value
             };
         }
     };
 
     var attributesParser = function(row, attributes) {
-        if (row.id) {
-            attributes[row.id] = {
+        if (deviceId) {
+            attributes[deviceId] = {
                 key: row.key,
                 value: row.value
             };
@@ -83,7 +78,7 @@ exports.formatAddComponentsResult = function (result) {
                 dataValues: {
                     componentId: row.componentId,
                     name: row.name,
-                    deviceId: row.deviceId,
+                    deviceId: deviceId,
                     componentType: {
                         dataValues: {
                             componentTypeId: row.componentType.componentTypeId,
@@ -106,22 +101,18 @@ exports.formatAddComponentsResult = function (result) {
         }
     };
 
-    var device = null;
-
-    if (result) {
-        device = {
-            id: result.id,
-            gatewayId: result.gatewayId,
-            accountId: result.accountId,
-            name: result.name,
-            loc: result.loc,
-            description: result.description,
-            status: result.status,
-            components: helper.parseCollection(result.deviceComponents, componentsParser),
-            tags: helper.parseCollection(result.tags, tagsParser),
-            attributes: helper.parseCollection(result.attributes, attributesParser)
-        };
-    }
+    var device = {
+        id: deviceId,
+        gatewayId: result.gatewayId,
+        accountId: result.accountId,
+        name: result.name,
+        loc: result.loc,
+        description: result.description,
+        status: result.status,
+        components: helper.parseCollection(result.deviceComponents, componentsParser),
+        tags: helper.parseCollection(result.tags, tagsParser),
+        attributes: helper.parseCollection(result.attributes, attributesParser)
+    };
     return device;
 };
 

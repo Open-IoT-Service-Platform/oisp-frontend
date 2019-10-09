@@ -98,6 +98,7 @@ function toInternalAlert(accountId, externalAlert, rule, deviceComponent) {
     item.accountId = accountId;
     item.alertId = uuid.v4();
     item.deviceId = externalAlert.deviceId || deviceComponent.device.id;
+    item.deviceUID = externalAlert.deviceUID || deviceComponent.device.uid;
     item.ruleId = rule.ruleId;
     item.ruleName = rule.name;
     item.priority = rule.priority;

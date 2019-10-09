@@ -50,7 +50,7 @@ exports.collectData = function(options, resultCallback) {
     // For user only:
     // 3a) Device does not belong to one of the accounts of the user => NotAuthorized
     //
-    Component.findComponentsAndTypesForDevice(deviceId, function(errGetComponents, filteredComponents) {
+    Component.findComponentsAndTypesForDevice(accountId, deviceId, function(errGetComponents, filteredComponents) {
         if (!errGetComponents && filteredComponents && filteredComponents.length > 0) { //Case 1a
             // If token is not a device token, check account/device relationship
             // For a device token, this is part of the token info
@@ -125,6 +125,8 @@ exports.collectData = function(options, resultCallback) {
                     }
                 })
                 .catch((err) => resultCallback(err));
+        } else if (errGetComponents) { //1a
+            resultCallback(errBuilder.build(errGetComponents));
         } else { //1a
             resultCallback(errBuilder.build(errBuilder.Errors.Device.Component.NotFound));
         }
