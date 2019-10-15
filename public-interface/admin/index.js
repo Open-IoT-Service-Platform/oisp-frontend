@@ -23,7 +23,9 @@ var addUser = require('./addUser');
 var RemoveTestUser = require('./removeTestUser');
 var ResetDB = require('./resetDB');
 var CreateDB = require('./createDB');
+var UpdateDB = require('./updateDB');
 var command = process.argv[2];
+var arg = process.argv[3];
 
 switch (command) {
 case 'addUser':
@@ -43,6 +45,18 @@ case 'resetDB':
 case 'createDB':
     var databaseCreater = new CreateDB();
     databaseCreater.create();
+    break;
+case 'updateDB':
+    var databaseUpdater = new UpdateDB();
+    databaseUpdater.update(arg);
+    break;
+case 'revertDB':
+    var databaseUpdater = new UpdateDB();
+    databaseUpdater.revertOne(arg);
+    break;
+case 'revertAllDB':
+    var databaseUpdater = new UpdateDB();
+    databaseUpdater.revertAll(arg);
     break;
 default:
     console.log ("Command : ", command , " not supported ");

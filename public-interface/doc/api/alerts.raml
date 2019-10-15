@@ -64,6 +64,12 @@ get:
       example: 75
   get:
     is: [ authorization-header, response-errors-alerts, response-errors-generic ]
+    queryParameters:
+      active:
+        description: If true, ignore suppressed events
+        type: boolean
+        required: false
+        example: true
     description: |
       **Get Alert information**
 

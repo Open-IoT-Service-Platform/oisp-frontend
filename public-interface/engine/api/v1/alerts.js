@@ -142,12 +142,37 @@ function parseAlertResponse(data) {
     return results;
 }
 
-var findDeviceForAlert = function(alert, callback) {
-    Device.findByComponentId(alert.conditions[0].components[0].componentId, callback);
+var findDeviceForAlert = function(alert) {
+    return new Promise(function(resolve, reject) {
+
+        var callback = function(err, deviceComponent) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(deviceComponent);
+            }
+        };
+        Device.findByComponentId(alert.conditions[0].components[0].componentId, callback);
+    });
 };
 
+var checkResetted = function(account, alert, rule) {
+    return new Promise(function(resolve, reject) {
+        var callback = function(err, foundAlert) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(foundAlert);
+            }
+        };
+        if (rule.resetType  === Alert.resetType.automatic) {
+            resolve(null);
+        } else {
+            Alert.searchNewAlertsWithExternalId(account, rule.id, callback);
+        }
+    });
+};
 exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
-
     async.parallel(alertData.map(function (alert) {
         return function (done) {
 
@@ -158,46 +183,71 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
             };
             apiRules.getRule(options, function (err, rule) {
                 if (!err && rule) {
-                    findDeviceForAlert(alert, function(err, deviceComponent) {
-                        if (!err) {
-                            //to internal from rule
-                            var internalAlert = toInternalAlert(accountId, alert, rule, deviceComponent);
-                            internalAlert["externalId"] = rule.externalId;
-                            Alert.new(internalAlert, function(err){
-                                if (err) {
-                                    logger.error('alerts. trigger, error: ' + JSON.stringify(err));
-                                    alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
-                                } else {
-                                    if(hostUrl.indexOf('internal-') > -1) {
-                                        internalAlert.host = hostUrl.substr(hostUrl.indexOf('-')+1);
-                                    }
-                                    else {
-                                        internalAlert.host = hostUrl;
-                                    }
-
-                                    internalAlert.externalRule = rule;
-                                    actuationAlerts.addCommandsToActuationActions(accountId, rule)
-                                        .then(function onSuccess() {
-                                            actuationAlerts.saveAlertActuations(rule.actions, function (err) {
-                                                if (err) {
-                                                    logger.error('alerts.saveActuations - unable to add new actuation message into DB: ' + JSON.stringify(err));
-                                                }
-                                            });
-                                            process.emit("incoming_alert", {alert: internalAlert, rule: rule});
-                                        }, function onError(err) {
-                                            logger.error('alerts.getCommands, error: ' + JSON.stringify(err));
-                                        });
+                    // sometimes the rule-engine takes some time to adapt to new Rules
+                    // The check for rule status makes sure that a rule which just has been disabled is no
+                    // longer triggering anything
+                    if (rule == null || rule.status !== "Active") {
+                        alert.err = errBuilder.build(errBuilder.Errors.Alert.RuleNotActive).asResponse();
+                        logger.error('alerts. trigger, error: ' + JSON.stringify(alert));
+                        done(null, alert);
+                    } else {
+                        var suppressAlert = false;
+                        checkResetted(accountId, alert, rule)
+                            .then((found) => new Promise(function(resolve){
+                                if (found) {
+                                    logger.info("Active alert found with same ruleid. Creating silent alert instead.");
+                                    suppressAlert = true;
                                 }
-                                done(null, alert);
-                            });
-                        } else {
-                            logger.error('alerts. trigger, error: ' + JSON.stringify(err));
-                            alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
-                        }
-                    });
+                                resolve();
+                            }))
+                            .then(() => findDeviceForAlert(alert))
+                            .then((deviceComponent) => new Promise(function(resolve, reject){
+                                //to internal from rule
 
-                }
-                else {
+                                var internalAlert = toInternalAlert(accountId, alert, rule, deviceComponent);
+                                internalAlert["externalId"] = rule.externalId;
+                                if (suppressAlert) {
+                                    internalAlert["suppressed"] = suppressAlert;
+                                }
+                                Alert.new(internalAlert, function(err){
+                                    if (err) {
+                                        logger.error('alerts. trigger, error: ' + JSON.stringify(err));
+                                        alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
+                                        reject(alert);
+                                    } else {
+                                        if (!suppressAlert) {
+                                            if(hostUrl.indexOf('internal-') > -1) {
+                                                internalAlert.host = hostUrl.substr(hostUrl.indexOf('-')+1);
+                                            }
+                                            else {
+                                                internalAlert.host = hostUrl;
+                                            }
+
+                                            internalAlert.externalRule = rule;
+                                            actuationAlerts.addCommandsToActuationActions(accountId, rule)
+                                                .then(function onSuccess() {
+                                                    actuationAlerts.saveAlertActuations(rule.actions, function (err) {
+                                                        if (err) {
+                                                            logger.error('alerts.saveActuations - unable to add new actuation message into DB: ' + JSON.stringify(err));
+                                                        }
+                                                    });
+                                                    process.emit("incoming_alert", {alert: internalAlert, rule: rule});
+                                                }, function onError(err) {
+                                                    logger.error('alerts.getCommands, error: ' + JSON.stringify(err));
+                                                });
+                                        }
+                                        resolve(alert);
+                                    }
+                                });
+                            }))
+                            .then((alert) => {done(null, alert);})
+                            .catch((err) => {
+                                logger.error('alerts. trigger, error: ' + JSON.stringify(err));
+                                alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
+                                done(err, null);
+                            });
+                    }
+                } else {
                     alert.err = errBuilder.build(errBuilder.Errors.Alert.RuleNotFound).asResponse();
                     logger.error('alerts. trigger, error: ' + JSON.stringify(alert));
                     done(null, alert);
@@ -215,14 +265,14 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
 
 exports.getUnreadAlerts = function (params, resultCallback) {
 
-    Alert.findByStatus(params.accountId, params.status, function (err, result) {
+    Alert.findByStatus(params.accountId, params.status, params.active, function (err, result) {
         resultCallback(err, result);
     });
 };
 
 exports.getAlerts = function (params, resultCallback) {
 
-    Alert.findByStatus(params.accountId, params.status, function (err, result) {
+    Alert.findByStatus(params.accountId, params.status, params.active, function (err, result) {
         resultCallback(err, result);
     });
 };

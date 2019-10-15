@@ -28,35 +28,74 @@ CreateDB.prototype.create = function(){
         host: config.postgres.options.replication.write.host,
         database: 'postgres',
         password: config.postgres.su_password,
-        port: config.postgres.options.replication.write.port,
+        port: config.postgres.options.port,
     });
     const query = {text: 'CREATE DATABASE ' +
                          config.postgres.database + ';'
     };
-    client.connect()
+    client.connect(
+    )
+        .then(() => console.log("Connected"))
+        .catch(function(err) {
+            console.log("Cannot connect: " + err);
+            process.exit(1);
+        })
         .then(function() {
-            console.log("Connected to postgres");
+            console.log("Executing query: ", query.text);
+            return client.query(query);
+        })
+        /*.catch(function(err) {
+            console.log("Cannot create db: " + err);
+            console.log("OK to continue!");
+        })*/
+        .then(function() {
+            query.text = 'CREATE USER ' + config.postgres.su_username +
+                ' WITH PASSWORD \'' + config.postgres.su_password + '\';';
+            console.log("Trying to create PG user. Executing query: ", query.text);
+            return client.query(query);
+        })
+        .catch(function(err) {
+            console.log("Cannot create user: " + err);
+            console.log("OK to continue ");
+        })
+        .then(function() {
+            query.text = ' GRANT CONNECT ON DATABASE ' + config.postgres.database +
+                ' TO ' + config.postgres.username + ';';
+            console.log("Trying grant rights to PG user. Executing query: ", query.text);
+            return client.query(query);
+        })
+        .catch(function(err) {
+            console.log("Cannot create user: " + err);
+            console.log("OK to continue ");
+        })
+        .then(function() {
+            query.text = 'CREATE DATABASE test;';
+            console.log("Trying to create test database. Executing query: ", query.text);
             return client.query(query);
         })
         .then(function() {
-            query.text = 'CREATE USER ' + config.postgres.username +
-                ' WITH PASSWORD ' + config.postgres.password + ';' +
-                ' GRANT CONNECT ON DATABASE ' + config.postgres.database +
-                ' TO ' + config.postgres.username + ';';
-            return client.query();
-        })
-        .then(function() {
-            query.text = 'CREATE DATABASE test; ' +
-                'GRANT ALL PRIVILEGES ON DATABASE test TO ' +
+            query.text = 'GRANT ALL PRIVILEGES ON DATABASE test TO ' +
                 config.postgres.su_username + '; ' +
                 'GRANT CONNECT ON DATABASE test TO ' +
                 config.postgres.username + ';';
-            return client.query();
+            console.log("Trying to create test database. Executing query: ", query.text);
+            return client.query(query);
+        })
+        .catch(function(err) {
+            console.log("Cannot create db test: " + err);
+            console.log("OK to continue ");
         })
         .then(() => {
+            console.log("Trying to create DB models ...");
             return models.createDatabase();
+
+        })
+        .catch(function(err) {
+            console.log("Cannot create models: " + err);
+            console.log("OK to continue ");
         })
         .then(function() {
+            console.log("Trying to create system users.");
             return systemUsers.create();
         })
         .then(function() {
