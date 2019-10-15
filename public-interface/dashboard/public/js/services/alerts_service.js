@@ -40,7 +40,8 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                         method: 'GET',
                         url: url,
                         params: {
-                            "_" : utilityService.timeStamp()
+                            "_" : utilityService.timeStamp(),
+                            "active": true
                         }
                     }).success(function(data){
                         summary.unread = data;
@@ -56,7 +57,8 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                         method: 'GET',
                         url: url,
                         params: {
-                            "_" : utilityService.timeStamp()
+                            "_" : utilityService.timeStamp(),
+                            "active": true
                         }
                     }).success(function(data) {
                         summary.unread = removeReadAlerts(data);
@@ -71,7 +73,8 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                         method: 'GET',
                         url: url,
                         params: {
-                            "_" : utilityService.timeStamp()
+                            "_" : utilityService.timeStamp(),
+                            "active": true
                         }
                     }).success(successCallback).error(errorCallback);
                 });
@@ -87,7 +90,10 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                 .then(function(url){
                     var requestOptions = {
                         method: 'PUT',
-                        url: url
+                        url: url,
+                        params:{
+                            "active": true
+                        }
                     };
                     $http(requestOptions).success(function(data, status){
                         fireStatusUpdatedEvent(ngScope, {alert: alert, newStatus: newStatus});

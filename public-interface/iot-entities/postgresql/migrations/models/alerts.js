@@ -70,10 +70,6 @@ module.exports = function (sequelize, DataTypes) {
         },
         resetType: {
             type: DataTypes.ENUM('Automatic', 'Manual')
-        },
-        suppressed: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
         }
     },
     {

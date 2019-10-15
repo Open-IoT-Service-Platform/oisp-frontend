@@ -28,7 +28,7 @@ var Accounts = require('./../models/accounts'),
     DeviceAttributes = require('./../models/deviceAttributes'),
     DeviceComponents = require('./../models/deviceComponents'),
     UserInteractionTokens = require('./../models/userInteractionTokens'),
-    Alerts = require('./../models/alerts'),
+    Alerts = require('./../migrations/models/alerts'),
     Actuations = require('./../models/actuations'),
     AlertComments = require('./../models/alertComments'),
     ConnectionBindings = require('./../models/connectionBindings'),
@@ -96,7 +96,7 @@ module.exports.fillModels = function (sequelize, DataTypes) {
             allowNull: false
         }
     });
-    
+
     settings.belongsTo(accounts, {
         onDelete: 'CASCADE',
         foreignKey: {

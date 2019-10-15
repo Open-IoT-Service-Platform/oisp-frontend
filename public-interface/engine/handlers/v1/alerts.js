@@ -108,6 +108,9 @@ exports.getAlerts = function(req, res, next) {
         params.status = req.query.status.split(",");
     }
 
+    if (req.query.active) {
+        params.active = req.query.active;
+    }
     alert.getAlerts(params, function(err, result){
         if(!err && result){
             res.status(httpStatuses.OK.code).send(result);
