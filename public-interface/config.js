@@ -157,10 +157,10 @@ var config = {
     },
     postgres: {
         database: postgres_config.dbname,
-        su_username: postgres_config.username,
-        su_password: postgres_config.password,
-        username: 'oisp_user',
-        password: 'supersecret',
+        su_username: postgres_config.su_username,
+        su_password: postgres_config.su_password,
+        username: postgres_config.username,
+        password: postgres_config.password,
         options: {
             host: postgres_config.hostname,
             port: postgres_config.port,
