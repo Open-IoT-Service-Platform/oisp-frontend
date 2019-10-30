@@ -44,13 +44,9 @@ CreateDB.prototype.create = function(){
             console.log("Executing query: ", query.text);
             return client.query(query);
         })
-        /*.catch(function(err) {
-            console.log("Cannot create db: " + err);
-            console.log("OK to continue!");
-        })*/
         .then(function() {
-            query.text = 'CREATE USER ' + config.postgres.su_username +
-                ' WITH PASSWORD \'' + config.postgres.su_password + '\';';
+            query.text = 'CREATE USER ' + config.postgres.username +
+                ' WITH PASSWORD \'' + config.postgres.password + '\';';
             console.log("Trying to create PG user. Executing query: ", query.text);
             return client.query(query);
         })
@@ -87,7 +83,7 @@ CreateDB.prototype.create = function(){
         })
         .then(() => {
             console.log("Trying to create DB models ...");
-            return models.createDatabase();
+            return models.initSchema();
 
         })
         .catch(function(err) {
