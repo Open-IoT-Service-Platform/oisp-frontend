@@ -41,7 +41,6 @@ var http = require('http'),
     heartBeat = require('./lib/heartbeat'),
     tracer = require('./lib/express-jaeger').tracer,
     grafana = require("./grafana"),
-    systemUsers = require('./lib/dp-users/systemUsers'),
     cbor = require("./lib/cbor");
 
 var XSS = iotRoutes.cors,
@@ -153,21 +152,14 @@ commServer.init(httpServer, IotWsAuth);
 
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
-    models.initSchema()
-        .then(function() {
-            systemUsers.create();
-        })
-        .then(() => {
-            grafana.getViewerToken();
-        })
-        .then(() => {
-            if (!module.parent) {
-                httpServer.listen(api_port, function () {
-                    console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
-                    heartBeat.start();
-                });
-            } else {
-                module.exports.server = appServer;
-            }
-        });
+    grafana.getViewerToken().then(() => {
+        if (!module.parent) {
+            httpServer.listen(api_port, function () {
+                console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
+                heartBeat.start();
+            });
+        } else {
+            module.exports.server = appServer;
+        }
+    });
 });
