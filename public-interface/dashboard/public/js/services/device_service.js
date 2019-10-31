@@ -119,6 +119,7 @@ iotServices.factory('devicesService', ['$http', 'sessionService', function ($htt
             var clone = JSON.parse(JSON.stringify(device));
             var id = device.deviceId;
             clone = formatDevice(clone);
+            delete clone.uid;
             delete clone.deviceId;
             delete clone.status;
             delete clone.created;
