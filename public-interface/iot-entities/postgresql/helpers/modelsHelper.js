@@ -28,7 +28,8 @@ var Accounts = require('./../models/accounts'),
     DeviceAttributes = require('./../models/deviceAttributes'),
     DeviceComponents = require('./../models/deviceComponents'),
     UserInteractionTokens = require('./../models/userInteractionTokens'),
-    Alerts = require('./../migrations/models/alerts'),
+    Alerts = require('./../models/alerts'),
+    AlertsBase = require('./../migrations/models/alerts'),
     Actuations = require('./../models/actuations'),
     AlertComments = require('./../models/alertComments'),
     ConnectionBindings = require('./../models/connectionBindings'),
@@ -59,7 +60,7 @@ const components = [
 
 module.exports.defaultComponents = components;
 
-module.exports.fillModels = function (sequelize, DataTypes) {
+module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) {
     var accounts = new Accounts(sequelize, DataTypes),
         actuations = new Actuations(sequelize, DataTypes),
         users = new Users(sequelize, DataTypes),
@@ -75,11 +76,17 @@ module.exports.fillModels = function (sequelize, DataTypes) {
         invites = new Invites(sequelize, DataTypes),
         deviceComponents = new DeviceComponents(sequelize, DataTypes),
         userInteractionTokens = new UserInteractionTokens(sequelize, DataTypes),
-        alerts = new Alerts(sequelize, DataTypes),
         connectionBindings = new ConnectionBindings(sequelize, DataTypes),
         purchasedLimits = new PurchasedLimits(sequelize, DataTypes),
         alertComments = new AlertComments(sequelize, DataTypes),
-        refreshTokens = new RefreshTokens(sequelize, DataTypes);
+        refreshTokens = new RefreshTokens(sequelize, DataTypes),
+        alerts = null;
+
+    if (!baseModels) {
+        alerts = new Alerts(sequelize, DataTypes);
+    } else {
+        alerts = new AlertsBase(sequelize, DataTypes);
+    }
 
     users.hasMany(settings, {
         onDelete: 'CASCADE',
