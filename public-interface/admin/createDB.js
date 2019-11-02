@@ -82,6 +82,11 @@ CreateDB.prototype.create = function(){
             console.log("OK to continue ");
         })
         .then(() => {
+            console.log("Trying to init DB models ...");
+            return models.initModels(true);
+
+        })
+        .then(() => {
             console.log("Trying to create DB models ...");
             return models.initSchema();
 

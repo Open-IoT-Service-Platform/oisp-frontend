@@ -91,7 +91,6 @@ if (jaegerConfig.tracing) {
     shimmer.wrap(sequelize, 'query', wrapQuery);
 }
 
-modelsHelper.fillModels(super_user_sequelize, Sequelize);
 var models = modelsHelper.fillModels(sequelize, Sequelize);
 
 var executeSql = function (sql, transaction) {
@@ -172,6 +171,12 @@ module.exports = models;
 module.exports.super_user_sequelize = super_user_sequelize;
 module.exports.sequelize = sequelize;
 
+module.exports.initModels = function(onlyBaseModels) {
+    // for migrations it is needed to first setup the base model and update later
+    // except for tests. When the DB is reset there is no future migration expected
+    // So e.g. for tests, the full model has to be built and not the base model
+    modelsHelper.fillModels(super_user_sequelize, Sequelize, onlyBaseModels);
+};
 module.exports.createDatabase = function () {
     return super_user_sequelize.createSchema('dashboard')
         .then(() => {

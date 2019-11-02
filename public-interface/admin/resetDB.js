@@ -35,6 +35,11 @@ ResetDB.prototype.reset = function(cb) {
             return Promise.all(requests);
         })
         .then(() => {
+            console.log("Trying to init DB models ...");
+            return models.initModels(false);
+
+        })
+        .then(() => {
             return models.createDatabase();
         })
         .then(function() {
