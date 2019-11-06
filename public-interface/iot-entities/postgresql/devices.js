@@ -615,7 +615,7 @@ var criteriaQuery = function (criteria, queryParameters) {
         })
         .then(devUIDs => {
             if (tagsFilter) {
-                subCondition.deviceUIDs = { [Op.in]: devUIDs };
+                subCondition.deviceUID = { [Op.in]: devUIDs };
                 tagsFilter.where = sequelize.and(tagsFilter.where, subCondition);
                 return deviceTags.findAll(tagsFilter)
                     .then(result => {
