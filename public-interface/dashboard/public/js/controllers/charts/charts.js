@@ -115,6 +115,7 @@ iotController.controller('ChartCtrl', function( $scope,
     };
 
     $scope.refreshRates = [
+        {text: $rootScope.i18n.charts.refreshRates.refresh1Seconds, seconds: 1},
         {text: $rootScope.i18n.charts.refreshRates.refresh5Seconds, seconds: 5},
         {text: $rootScope.i18n.charts.refreshRates.refresh10Seconds, seconds: 10},
         {text: $rootScope.i18n.charts.refreshRates.refresh30Seconds, seconds: 30},
@@ -250,7 +251,7 @@ iotController.controller('ChartCtrl', function( $scope,
     };
 
     $scope.selectRefreshRate = function(rateSeconds) {
-        if(rateSeconds >= 5 && rateSeconds % 1 === 0) {
+        if(rateSeconds >= 1 && rateSeconds % 1 === 0) {
             $scope.refreshRateSeconds = rateSeconds;
             $scope.restartRefresh();
         }
