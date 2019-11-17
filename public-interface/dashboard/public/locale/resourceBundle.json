@@ -207,7 +207,7 @@
         "select": "Select at least one device with components",
         "attribute_key" : "Attribute name",
         "attribute_value" : "Attribute value",
-        "attribute_remove" : "Remove attribute",        
+        "attribute_remove" : "Remove attribute",
         "search_devices": "Search Devices",
         "search_device": "Search Device",
         "selected_devices": "Selected Devices",
@@ -253,6 +253,7 @@
         "aggregationInfo": "Data from this period will be aggregated",
         "aggregationInfoHeader": "Warning",
         "refreshRates" : {
+            "refresh1Seconds": "1 seconds",
             "refresh5Seconds": "5 seconds",
             "refresh10Seconds": "10 seconds",
             "refresh30Seconds": "30 seconds",
