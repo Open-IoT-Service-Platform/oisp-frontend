@@ -32,7 +32,6 @@ var Accounts = require('./../models/accounts'),
     AlertsBase = require('./../migrations/models/alerts'),
     Actuations = require('./../models/actuations'),
     AlertComments = require('./../models/alertComments'),
-    ConnectionBindings = require('./../models/connectionBindings'),
     PurchasedLimits = require('./../models/purchasedLimits'),
     RefreshTokens = require('./../models/refreshTokens');
 
@@ -76,7 +75,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         invites = new Invites(sequelize, DataTypes),
         deviceComponents = new DeviceComponents(sequelize, DataTypes),
         userInteractionTokens = new UserInteractionTokens(sequelize, DataTypes),
-        connectionBindings = new ConnectionBindings(sequelize, DataTypes),
         purchasedLimits = new PurchasedLimits(sequelize, DataTypes),
         alertComments = new AlertComments(sequelize, DataTypes),
         refreshTokens = new RefreshTokens(sequelize, DataTypes),
@@ -215,14 +213,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         }
     });
 
-    devices.hasMany(connectionBindings, {
-        onDelete: 'CASCADE',
-        foreignKey: {
-            name: 'deviceUID',
-            allowNull: false
-        }
-    });
-
     deviceComponents.belongsTo(componentTypes, {
         as: 'componentType',
         onDelete: 'CASCADE',
@@ -333,7 +323,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         userInteractionTokens: userInteractionTokens,
         alerts: alerts,
         actuations: actuations,
-        connectionBindings: connectionBindings,
         purchasedLimits: purchasedLimits,
         refreshTokens: refreshTokens,
         alertComments: alertComments

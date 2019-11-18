@@ -23,13 +23,21 @@ var ExecutorFactory = require('./executor-factory'),
 
 var ACTUATOR_TYPE = 'actuation';
 
+function getExecutor(transport) {
+    if ( transport === 'ws' || transport === 'auto' ) {
+        return 'redis';
+    }
+    return transport;
+}
+
 function AlertProcessor(executors) {
 
     function executeAlertAction(executors, data, actionType, resultCallback) {
         var _executorCollection = executors;
-
-        if( _executorCollection[actionType]) {
-            var instance = new _executorCollection[actionType](config, logger);
+        var executor = getExecutor(actionType);
+        logger.info("Executor "+executor);
+        if( _executorCollection[executor]) {
+            var instance = new _executorCollection[executor](config, logger);
             instance.execute(data, function(err, result) {
                 logger.info("AlertProcessor - Action executed " + ((err !== "undefined") ? "successfully":"with errors"));
                 if(result) {
@@ -43,7 +51,7 @@ function AlertProcessor(executors) {
     }
 
     function processAlert(data){
-        logger.info("AlertProcessor - Alert arrived: " + JSON.stringify(data.alert));
+        logger.info("AlertProcessor - Alert arrived: " + JSON.stringify(data, null, "\t"));
         async.each(data.rule.actions, function(action, done){
             if (action.type === ACTUATOR_TYPE) {
                 async.each(action.messages, function (message, parallelCallback) {
@@ -80,9 +88,10 @@ function MessageProcessor(executors) {
     var _executorCollection = executors;
 
     function processMessage(message, done){
-        logger.info("Message Processor - message arrived: " + JSON.stringify(message));
-        if( _executorCollection[message.transport]) {
-            var instance = new _executorCollection[message.transport](config, logger);
+        logger.info("Message Processor - message arrived: " + JSON.stringify(message, null, "\t"));
+        var executor = getExecutor(message.transport);
+        if( _executorCollection[executor]) {
+            var instance = new _executorCollection[executor](config, logger);
 
             instance.execute(message, function(err, result) {
                 logger.info("MessageProcessor - message handled " + ((err !== "undefined") ? "successfully":"with errors"));
