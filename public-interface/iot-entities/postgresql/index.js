@@ -37,7 +37,6 @@ var DAOs = [
     'userInteractionTokens',
     'alerts',
     'actuations',
-    'connectionBindings',
     'purchasedLimits'
 ];
 

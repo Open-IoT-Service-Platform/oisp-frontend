@@ -244,6 +244,15 @@ var config = {
             username: websocketUser_config.username,
             password : websocketUser_config.password,
             verifyCert: false
+        },
+        redis: {
+            host: redis_config.hostname,
+            port: redis_config.port,
+            username: websocketUser_config.username,
+            password : websocketUser_config.password,
+            enableOfflineQueue : true,
+            retryTime: 3000,
+            retriesLimit: 5
         }
     },
     logger: {
