@@ -21,29 +21,12 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     Device = postgresProvider.devices,
     ComplexCommand = postgresProvider.complexCommands,
     Actuations = postgresProvider.actuations,
-    connectionBindings = postgresProvider.connectionBindings,
     async = require('async'),
     Q = require('q'),
     logger = require('../../../lib/logger').init(),
     commands = require('../v1/commands');
 
 var ACTUATION_TYPE = 'actuation';
-/**
- * Returns protocol, which should be used for sending actuation. It compares device last connection time and select
- * protocol which was used recently. If there is no info about device connection status, method throws Error.
- * @param deviceId
- * @returns {*}
- */
-var getProtocolForActuation = function (deviceUID) {
-    return connectionBindings.findLatestConnection(deviceUID)
-        .then(function(connectionBinding) {
-            if (connectionBinding) {
-                return Q.resolve(connectionBinding.type);
-            } else {
-                throw new Error('Unable to get connection status for device - ' + deviceUID);
-            }
-        });
-};
 
 var addNewActuation = function (messageContent, resultCallback) {
     var data = {
@@ -102,30 +85,23 @@ var parseComplexCommandToActuationMessage = function (accountId, complexCommands
         var parseAllCommands = complexCommands.commands.map(function (command) {
             return Q.nfcall(Device.findByAccountIdAndComponentId, accountId, command.componentId)
                 .then(function deviceFound(device) {
-                    return getProtocolForActuation(device.uid)
-                        .then(function (protocol) {
-                            var message = {
-                                type: commands.MESSAGE_TYPE_COMMAND,
-                                transport: protocol,
-                                content: {
-                                    transport: protocol,
-                                    domainId: accountId,
-                                    deviceUID: device.uid,
-                                    deviceId: device.deviceId,
-                                    gatewayId: device.gatewayId,
-                                    componentId: command.componentId,
-                                    command: device.components[0].componentType.command.commandString,
-                                    params: command.parameters
-                                }
-                            };
-                            commandsMessages.push(message);
-                        })
-                        /*jshint -W098 */
-                        .catch(function (err) {
-                            logger.error('actuationAlerts - unable to get information about connection status for device - ' + device.deviceId +
-                            '. Alert actuation command will not be send.');
-                        });
-                    /*jshint +W098 */
+                    logger.debug("Foud device "+device.uid);
+                    var protocol = 'auto';
+                    var message = {
+                        type: commands.MESSAGE_TYPE_COMMAND,
+                        transport: protocol,
+                        content: {
+                            transport: protocol,
+                            domainId: accountId,
+                            deviceUID: device.uid,
+                            deviceId: device.deviceId,
+                            gatewayId: device.gatewayId,
+                            componentId: command.componentId,
+                            command: device.components[0].componentType.command.commandString,
+                            params: command.parameters
+                        }
+                    };
+                    commandsMessages.push(message);
                 });
         });
         return Q.all(parseAllCommands)
