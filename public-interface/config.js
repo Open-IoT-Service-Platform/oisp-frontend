@@ -217,7 +217,7 @@ var config = {
             topicsHeartbeatName: kafka_config.topicsHeartbeatName,
             topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval
         },
-        ingestion: 'REST',
+        ingestion: 'Kafka',
         userScheme: null // default
     },
     controlChannel: {
