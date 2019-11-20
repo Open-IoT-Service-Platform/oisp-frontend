@@ -24,6 +24,7 @@ var RemoveTestUser = require('./removeTestUser');
 var ResetDB = require('./resetDB');
 var CreateDB = require('./createDB');
 var UpdateDB = require('./updateDB');
+var getUserToken = require('./getUserToken');
 var command = process.argv[2];
 var arg = process.argv[3];
 
@@ -57,6 +58,10 @@ case 'revertDB':
 case 'revertAllDB':
     var databaseUpdater = new UpdateDB();
     databaseUpdater.revertAll(arg);
+    break;
+case 'getUserToken':
+    var arg = process.argv.slice(3);
+    getUserToken.apply(null, arg);
     break;
 default:
     console.log ("Command : ", command , " not supported ");
