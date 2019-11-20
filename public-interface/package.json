@@ -37,7 +37,7 @@
     "http-proxy": "^1.17.0",
     "jaeger-client": "^3.13.0",
     "jsjws": "^5.0.2",
-    "kafka-node": "^3.0.1",
+    "kafka-node": "^5.0.0",
     "methods": "^1.1.2",
     "moment": ">=2.5.1",
     "mqtt": "^2.18.8",
