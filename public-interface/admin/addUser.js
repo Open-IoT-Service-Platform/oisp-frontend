@@ -18,11 +18,16 @@
 
 var postgresProvider = require('../iot-entities/postgresql'),
     user = postgresProvider.users,
-    cryptoUtils = require('../lib/cryptoUtils');
+    keycloak = require('../lib/security/keycloak');
 
 function add (data) {
-    return user.new(data, null)
-        .then (function (result) {
+    return keycloak.serviceAccount.createUser(data)
+        .then(() => {
+            return keycloak.serviceAccount.findUserByParameters({ email: data.email });
+        }).then(us => {
+            data.id = us.id;
+            return user.new(data, null);
+        }).then (function (result) {
             if (result) {
                 console.log("User has been added: ", result);
                 process.exit(0);
@@ -37,8 +42,15 @@ function add (data) {
 }
 
 function update (data) {
-    return user.update(data, null)
-        .then(function (result) {
+    return keycloak.serviceAccount.updateUserById(data.id, data)
+        .then(() => {
+            if (data.password) {
+                return keycloak.serviceAccount.changeUserPassword(data.id, data.password);
+            }
+            return Promise.resolve();
+        }).then(() => {
+            return user.update(data, null);
+        }).then(function (result) {
             if (result) {
                 console.log("User has been updated: ", data);
                 process.exit(0);
@@ -54,27 +66,27 @@ function update (data) {
 }
 
 module.exports = function () {
-    if (arguments.length < 3) {
+    if (arguments.length < 2) {
         console.error("Not enough arguments : ", arguments);
         process.exit(1);
     }
     var email = arguments[0],
         pass = arguments[1],
+        role = null;
+    if (arguments.length === 3) {
         role = arguments[2];
+    }
     var userData = {
         email: email,
-        password: "",
-        salt: "",
-        role: "",
+        password: pass,
         verified: true,
         termsAndConditions: true
     };
-    if (email && pass && role) {
+    if (email && pass) {
         userData.email = email;
-        userData.role = role;
-        var crypt = cryptoUtils.hash(pass);
-        userData.password = crypt.password;
-        userData.salt = crypt.salt;
+        if (role) {
+            userData.roles = [role];
+        }
         user.findByEmail(userData.email, function (err, result) {
             if (!err && result) {
                 userData.id = result.id;

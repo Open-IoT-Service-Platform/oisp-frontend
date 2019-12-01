@@ -17,6 +17,7 @@
 var Accounts = require('./../models/accounts'),
     Settings = require('./../models/settings'),
     Users = require('./../models/users'),
+    UsersBase = require('../migrations/models/users'),
     UserAccounts = require('./../models/userAccounts'),
     ComponentTypes = require('./../models/componentTypes'),
     ComplexCommands = require('./../models/complexCommands'),
@@ -33,8 +34,7 @@ var Accounts = require('./../models/accounts'),
     Actuations = require('./../models/actuations'),
     AlertComments = require('./../models/alertComments'),
     ConnectionBindings = require('./../models/connectionBindings'),
-    PurchasedLimits = require('./../models/purchasedLimits'),
-    RefreshTokens = require('./../models/refreshTokens');
+    PurchasedLimits = require('./../models/purchasedLimits');
 
 const DESC = "DESC",
     ASC = "ASC";
@@ -63,7 +63,7 @@ module.exports.defaultComponents = components;
 module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) {
     var accounts = new Accounts(sequelize, DataTypes),
         actuations = new Actuations(sequelize, DataTypes),
-        users = new Users(sequelize, DataTypes),
+        users = null,
         settings = new Settings(sequelize, DataTypes),
         userAccounts = new UserAccounts(sequelize, DataTypes),
         componentTypes = new ComponentTypes(sequelize, DataTypes),
@@ -79,13 +79,14 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         connectionBindings = new ConnectionBindings(sequelize, DataTypes),
         purchasedLimits = new PurchasedLimits(sequelize, DataTypes),
         alertComments = new AlertComments(sequelize, DataTypes),
-        refreshTokens = new RefreshTokens(sequelize, DataTypes),
         alerts = null;
 
     if (!baseModels) {
         alerts = new Alerts(sequelize, DataTypes);
+        users = new Users(sequelize, DataTypes);
     } else {
         alerts = new AlertsBase(sequelize, DataTypes);
+        users = new UsersBase(sequelize, DataTypes);
     }
 
     users.hasMany(settings, {
@@ -335,7 +336,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         actuations: actuations,
         connectionBindings: connectionBindings,
         purchasedLimits: purchasedLimits,
-        refreshTokens: refreshTokens,
         alertComments: alertComments
     };
 };

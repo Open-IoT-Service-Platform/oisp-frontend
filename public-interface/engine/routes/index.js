@@ -27,7 +27,6 @@ var cors = require('./header/cors').cors,
     refreshTokens = require("./refreshTokens.v1"),
     component = require('./components.v1'),
     actuator = require('./commands.v1'),
-    test = require('./test.v1'),
     time = require('./time.v1');
 
 var routes =  {
@@ -43,7 +42,6 @@ var routes =  {
     refreshTokens: refreshTokens,
     component: component,
     actuator: actuator,
-    test: test,
     time: time
 };
 

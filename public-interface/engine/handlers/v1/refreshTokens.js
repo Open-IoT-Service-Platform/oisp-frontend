@@ -18,37 +18,10 @@
 
 var refreshTokens = require('../../api/v1/refreshTokens'),
     httpStatuses = require('../../res/httpStatuses'),
-    tokenTypes = require('../../../lib/security/config').tokenTypes,
     errBuilder  = require("../../../lib/errorHandler/index").errBuilder,
     decodeToken = require("../../../lib/security/authorization").decodeToken,
     Response = require('../../../lib/response').response;
 
-var create = function(req, res, next) {
-    var responder = new Response(res, next);
-    var id = req.tokenInfo.payload.sub;
-    var type = req.tokenInfo.payload.type;
-    var accountId = null;
-    if (type === tokenTypes.device) {
-        accountId = req.tokenInfo.payload.accounts[0].id;
-    }
-    refreshTokens.create(id, type, accountId).then(result => {
-        responder(httpStatuses.OK.code, result);
-    }).catch(err => {
-        responder(err);
-    });
-};
-
-var revoke = function(req, res, next) {
-    var responder = new Response(res, next);
-    if(!req.body.refreshToken){
-        return responder(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest));
-    }
-    refreshTokens.revoke(req.body.refreshToken).then(() => {
-        responder(httpStatuses.OK.code);
-    }).catch(err => {
-        responder(err);
-    });
-};
 
 var refresh = function(req, res, next) {
     var responder = new Response(res, next);
@@ -64,7 +37,5 @@ var refresh = function(req, res, next) {
 };
 
 module.exports = {
-    create: create,
-    revoke: revoke,
     refresh: refresh
 };

@@ -47,15 +47,9 @@ var getReplacementsForQuery = function (userModel, id) {
     var replaceObject = {
         id: id,
         email: userModel.email,
-        password: userModel.password,
-        salt: userModel.salt,
-        termsAndConditions: userModel.termsAndConditions,
-        verified: userModel.verified,
-        provider: userModel.provider,
         attrs: JSON.stringify(userModel.attrs),
         accountId: accountId,
-        role: role,
-        type: userModel.type
+        role: role
     };
     for(var value in replaceObject){
         if (undefined === replaceObject[value]){
@@ -67,19 +61,13 @@ var getReplacementsForQuery = function (userModel, id) {
 
 exports.new = function (userData, transaction) {
     var userModel = interpreter.toDb(userData);
-    userModel = getReplacementsForQuery(userModel, uuid.v4());
+    userModel = getReplacementsForQuery(userModel, userModel.id ? userModel.id : uuid.v4());
     if (userModel.accountId) {
         delete userModel.accountId;
     }
     if (userModel.role) {
         delete userModel.role;
     }
-    var defaultValueFields = ['termsAndConditions', 'verified', 'type'];
-    defaultValueFields.forEach(field => {
-        if (userModel[field] === null) {
-            delete userModel[field];
-        }
-    });
     return users.create(userModel, { transaction: transaction })
         .then(result => {
             if (result) {
@@ -190,9 +178,7 @@ exports.find = function (email, accountId, resultCallback) {
 };
 
 exports.findByIdWithAccountDetails = function (id, resultCallback) {
-    users.findOne({where: {id: id}, include: [
-        accounts
-    ]})
+    users.findOne({where: {id: id}, include: [ accounts ]})
         .then(function (user) {
             if (user) {
                 return resultCallback(null, interpreter.toApp(user, true));
@@ -262,8 +248,7 @@ var updateUser = function(userData, transaction) {
         return users.findOne(filters);
     })
         .then(result => {
-            var editableFields = ['password', 'salt', 'termsAndConditions',
-                'verified', 'provider', 'attrs'];
+            var editableFields = ['attrs'];
             var edited = [];
             editableFields.forEach(field => {
                 if (userModel[field]) {

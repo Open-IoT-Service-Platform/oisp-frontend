@@ -22,8 +22,6 @@ var refreshTokens = require ('../handlers/v1/refreshTokens'),
 
 module.exports = {
     register:  function (app) {
-        app.post(VERSION + PATH + '/refresh' , schemaValidator.validateSchema(schemas.refreshToken.CREATE), refreshTokens.create);
         app.put(VERSION + PATH + '/refresh' , schemaValidator.validateSchema(schemas.refreshToken.REFRESH), refreshTokens.refresh);
-        app.delete(VERSION + PATH + '/refresh/revoke' , schemaValidator.validateSchema(schemas.refreshToken.REVOKE), refreshTokens.revoke);
     }
 };

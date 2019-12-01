@@ -22,23 +22,15 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     userSettings = postgresProvider.settings,
     config = require('../../../config'),
     errBuilder = require('../../../lib/errorHandler').errBuilder,
-    cryptoUtils = require('../../../lib/cryptoUtils'),
     mailer = require('../../../lib/mailer'),
     entropy = require('../../../lib/entropizer'),
     Q = require('q'),
     userDeleteManager = require('../helpers/userDeleteManager'),
-    accountsApi = require('./accounts');
+    accountsApi = require('./accounts'),
+    keycloak = require('../../../lib/security/keycloak');
 
 exports.getUsers = function (accountId, queryParameters, resultCallback) {
     user.getUsers(accountId, queryParameters, function (err, users) {
-        if (users) {
-            users.forEach(function (u) {
-                if (u.password) {
-                    delete(u.salt);
-                    delete(u.password);
-                }
-            });
-        }
         resultCallback(err, users);
     });
 };
@@ -59,10 +51,6 @@ exports.isUserSoleAdminForAccount = function (userId, accountId, resultCallback)
 exports.getUser = function (userId, resultCallback) {
     user.findByIdWithAccountDetails(userId, function(err, result) {
         if (!err && result) {
-            if(result.password) {
-                delete(result.salt);
-                delete(result.password);
-            }
             resultCallback(null, result);
         }
         else {
@@ -137,17 +125,11 @@ function sendActivationEmail(host, email, resultCallback) {
 }
 
 function addNewUser(data, host) {
-
-    delete data.verified;
-
     return user.new(data, null)
         .then(function (result) {
             if (!result) {
                 throw errBuilder.Errors.Generic.InternalServerError;
             }
-
-            delete result.password;
-            delete result.salt;
 
             if (!data.provider) {
                 return Q.nfcall(sendActivationEmail, host, data.email)
@@ -171,15 +153,18 @@ function addNewUser(data, host) {
 exports.addUser = function (data, host) {
     if (data.password) {
         if (entropy.check(data.password)) {
-            var crypt = cryptoUtils.hash(data.password);
-            data.password = crypt.password;
-            data.salt = crypt.salt;
-            return addNewUser(data, host);
+            return keycloak.serviceAccount.createUser(data).then(() => {
+                return keycloak.serviceAccount.findUserByParameters({ email: data.email });
+            }).then(us => {
+                delete data.password;
+                delete data.verified;
+                delete data.termsAndConditions;
+                data.id = us.id;
+                return addNewUser(data, host);
+            });
         } else {
             return Q.reject(errBuilder.build(errBuilder.Errors.User.WeakPassword));
         }
-    } else {
-        return addNewUser(data, host);
     }
 };
 
@@ -193,7 +178,7 @@ exports.updateUser = function (data, accountId) {
         newAccounts[accountId] = data.accounts[accountId].role || data.accounts[accountId];
         data.accounts = newAccounts;
     }
-
+    // user metadata stays same, no need to update keycloak
     return postgresProvider.startTransaction()
         .then(function(transaction) {
             return user.update(data, transaction)
@@ -262,27 +247,26 @@ var deleteUserAccounts = function(userId, transaction) {
 };
 
 exports.deleteUser = function (userId) {
-    return postgresProvider.startTransaction()
-        .then(function(transaction) {
-            return deleteUserAccounts(userId, transaction)
-                .then(function () {
-                    return Q.nfcall(user.delete, userId, transaction);
-                })
-                .then(function() {
-                    return postgresProvider.commit(transaction);
-                })
-                .catch (function (err) {
-                    return postgresProvider.rollback(transaction)
-                        .done(function() {
-                            if (err && err.code) {
-                                logger.error("Could not delete user: " + userId);
-                                throw err;
-                            } else {
-                                throw errBuilder.build(errBuilder.Errors.User.NotFound);
-                            }
-                        });
-                });
+    var transaction;
+    return keycloak.serviceAccount.deleteUser(userId).then(() => {
+        return postgresProvider.startTransaction();
+    }).then(function(t) {
+        transaction = t;
+        return deleteUserAccounts(userId, transaction);
+    }).then(function () {
+        return Q.nfcall(user.delete, userId, transaction);
+    }).then(function() {
+        return postgresProvider.commit(transaction);
+    }).catch (function (err) {
+        return postgresProvider.rollback(transaction).done(function() {
+            if (err && err.code) {
+                logger.error("Could not delete user: " + userId);
+                throw err;
+            } else {
+                throw errBuilder.build(errBuilder.Errors.User.NotFound);
+            }
         });
+    });
 };
 
 exports.deleteUserFromAccount = function (email, accountId, isSelf) {
@@ -358,39 +342,21 @@ exports.getPasswordToken = function (tokenId, resultCallback) {
     });
 };
 
-var isUserFromRequest = function (user, userIdFromToken) {
-    if (user && user.id) {
-        return user.id === userIdFromToken;
-    }
-    return false;
-};
-
 exports.changePasswordOfUser = function (email, userIdentifier, data, resultCallback) {
     if (entropy.check(data.password)) {
-        user.findByEmail(email, function (err, usr) {
-            if (usr && isUserFromRequest(usr, userIdentifier)) {
-                cryptoUtils.verify(data.currentpwd, usr.password, usr.salt, function (valid) {
-                    if (valid) {
-                        var crypt = cryptoUtils.hash(data.password);
-                        usr.password = crypt.password;
-                        usr.salt = crypt.salt;
-                        delete usr.accounts;
-
-                        return user.updateByEmail(usr, null)
-                            .then(function () {
-                                resultCallback(null);
-                            })
-                            .catch(function () {
-                                resultCallback(errBuilder.build(errBuilder.Errors.User.SavingError));
-                            });
-                    } else {
-                        resultCallback(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest));
-                    }
+        keycloak.adapter.obtainDirectly(email, data.currentpwd)
+            .then(() => {
+                return user.findByEmail(email, function(err, usr) {
+                    return keycloak.serviceAccount.changeUserPassword(usr.id, data.password)
+                        .then(() => {
+                            resultCallback(null);
+                        }).catch(() => {
+                            resultCallback(errBuilder.build(errBuilder.Errors.User.SavingError));
+                        });
                 });
-            } else {
+            }).catch(() => {
                 resultCallback(errBuilder.build(errBuilder.Errors.Generic.InvalidRequest));
-            }
-        });
+            });
     } else {
         resultCallback(errBuilder.build(2401));
     }
@@ -403,19 +369,9 @@ exports.changePassword = function (data, resultCallback) {
                 if (!token) {
                     throw errBuilder.Errors.User.InvalidInteractionToken;
                 }
-                var crypt = cryptoUtils.hash(data.password);
-                var userData = {
-                    password: crypt.password,
-                    salt: crypt.salt,
-                    email: token.email
-                };
-                delete userData.accounts;
-                return user.updateByEmail(userData)
-                    .then(function (updatedUser) {
-                        if (!updatedUser) {
-                            throw errBuilder.Errors.User.SavingError;
-                        }
-                        userInteractionToken.deleteByUserIdAndType(updatedUser.id, userInteractionToken.TYPE.PASSWORD_RESET);
+                return keycloak.serviceAccount.changeUserPassword(token.userId, data.password)
+                    .then(function() {
+                        userInteractionToken.deleteByUserIdAndType(token.userId, userInteractionToken.TYPE.PASSWORD_RESET);
                     })
                     .catch(function () {
                         throw errBuilder.Errors.User.SavingError;
@@ -532,21 +488,16 @@ exports.activate = function (options, callback) {
                 throw errBuilder.Errors.User.Activation.TokenError;
             }
             var userData = {
-                verified: true,
-                email: token.email
+                verified: true
             };
 
-            return user.updateByEmail(userData, null)
-                .then(function (updatedUser) {
-                    if (!updatedUser) {
-                        throw errBuilder.Errors.User.NotFound;
-                    }
-                    return Q.nfcall(userInteractionToken.deleteByUserIdAndType, updatedUser.id, userInteractionToken.TYPE.ACTIVATE_USER)
+            return keycloak.serviceAccount.updateUserById(token.userId, userData)
+                .then(function() {
+                    return Q.nfcall(userInteractionToken.deleteByUserIdAndType, token.userId, userInteractionToken.TYPE.ACTIVATE_USER)
                         .catch(function (err) {
                             logger.error('users. activate, could not remove interaction token, error: ' + JSON.stringify(err));
                         });
-                })
-                .catch(function () {
+                }).catch(function () {
                     throw errBuilder.Errors.User.Activation.CannotUpdate;
                 });
         })

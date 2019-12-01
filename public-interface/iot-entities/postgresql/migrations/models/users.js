@@ -29,9 +29,35 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             unique: true
         },
+        password: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        salt: {
+            type: DataTypes.STRING(255),
+            allowNull: false
+        },
+        termsAndConditions: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        verified: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
+        provider: {
+            type: DataTypes.STRING(255)
+        },
         //in sequelize 'attributes' name is restricted, so we have to use attr instead here
         attrs: {
             type: DataTypes.JSON
+        },
+        type: {
+            type: DataTypes.ENUM('system', 'user'),
+            allowNull: false,
+            defaultValue: 'user'
         }
     }, {
         createdAt: 'created',

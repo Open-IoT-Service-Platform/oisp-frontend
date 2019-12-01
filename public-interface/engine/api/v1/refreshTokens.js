@@ -17,20 +17,28 @@
 'use strict';
 
 var postgresProvider = require('../../../iot-entities/postgresql'),
-    User = postgresProvider.users,
     Device = postgresProvider.devices,
-    RefreshToken = postgresProvider.refreshTokens,
-    refreshTokenExpire = require('../../../lib/security/config').refresh_token_expire * 60 * 1000,
     tokenTypes = require('../../../lib/security/config').tokenTypes,
     logger = require('../../../lib/logger/index').init(),
     errBuilder  = require("../../../lib/errorHandler/index").errBuilder,
-    Q = require('q'),
-    auth = require('../../../lib/security/index').authorization;
+    keycloak = require('../../../lib/security/keycloak');
 
-var refreshJWTToken = function(oldToken) {
-    return Q.nfcall(auth.generateToken, oldToken.sub, oldToken.accounts,
-        oldToken.role, refreshTokenExpire, oldToken.type)
-        .catch(function(err) {
+var refreshJWTToken = function(oldToken, refreshToken, deviceUID) {
+    var headers = {
+        'X-Access-Type': oldToken.type
+    };
+    if (oldToken.type === tokenTypes.device) {
+        headers['X-DeviceID'] = oldToken.sub;
+        headers['X-DeviceUID'] = deviceUID;
+        headers['X-Activation-Code'] = keycloak.placeholder;
+    }
+    return keycloak.customGrants.ensureFreshness(refreshToken, headers)
+        .then(grant => {
+            return {
+                token: grant.access_token,
+                refreshToken: grant.refresh_token
+            };
+        }).catch(err => {
             logger.error("The Token could not be generated " + JSON.stringify(err));
             throw errBuilder.build(errBuilder.Errors.RefreshToken.RefreshError);
         });
@@ -38,51 +46,24 @@ var refreshJWTToken = function(oldToken) {
 
 exports.refresh = function(refreshToken, oldToken) {
     var tokens = {};
-    var oldRefreshToken;
-    return RefreshToken.findByToken(refreshToken).then(result => {
-        if (!result) {
-            throw errBuilder.build(errBuilder.Errors.RefreshToken.InvalidToken);
-        }
-        oldRefreshToken = result;
-        var expireDate = new Date(result.exp);
-        if (new Date() > expireDate) {
-            throw errBuilder.build(errBuilder.Errors.RefreshToken.ExpireError);
-        }
-        return refreshJWTToken(oldToken);
-    }).then(newAccessToken => {
-        tokens.jwt = newAccessToken;
-        return RefreshToken.new(oldRefreshToken.id, new Date() + refreshTokenExpire,
-            oldRefreshToken.type);
-    }).then(newRefreshToken => {
-        tokens.refreshToken = newRefreshToken;
-        return tokens;
-    });
-};
-
-exports.revoke = function(refreshToken) {
-    return RefreshToken.destroyByToken(refreshToken);
-};
-
-exports.create = function(id, type, accountId) {
-    if (tokenTypes.device === type) {
-        return Device.findByIdAndAccount(id, accountId).then(result => {
+    if (oldToken.type === tokenTypes.device) {
+        var deviceId = oldToken.sub;
+        var accountId = oldToken.accounts[0].id;
+        return Device.findByIdAndAccount(deviceId, accountId).then(result => {
             if (!result) {
                 throw errBuilder.build(errBuilder.Errors.Device.NotFound);
             }
-            return RefreshToken.new(result.uid, new Date() + refreshTokenExpire, type);
-        }).then(refreshToken => {
-            return { refreshToken: refreshToken };
-        });
-    } else if (tokenTypes.user === type) {
-        return User.findById(id).then(result => {
-            if (!result) {
-                throw errBuilder.build(errBuilder.Errors.User.NotFound);
-            }
-            return RefreshToken.new(result.id, new Date() + refreshTokenExpire, type);
-        }).then(refreshToken => {
-            return { refreshToken: refreshToken };
+            return refreshJWTToken(oldToken, refreshToken, result.uid).then(grant => {
+                tokens.jwt = grant.access_token;
+                tokens.refreshToken = grant.refresh_token;
+                return tokens;
+            });
         });
     } else {
-        throw errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
+        return refreshJWTToken(oldToken, refreshToken).then(grant => {
+            tokens.jwt = grant.access_token;
+            tokens.refreshToken = grant.refresh_token;
+            return tokens;
+        });
     }
 };

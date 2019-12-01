@@ -598,11 +598,6 @@ var users = function () {
         accounts: 'accounts',
         attributes: 'attrs',
         email: 'email',
-        password: 'password',
-        salt: 'salt',
-        verified: 'verified',
-        provider: 'provider',
-        termsAndConditions: 'termsAndConditions',
         created: 'created',
         updated: 'updated'
     };
