@@ -38,8 +38,7 @@ var DAOs = [
     'alerts',
     'actuations',
     'connectionBindings',
-    'purchasedLimits',
-    'refreshTokens'
+    'purchasedLimits'
 ];
 
 DAOs.forEach(function(dao) {

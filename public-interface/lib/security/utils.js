@@ -15,9 +15,6 @@
  */
 
 'use strict';
-var jsjws = require('jsjws'),
-    keyPem = require('./key-pem'),
-    secConfig = require('./config');
 
 /**
  * @description Retrieve a token or null if not presented as Bearer Authorization Token
@@ -33,20 +30,6 @@ var getBearerToken = function (header) {
     return token;
 };
 
-var getSubjectFromHeader = function (header) {
-    var jws = new jsjws.JWS();
-    try {
-        var token = getBearerToken(header);
-        jws.verifyJWSByKey(token, keyPem.pub_key(), secConfig.supportedAlg);
-
-        var payload = jws.getParsedPayload();
-        return payload.sub;
-    } catch (err) {
-        return null;
-    }
-};
-
 module.exports = {
-    getSubjectFromHeader: getSubjectFromHeader,
     getBearerToken: getBearerToken
 };

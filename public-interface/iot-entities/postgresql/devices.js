@@ -159,6 +159,20 @@ exports.findByIdAndAccount = function (deviceId, accountId, transaction) {
         });
 };
 
+exports.findByDeviceUIDWithAccountId = function(deviceUID) {
+    var filter = {
+        where: {
+            uid: deviceUID,
+        }
+    };
+    return devices.findOne(filter).then(device => {
+        var accountId = device.accountId;
+        var ret = interpreterHelper.mapAppResults(device, interpreter);
+        ret["accountId"] = accountId;
+        return ret;
+    });
+};
+
 var updateDeviceAttributes = function (attributes, device, transaction) {
     if (attributes) {
         return deviceAttributes.destroy({where: {deviceUID: device.uid}, transaction: transaction})

@@ -154,6 +154,9 @@ var config = {
         ruleEngineUser: {
             email: ruleEngine_config.username,
             password: ruleEngine_config.password
+        },
+        keycloak: {
+			keycloakListenerPort: 4004
         }
     },
     verifyUserEmail: true,

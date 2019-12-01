@@ -5,7 +5,7 @@
   "description": "IoT Kit Analytics",
   "main": "app.js",
   "engines": {
-    "node": "0.10.38"
+    "node": "8.16.0"
   },
   "scripts": {
     "test": "make unittest"
@@ -37,7 +37,10 @@
     "http-proxy": "^1.17.0",
     "jaeger-client": "^3.13.0",
     "jsjws": "^5.0.2",
+    "jwt-decode": "^2.2.0",
     "kafka-node": "^3.0.1",
+    "keycloak-admin": "^1.13.0",
+    "keycloak-connect": "^7.0.1",
     "methods": "^1.1.2",
     "moment": ">=2.5.1",
     "mqtt": "^2.18.8",
@@ -45,11 +48,6 @@
     "node-uuid": "^1.4.1",
     "nodemailer": "^6.4.0",
     "opentracing": "^0.14.3",
-    "passport": "^0.4.0",
-    "passport-facebook": "^2.1.1",
-    "passport-github": "^1.1.0",
-    "passport-google-oauth": "^1.0.0",
-    "passport-local": "^1.0.0",
     "pg": "^7.6.0",
     "pg-hstore": "2.3.2",
     "q": "^1.0.1",

@@ -41,9 +41,8 @@ var cloneObject = function(object) {
     return clone;
 };
 
-var generateToken = function(device, deviceAccount) {
-
-    return Q.nfcall(auth.generateToken, device.deviceId, deviceAccount, null, null, auth.tokenTypes.device)
+var generateToken = function(device, activationCode) {
+    return Q.nfcall(auth.generateToken, device.uid, device.id, activationCode, auth.tokenTypes.device)
         .catch(function(err) {
             logger.error("The Token could not be generated " + JSON.stringify(err));
             throw errBuilder.build(errBuilder.Errors.Device.ActivationError);
@@ -202,16 +201,18 @@ exports.registerDevice = function (deviceToRegister, activationCode, resultCallb
             }
         })
         .then(function(activationResult) {
-            var deviceAccount = [{
-                id: activationResult.accountId,
-                role: 'device'
-            }];
-            return generateToken(deviceToRegister, deviceAccount)
-                .then(function(token) {
-                    if (!token) {
+            Device.findByIdAndAccount(deviceToRegister.deviceId, activationResult.accountId)
+                .then(d => {
+                    return generateToken(d, activationCode);
+                }).then(function(grant) {
+                    if (!grant) {
                         throw errBuilder.Errors.Device.ActivationError;
                     }
-                    resultCallback(null, {deviceToken: token, domainId: activationResult.accountId});
+                    resultCallback(null, {
+                        deviceToken: grant.access_token,
+                        refreshToken: grant.refresh_token,
+                        domainId: activationResult.accountId
+                    });
                 });
         })
         .catch(function(err) {

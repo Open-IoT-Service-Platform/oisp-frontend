@@ -19,30 +19,28 @@ var postgresProvider = require('../../iot-entities/postgresql'),
     user = postgresProvider.users,
     logger = require('../logger').init(),
     errBuilder = require('../errorHandler').errBuilder,
-    cryptoUtils = require('../cryptoUtils'),
     entropy = require('../entropizer'),
     gatewayUser = require('../../config').auth.gatewayUser,
     ruleEngineUser = require('../../config').auth.ruleEngineUser,
-    Q = require('q');
+    Q = require('q'),
+    keycloak = require('../security/keycloak');
 
 function addUser(data) {
-
     if (!entropy.check(data.password)) {
         return Q.reject(errBuilder.build(errBuilder.Errors.User.WeakPassword));
     }
-
-    var crypt = cryptoUtils.hash(data.password);
-    data.password = crypt.password;
-    data.salt = crypt.salt;
-
-    return user.new(data, null)
-        .then(function (result) {
-            if (!result) {
-                throw errBuilder.Errors.User.SavingError;
-            }
-            logger.info("System user - " + data.email +  " created.");
-            return result;
-        });
+    return keycloak.serviceAccount.createUser(data).then(() => {
+        return keycloak.serviceAccount.findUserByParameters({ email: data.email });
+    }).then(us => {
+        data.id = us.id;
+        return user.new(data, null);
+    }).then(result => {
+        if (!result) {
+            throw errBuilder.Errors.User.SavingError;
+        }
+        logger.info("System user - " + data.email +  " created.");
+        return result;
+    });
 }
 
 exports.create = function(){
@@ -60,7 +58,7 @@ exports.create = function(){
     dataUser.forEach(function(userData) {
         userData.termsAndConditions = true;
         userData.verified = true;
-        userData.type = user.USER_TYPES.system;
+        userData.roles = [user.USER_TYPES.system];
     });
 
     return Q.all(dataUser.map(function(systemUser) {

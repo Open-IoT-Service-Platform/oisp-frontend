@@ -41,7 +41,8 @@ var http = require('http'),
     heartBeat = require('./lib/heartbeat'),
     tracer = require('./lib/express-jaeger').tracer,
     grafana = require("./grafana"),
-    cbor = require("./lib/cbor");
+    cbor = require("./lib/cbor"),
+    keycloak = require('./lib/security/keycloak');
 
 var XSS = iotRoutes.cors,
     appServer = express(),
@@ -101,6 +102,7 @@ appServer.use(bodyParser.urlencoded({extended: true, limit: config.api.bodySizeL
 appServer.use(XSS());
 
 appServer.use(winstonLogger.httpLogger());
+appServer.use(keycloak.adapter.middleware());
 
 (function setAppServerUseSecurityAndCaptcha(){
     var endpoints = ['/v1','/ui'];
@@ -147,19 +149,24 @@ grafana.reverseProxyGrafana.listen(config.grafana.proxyPort, () => {
     console.log('Grafana Reverse Proxy listening on port ' + config.grafana.proxyPort);
 });
 
+keycloak.keycloakListener.listen(config.auth.keycloak.keycloakListenerPort, () => {
+    console.log('Keycloak Listener listening on port ' + config.auth.keycloak.keycloakListenerPort);
+});
+
 monitor.start();
 commServer.init(httpServer, IotWsAuth);
 
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
-    grafana.getViewerToken().then(() => {
-        if (!module.parent) {
-            httpServer.listen(api_port, function () {
-                console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
-                heartBeat.start();
-            });
-        } else {
-            module.exports.server = appServer;
-        }
-    });
+    grafana.getViewerToken()
+        .then(() => {
+            if (!module.parent) {
+                httpServer.listen(api_port, function () {
+                    console.log("Server Listen at Port: " + api_port + " in ENV : " + ENV);
+                    heartBeat.start();
+                });
+            } else {
+                module.exports.server = appServer;
+            }
+        });
 });

@@ -15,25 +15,16 @@
  */
 
 'use strict';
-
-var routes = require('./routes.config'),
-    roles = require('./roles.config'),
-    keys_config = require('../../../config').auth.keys;
+var routes = require('./routes.config');
+var roles = require('./roles.config');
 
 module.exports = {
-    roles: roles,
-    routes: routes,
-    private_pem_path: keys_config.private_pem_path,
-    public_pem_path: keys_config.public_pem_path,
     default_activation_code_expire: 60, // 1 Hour year (in minutes)
     tokenTypes: {
     	user: "user",
     	device: "device"
     },
-    refresh_token_expire: 525948, // 1 year (in minutes)
-    default_token_expire: 5256000, // 10 years (in minutes)
-    user_token_expire: 1440, // 24 hours (in minutes)
-    iss: 'http://enableiot.com', // JWT Issuer
-    alg: 'RS256', // signature algorithm. Options:  RS256, RS512, PS256, PS512, HS256, HS512,
-    supportedAlg: ["RS256", "RS512", "PS256", "PS512", "HS256", "HS512"]
+    placeholder: 'placeholder@placeholder.org',
+    routes: routes,
+    roles: roles
 };
