@@ -97,6 +97,13 @@ if (postgres_config.writeHostname) {
 	};
 }
 
+var smtp_tls;
+if (smtp_config.host === "debugger") {
+    smtp_tls = {rejectUnauthorized: false};
+} else {
+    smtp_tls = {secureProtocol: "TLSv1_method"};
+}
+
 var config = {
     api: {
         forceSSL: true,
@@ -189,9 +196,7 @@ var config = {
                 user: smtp_config.username,
                 pass: smtp_config.password
             },
-            tls:{
-                secureProtocol: "TLSv1_method"
-            }
+            tls: smtp_tls
         },
         footer:"",
         blockedDomains: [ "@example.com", "@test.com" ]

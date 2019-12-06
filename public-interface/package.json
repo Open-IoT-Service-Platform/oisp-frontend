@@ -43,7 +43,7 @@
     "mqtt": "^2.18.8",
     "node-http-proxy-json": "^0.1.6",
     "node-uuid": "^1.4.1",
-    "nodemailer": "^4.6.6",
+    "nodemailer": "^6.4.0",
     "opentracing": "^0.14.3",
     "passport": "^0.4.0",
     "passport-facebook": "^2.1.1",
