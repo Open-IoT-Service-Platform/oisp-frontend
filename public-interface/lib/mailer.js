@@ -83,7 +83,7 @@ var sendMail = function (templateName, params, smtpConfig) {
             logger.info('Preview URL: ' + JSON.stringify(nodemailer.getTestMessageUrl(res)));
         }
     }).catch(err => {
-        logger.error('mailer. send, error sending the mail: ' + JSON.stringify(err));
+        logger.error('mailer. send, error sending the mail: ' + err);
     });
 };
 
