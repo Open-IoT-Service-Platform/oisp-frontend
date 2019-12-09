@@ -1,12 +1,5 @@
 {
-    "realm":"OISP",
-    "auth-server-url":"http://localhost:8080/auth",
-    "ssl-required":"external",
-    "resource":"oisp-frontend",
     "verify-token-audience":true,
-    "credentials":{
-        "secret":"89e3c3e2-ad85-489f-b47c-adee2feb7061"
-    },
     "confidential-port":0,
     "policy-enforcer":{
         "user-managed-access":{},
@@ -14,12 +7,12 @@
         "paths":[
             {
                 "name":"api",
-                "path":"/{version}/api/health",
+                "path":"/v1/api/health",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -27,12 +20,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/time",
+                "path":"/v1/api/time",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -40,12 +33,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/auth/token",
+                "path":"/v1/api/auth/token",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -53,12 +46,12 @@
             },
             {
                 "name":"auth",
-                "path":"/{version}/api/auth/refresh",
+                "path":"/v1/api/auth/refresh",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -66,12 +59,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/devices/{deviceId}/activation",
+                "path":"/v1/api/devices/:deviceId/activation",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -79,12 +72,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/devices/register",
+                "path":"/v1/api/devices/register",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -92,24 +85,24 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/users/forgot_password",
+                "path":"/v1/api/users/forgot_password",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -117,12 +110,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/users/activate",
+                "path":"/v1/api/users/activate",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -130,12 +123,12 @@
             },
             {
                 "name":"api",
-                "path":"/{version}/api/users/request_user_activation",
+                "path":"/v1/api/users/request_user_activation",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "api:public"
+                            "api-public"
                         ]
                     }
                 ],
@@ -148,25 +141,25 @@
                     {
                         "method":"GET",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     }
                 ],
@@ -179,7 +172,7 @@
                     {
                         "method":"GET",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     }
                 ],
@@ -192,7 +185,7 @@
                     {
                         "method":"GET",
                         "scopes":[
-                            "ui:public"
+                            "ui-public"
                         ]
                     }
                 ],
@@ -200,912 +193,902 @@
             },
             {
                 "name":"auth",
-                "path":"/{version}/api/auth/tokenInfo",
+                "path":"/v1/api/auth/tokenInfo",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "auth:read"
+                            "auth-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/accounts/{accountId}/invites",
+                "path":"/v1/api/accounts/:accountId/invites",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/invites/{email}",
+                "path":"/v1/api/invites/:email",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/invites/{inviteId}/status",
+                "path":"/v1/api/invites/:inviteId/status",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/accounts/{accountId}/users",
-                "methods":[
-                    {
-                        "method":"GET",
-                        "scopes":[
-                            "user:admin"
-                        ]
-                    }
-                ]
-            },
-            {
-                "name":"user",
-                "path":"/{version}/api/user/me",
+                "path":"/v1/api/user/me",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/accounts/{accountId}/users/me/settings/*",
+                "path":"/v1/api/accounts/:accountId/users/me/settings/*",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"user",
-                "path":"/{version}/api/users/me/settings/*",
+                "path":"/v1/api/users/me/settings/*",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "user:admin"
+                            "user-admin"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "user:admin"
-                        ]
-                    }
-                ]
-            },
-            {
-                "name":"user",
-                "path":"/{version}/api/accounts/{accountId}/users/{userId}",
-                "methods":[
-                    {
-                        "method":"PUT",
-                        "scopes":[
-                            "user:admin"
-                        ]
-                    }
-                ]
-            },
-            {
-                "name":"user",
-                "path":"/{version}/api/users/{userId}",
-                "methods":[
-                    {
-                        "method":"GET",
-                        "scopes":[
-                            "user:admin"
-                        ]
-                    },
-                    {
-                        "method":"PUT",
-                        "scopes":[
-                            "user:admin"
-                        ]
-                    },
-                    {
-                        "method":"DELETE",
-                        "scopes":[
-                            "user:admin"
-                        ]
-                    }
-                ]
-            },
-            {
-                "name":"user",
-                "path":"/{version}/api/users",
-                "methods":[
-                    {
-                        "method":"POST",
-                        "scopes":[
-                            "user:create"
+                            "user-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}",
+                "path":"/v1/api/accounts/:accountId/users/:userId",
+                "methods":[
+                    {
+                        "method":"PUT",
+                        "scopes":[
+                            "account-admin"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name":"user",
+                "path":"/v1/api/users/:userId",
+                "methods":[
+                    {
+                        "method":"GET",
+                        "scopes":[
+                            "user-admin"
+                        ]
+                    },
+                    {
+                        "method":"PUT",
+                        "scopes":[
+                            "user-admin"
+                        ]
+                    },
+                    {
+                        "method":"DELETE",
+                        "scopes":[
+                            "user-admin"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name":"user",
+                "path":"/v1/api/users",
+                "methods":[
+                    {
+                        "method":"POST",
+                        "scopes":[
+                            "user-create"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name":"account",
+                "path":"/v1/api/accounts/:accountId",
                 "methods":[
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "platform:admin",
-                            "account:admin"
+                            "platform-admin",
+                            "account-admin"
                         ],
                         "scopes-enforcement-mode":"ANY"
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "account:admin"
+                            "account-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/sensorhealth/sampleratechanges",
+                "path":"/v1/api/accounts/:accountId/sensorhealth/sampleratechanges",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}",
+                "path":"/v1/api/accounts/:accountId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/invites/me",
+                "path":"/v1/api/accounts/:accountId/invites/me",
                 "methods":[
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/activationcode",
+                "path":"/v1/api/accounts/:accountId/activationcode",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/activationcode/refresh",
+                "path":"/v1/api/accounts/:accountId/activationcode/refresh",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/rules",
+                "path":"/v1/api/accounts/:accountId/rules",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/rules/{ruleId}",
+                "path":"/v1/api/accounts/:accountId/rules/:ruleId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:read"
+                            "account-read"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts",
+                "path":"/v1/api/accounts",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:create"
+                            "account-create"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/invites/{inviteId}",
+                "path":"/v1/api/accounts/:accountId/invites/:inviteId",
                 "methods":[
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "account:admin"
+                            "account-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/invites",
+                "path":"/v1/api/accounts/:accountId/invites",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:admin"
+                            "account-admin"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:admin"
+                            "account-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/users",
+                "path":"/v1/api/accounts/:accountId/users",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "account:admin"
+                            "account-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/cmpcatalog/{componentId}",
+                "path":"/v1/api/accounts/:accountId/cmpcatalog/:componentId",
                 "methods":[
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "account:admin"
+                            "account-admin"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/attributes",
+                "path":"/v1/api/accounts/:accountId/attributes",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/rules/clone/{ruleId}",
+                "path":"/v1/api/accounts/:accountId/rules/clone/:ruleId",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"account",
-                "path":"/{version}/api/accounts/{accountId}/cmpcatalog",
+                "path":"/v1/api/accounts/:accountId/cmpcatalog",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "account:write"
+                            "account-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/alerts",
+                "path":"/v1/api/accounts/:accountId/alerts",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "alert:read"
+                            "alert-read"
                         ]
                     },
                     {
                         "method":"POST",
                         "scopes":[
-                            "alert:trigger"
+                            "alert-trigger"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/alerts/{alertId}",
+                "path":"/v1/api/alerts/:alertId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "alert:read"
+                            "alert-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/alerts/{alertId}",
+                "path":"/v1/api/accounts/:accountId/alerts/:alertId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "alert:read"
+                            "alert-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/alerts",
+                "path":"/v1/api/alerts",
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":"alert:trigger"
+                        "scopes":[
+                            "alert-trigger"
+                        ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/alerts/{alertId}/reset",
+                "path":"/v1/api/accounts/:accountId/alerts/:alertId/reset",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/alerts/{alertId}/reset",
+                "path":"/v1/api/alerts/:alertId/reset",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/alerts/{alertId}/status/{status}",
+                "path":"/v1/api/accounts/:accountId/alerts/:alertId/status/:status",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/alerts/{alertId}/comments",
+                "path":"/v1/api/accounts/:accountId/alerts/:alertId/comments",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/accounts/{accountId}/resets",
+                "path":"/v1/api/accounts/:accountId/resets",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"alert",
-                "path":"/{version}/api/resets",
+                "path":"/v1/api/resets",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "alert:write"
+                            "alert-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"rules",
-                "path":"/{version}/api/rules/status/{status}",
+                "path":"/v1/api/rules/status/:status",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "rules:admin"
+                            "rules-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"rules",
-                "path":"/{version}/api/accounts/{accountId}/rules/{ruleId}/execution",
+                "path":"/v1/api/accounts/:accountId/rules/:ruleId/execution",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "rules:admin"
+                            "rules-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"rules",
-                "path":"/{version}/api/components/rules",
+                "path":"/v1/api/components/rules",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "rules:admin"
+                            "rules-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"rules",
-                "path":"/{version}/api/rules/synchronization_status/{statusId}",
+                "path":"/v1/api/rules/synchronization_status/:statusId",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "rules:admin"
+                            "rules-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"catalog",
-                "path":"/{version}/api/accounts/{accountId}/cmpcatalog",
+                "path":"/v1/api/accounts/:accountId/cmpcatalog",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "catalog:read"
+                            "catalog-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"catalog",
-                "path":"/{version}/api/cmpcatalog",
+                "path":"/v1/api/cmpcatalog",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "catalog:read"
+                            "catalog-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"catalog",
-                "path":"/{version}/api/accounts/{accountId}/cmpcatalog/componentId",
+                "path":"/v1/api/accounts/:accountId/cmpcatalog/componentId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "catalog:read"
+                            "catalog-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"catalog",
-                "path":"/{version}/api/cmpcatalog/{componentId}",
+                "path":"/v1/api/cmpcatalog/:componentId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "catalog:read"
+                            "catalog-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/data/admin/{deviceId}",
+                "path":"/v1/api/data/admin/:deviceId",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:writeany"
+                            "data-writeany"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/data/{deviceId}",
+                "path":"/v1/api/data/:deviceId",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:write"
+                            "data-write"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/accounts/{accountId}/data/search",
+                "path":"/v1/api/accounts/:accountId/data/search",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:read"
+                            "data-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/accounts/{accountId}/data/search/advanced",
+                "path":"/v1/api/accounts/:accountId/data/search/advanced",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:read"
+                            "data-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/accounts/{accountId}/data/report",
+                "path":"/v1/api/accounts/:accountId/data/report",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:read"
+                            "data-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/accounts/{accountId}/data/totals",
+                "path":"/v1/api/accounts/:accountId/data/totals",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "data:read"
+                            "data-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"data",
-                "path":"/{version}/api/accounts/{accountId}/data/firstLastMeasurementTimestamp",
+                "path":"/v1/api/accounts/:accountId/data/firstLastMeasurementTimestamp",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "data:read"
+                            "data-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/devices",
+                "path":"/v1/api/devices",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"GET",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices",
+                "path":"/v1/api/accounts/:accountId/devices",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"GET",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/devices/{deviceId}",
+                "path":"/v1/api/devices/:deviceId",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"GET",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices/{deviceId}",
+                "path":"/v1/api/accounts/:accountId/devices/:deviceId",
                 "methods":[
                     {
                         "method":"PUT",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"GET",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/devices/{deviceId}/components",
+                "path":"/v1/api/devices/:deviceId/components",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices/{deviceId}/components",
+                "path":"/v1/api/accounts/:accountId/devices/:deviceId/components",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"DELETE",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/control",
+                "path":"/v1/api/accounts/:accountId/control",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/control/commands/{commandName}",
+                "path":"/v1/api/accounts/:accountId/control/commands/:commandName",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     },
                     {
                         "method":"PUT",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/control/devices/{deviceId}",
+                "path":"/v1/api/accounts/:accountId/control/devices/:deviceId",
                 "methods":[
                     {
                         "method":"GET",
                         "scopes":[
-                            "device:admin"
+                            "device-admin"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices/search",
+                "path":"/v1/api/accounts/:accountId/devices/search",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices/count",
+                "path":"/v1/api/accounts/:accountId/devices/count",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]
             },
             {
                 "name":"device",
-                "path":"/{version}/api/accounts/{accountId}/devices/components",
+                "path":"/v1/api/accounts/:accountId/devices/components",
                 "methods":[
                     {
                         "method":"POST",
                         "scopes":[
-                            "device:read"
+                            "device-read"
                         ]
                     }
                 ]

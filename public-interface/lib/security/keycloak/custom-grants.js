@@ -80,7 +80,6 @@ module.exports = function getCustomGrants(clientId, secret, realmUrl, clientPubl
             options.headers[header] = headers[header];
         });
         options.form = params;
-        console.log(options);
         return rp(options).then(res => JSON.parse(res));
     }
 

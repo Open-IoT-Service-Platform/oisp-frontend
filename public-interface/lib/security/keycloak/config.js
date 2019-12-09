@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014 Intel Corporation
+ * Copyright (c) 2019 Intel Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,21 @@
  */
 
 'use strict';
-var routes = require('./routes.config');
-var roles = require('./roles.config');
+const fs = require('fs'),
+    keycloakConfig = require('./../../../config').auth.keycloak;
 
-module.exports = {
-    default_activation_code_expire: 60, // 1 Hour year (in minutes)
-    tokenTypes: {
-    	user: "user",
-    	device: "device"
-    },
-    routes: routes,
-    roles: roles
+// singleton
+var config;
+
+module.exports.getKeycloakConfig = function() {
+    if (config) {
+        return config;
+    }
+    const json = fs.readFileSync(process.cwd() + '/keycloak.json');
+    const conf = JSON.parse(json.toString());
+    Object.keys(keycloakConfig).forEach(option => {
+        conf[option] = keycloakConfig[option];
+    });
+    config = conf;
+    return config;
 };

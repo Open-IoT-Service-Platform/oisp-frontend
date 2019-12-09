@@ -130,7 +130,10 @@ module.exports = function ServiceAccount(keycloakAdapter) {
             return this.findUserByParameters({ email: userData.email });
         }).then(user => {
             userId = user.id;
-            return this.changeUserPassword(userId, userData.password);
+            if (userData.password) {
+                return this.changeUserPassword(userId, userData.password);
+            }
+            return Promise.resolve();
         }).then(() => {
             var assignedRoles = [];
             if (userData.roles) {

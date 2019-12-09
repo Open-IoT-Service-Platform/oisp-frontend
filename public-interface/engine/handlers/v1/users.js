@@ -21,8 +21,7 @@ var users = require('../../api/v1/users'),
     errBuilder = require("../../../lib/errorHandler/index").errBuilder,
     httpStatuses = require('../../res/httpStatuses'),
     attributesValidation = require('../helpers/attributesValidation'),
-    Q = require('q'),
-    auth = require('../../../lib/security/authorization');
+    Q = require('q');
 
 
 function isMe(req) {
@@ -47,20 +46,11 @@ exports.getUsers = function (req, res, next) {
         next(errBuilder.build(errBuilder.Errors.Generic.NotAuthorized));
     }
     var queryParameters = req.query;
-
-    auth.isAdminForAccountInUri(req, req.identity, function (isAdmin, isSelf, accountId) {
-        if (accountId && (isAdmin)) {
-            users.getUsers(req.params.accountId, queryParameters, function (err, users) {
-                if (!err) {
-                    res.status(httpStatuses.OK.code).send(users);
-                }
-                else {
-                    next(err);
-                }
-            });
+    users.getUsers(req.params.accountId, queryParameters, function (err, users) {
+        if (!err) {
+            res.status(httpStatuses.OK.code).send(users);
         } else {
-            var responder = new Response(res, next);
-            responder(errBuilder.Errors.Generic.NotAuthorized);
+            next(err);
         }
     });
 };
@@ -153,25 +143,15 @@ exports.updateUserRoleForYourAccount = function (req, res, next) {
 
     if ((body.accounts && body.accounts[req.params.accountId])) {
         data.accounts = body.accounts;
-        auth.isAdminForAccountInUri(req, data.id, function(isAdmin, isSelf, accountId) {
-            if(accountId && (isAdmin)) {
-                users.updateUser(data, req.params.accountId)
-                    .then(function () {
-                        res.status(httpStatuses.OK.code).send();
-                    })
-                    .catch(function (err) {
-                        next(err);
-                    });
-            } else {
-                var responder = new Response(res, next);
-                responder(errBuilder.Errors.Generic.NotAuthorized);
-            }
+        users.updateUser(data, req.params.accountId).then(function () {
+            res.status(httpStatuses.OK.code).send();
+        }).catch(function (err) {
+            next(err);
         });
     } else {
         var responder = new Response(res, next);
         responder(errBuilder.Errors.Generic.NotAuthorized);
     }
-
 };
 
 exports.deleteUser = function (req, res, next) {

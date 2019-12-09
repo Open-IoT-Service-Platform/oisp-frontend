@@ -129,6 +129,8 @@ appServer.use('/v1', function setUUID (req, res, next) {
     next();
 });
 
+keycloak.registerEnforcer(appServer, keycloak.adapter);
+
 /* Modules that registered his routes
  shall be unique or will be override
  */

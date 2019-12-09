@@ -16,11 +16,15 @@
 
 'use strict';
 const Keycloak = require('keycloak-connect'),
-    keycloakListener = require('./keycloak-listener'),
+    keycloakListener = require('./listener'),
     KeycloakServiceAccount = require('./service-account'),
     getCustomGrants = require('./custom-grants'),
-    keycloakAdapter = new Keycloak({}),
-    serviceAdapter = new Keycloak({}),
+    registerEnforcer = require('./enforcer').register,
+    authConfig = require('./../../../config').auth,
+    config = require('./config').getKeycloakConfig();
+
+const keycloakAdapter = new Keycloak({}, config),
+    serviceAdapter = new Keycloak({}, config),
     serviceAccount = new KeycloakServiceAccount(serviceAdapter),
     customGrants = getCustomGrants(keycloakAdapter.grantManager.clientId,
         keycloakAdapter.grantManager.secret, keycloakAdapter.grantManager.realmUrl,
@@ -32,5 +36,7 @@ module.exports = {
     adapter: keycloakAdapter,
     customGrants: customGrants,
     placeholder: 'placeholder',
-    placeholdermail: 'placeholder@placeholder.org'
+    placeholdermail: authConfig.placeholderUser,
+    registerEnforcer: registerEnforcer,
+    config: config
 };
