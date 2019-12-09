@@ -39,7 +39,7 @@ var getCurrentUser = function (req, res, next) {
     }
 };
 
-var loginWithKeycloak = function(req, res, next) {
+var loginWithKeycloak = function(req, res) {
     var username = req.body.username;
     var password = req.body.password;
     keycloak.adapter.grantManager.obtainDirectly(username, password)
@@ -49,8 +49,8 @@ var loginWithKeycloak = function(req, res, next) {
                 refresh_token: grant.refresh_token.token,
                 id_token: grant.id_token.token
             });
-        }).catch(err => {
-            next(err);
+        }).catch(() => {
+            res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(errBuilder.Errors.Generic.NotAuthorized.message);
         });
 };
 
@@ -64,9 +64,7 @@ module.exports = function (cfg, forceSSL) {
     app.get('/api/auth/me', getCurrentUser);
     app.get('/auth/me', getCurrentUser);
 
-    app.post('/auth/local',
-        loginWithKeycloak
-    );
+    app.post('/auth/local', loginWithKeycloak);
 
     app.post('/api/auth/token',
         schemaValidator.validateSchema(schemas.authorization.AUTH),

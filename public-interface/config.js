@@ -71,7 +71,8 @@ var postgres_config = getOISPConfig("postgresConfig"),
     kafka_config = getOISPConfig("kafkaConfig"),
     jaeger_enabled = getOISPConfig("jaegerTracing"),
     grafana_config = getOISPConfig("grafanaConfig"),
-    winston = require('winston');
+    winston = require('winston'),
+    keycloak_config = getOISPConfig("keycloakConfig");
 
 // Get replica information from the postgres config,
 // Done this way to avoid compatibility problems with other services
@@ -121,25 +122,6 @@ var config = {
         }
     },
     auth: {
-        facebook: {
-            clientID: '',
-            clientSecret: '',
-            callbackURL: ''
-        },
-        github: {
-            clientID: '',
-            clientSecret: '',
-            callbackURL: ""
-        },
-        google: {
-            clientID: '',
-            clientSecret: '',
-            callbackURL: ''
-        },
-        keys: {
-            private_pem_path: dashboardSecurity_config.private_pem_path,
-            public_pem_path: dashboardSecurity_config.public_pem_path
-        },
         captcha: {
             googleUrl: 'http://www.google.com/recaptcha/api/verify',
             privateKey: recaptcha_config.secretKey,
@@ -155,8 +137,18 @@ var config = {
             email: ruleEngine_config.username,
             password: ruleEngine_config.password
         },
+        placeholderUser: {
+            email: 'placeholder@placeholder.org',
+        },
         keycloak: {
-			keycloakListenerPort: 4004
+			keycloakListenerPort: keycloak_config.listenerPort,
+            realm: keycloak_config.realm,
+            "auth-server-url": keycloak_config["auth-server-url"],
+            resource: keycloak_config.resource,
+            credentials: {
+                secret: keycloak_config.secret
+            },
+            "ssl-required": keycloak_config["ssl-required"]
         }
     },
     verifyUserEmail: true,

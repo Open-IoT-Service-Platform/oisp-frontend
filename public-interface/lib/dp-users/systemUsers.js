@@ -22,11 +22,12 @@ var postgresProvider = require('../../iot-entities/postgresql'),
     entropy = require('../entropizer'),
     gatewayUser = require('../../config').auth.gatewayUser,
     ruleEngineUser = require('../../config').auth.ruleEngineUser,
+    placeholderUser = require('../../config').auth.placeholderUser,
     Q = require('q'),
     keycloak = require('../security/keycloak');
 
 function addUser(data) {
-    if (!entropy.check(data.password)) {
+    if (data.password && !entropy.check(data.password)) {
         return Q.reject(errBuilder.build(errBuilder.Errors.User.WeakPassword));
     }
     return keycloak.serviceAccount.createUser(data).then(() => {
@@ -52,19 +53,25 @@ exports.create = function(){
         {
             password: ruleEngineUser.password,
             email: ruleEngineUser.email
+        },
+        {
+            email: placeholderUser.email,
+            roles: [user.USER_TYPES.user]
         }
     ];
 
     dataUser.forEach(function(userData) {
         userData.termsAndConditions = true;
         userData.verified = true;
-        userData.roles = [user.USER_TYPES.system];
+        if (!userData.roles) {
+            userData.roles = [user.USER_TYPES.system];
+        }
     });
 
     return Q.all(dataUser.map(function(systemUser) {
-        return Q.nfcall(user.findByEmail, systemUser.email)
+        return keycloak.serviceAccount.findUserByParameters({ email: systemUser.email })
             .then(function (user) {
-                if (!user) {
+                if (!user || !user.id) {
                     return addUser(systemUser);
                 } else {
                     logger.info("System user - " + systemUser.email + " already exists");

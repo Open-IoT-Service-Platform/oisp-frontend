@@ -20,7 +20,6 @@ var devices = require('../../api/v1/devices'),
     httpStatuses = require('../../res/httpStatuses'),
     errors = require('../../../lib/errorHandler/index').errBuilder.Errors,
     errBuilder = require('../../../lib/errorHandler/index').errBuilder,
-    auth = require('../../../lib/security/authorization'),
     logger = require('../../../lib/logger/index').init(),
     schemaValidator = require('../../../lib/schema-validator'),
     schemas = require('../../../lib/schema-validator/schemas'),
@@ -110,6 +109,7 @@ exports.updateDevice = function (req, res, next) {
             responder(httpStatuses.BadRequest.code, err);
         });
 };
+
 exports.getDevice = function (req, res, next) {
     var accountId = requestParser.getAccountIdFromReq(req);
     var responder = new Response(res, next);
@@ -264,25 +264,20 @@ exports.addComponents = function (req, res, next) {
 
     var addComponentLogic = function () {
         var responder = new Response(res, next);
-
-        auth.isAdminForAccountInUri(req, req.identity, function (isAdmin, isSelf, accountId) {
-            var deviceId = req.params.deviceId;
-            accountId = requestParser.getAccountIdFromReq(req);
-            if (accountId && (isAdmin || deviceId === req.identity)) {
-                devices.addComponents(deviceId, req.body, accountId)
-                    .then(function (result) {
-                        logger.info("Success Add Component To device " + JSON.stringify(result));
-                        responder(httpStatuses.Created.code, result);
-                    })
-                    .catch(function (err) {
-                        logger.error("Not Add Components to Device" + JSON.stringify(err));
-                        responder(err);
-                    });
-            } else {
-                responder(errBuilder.build(errors.Generic.NotAuthorized));
-                return;
-            }
-        });
+        var deviceId = req.params.deviceId;
+        var accountId = requestParser.getAccountIdFromReq(req);
+        if (accountId) {
+            devices.addComponents(deviceId, req.body, accountId).then(result => {
+                logger.info("Success Add Component To device " + JSON.stringify(result));
+                responder(httpStatuses.Created.code, result);
+            }).catch(err => {
+                logger.error("Not Add Components to Device" + JSON.stringify(err));
+                responder(err);
+            });
+        } else {
+            responder(errBuilder.build(errors.Generic.NotAuthorized));
+            return;
+        }
     };
 
     var schema = schemas.deviceComponent.SINGLE;

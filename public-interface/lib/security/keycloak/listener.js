@@ -16,8 +16,8 @@
 
 'use strict';
 const express = require('express'),
-    user = require('./../../../iot-entities/postgresql').user,
-    device = require('./../../../iot-entities/postgresql').device,
+    users = require('./../../../iot-entities/postgresql').users,
+    devices = require('./../../../iot-entities/postgresql').devices,
     accounts = require('./../../../iot-entities/postgresql').accounts,
     httpStatuses = require('./../../../engine/res/httpStatuses'),
     app = express(),
@@ -27,7 +27,7 @@ app.get('/keycloak/users/:userId/accounts', (req, res) => {
     if (!req.params.userId) {
         return res.status(httpStatuses.OK.code).send([]);
     }
-    user.findByIdWithAccountDetails(req.params.userId, (err, result) => {
+    users.findByIdWithAccountDetails(req.params.userId, (err, result) => {
         if (!err && result) {
             var ret = [];
             Object.keys(result.accounts).forEach(accId => {
@@ -49,7 +49,7 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
     if (!req.params.activationCode || !req.params.deviceUID) {
         return res.status(httpStatuses.OK.code).send([]);
     }
-    device.findByDeviceUIDWithAccountId(req.params.deviceUID).then(d => {
+    devices.findByDeviceUIDWithAccountId(req.params.deviceUID).then(d => {
         if (req.params.activationCode === PLACEHOLDER) {
             return res.status(httpStatuses.OK.code).send([{
                 id: d.accountId,
@@ -58,9 +58,9 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
             }]);
         }
         accounts.findByActivationCode(req.params.activationCode, (err, account) => {
-            if (!err && account && d && account.id === d.accountId) {
+            if (!err && account && d && account.public_id === d.accountId) {
                 return res.status(httpStatuses.OK.code).send([{
-                    id: account.id,
+                    id: account.public_id,
                     name: account.name,
                     role: 'device'
                 }]);

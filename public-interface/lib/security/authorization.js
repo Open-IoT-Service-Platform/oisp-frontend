@@ -17,9 +17,10 @@
 "use strict";
 var jwt_decode = require('jwt-decode'),
     tokenTypes,
-    express = require('../express-jaeger').express,
+    express = require('./../express-jaeger').express,
     utils = require('./utils'),
     keycloak = require('./keycloak'),
+    users = require('./../../iot-entities/postgresql').users,
     tokenTypes;
 
 var generateToken = function(deviceUID, deviceId, activationcode, type, callback, email) {
@@ -74,6 +75,23 @@ var getTokenInfo = function(token, req, callback){
     callback(result);
 };
 
+var checkUser = function(token) {
+    return users.findById(token.sub).then(user => {
+        if (user && user.id) {
+            return true;
+        }
+        return false;
+    });
+};
+
+var addUserToDB = function(token) {
+    var userData = {
+        id: token.sub,
+        email: token.email
+    };
+    return users.new(userData);
+};
+
 var parseTokenFromRequest = function(req, res, next) {
     var accessToken = utils.getBearerToken(req.headers.authorization);
     if (accessToken) {
@@ -87,6 +105,14 @@ var parseTokenFromRequest = function(req, res, next) {
         }
         keycloak.adapter.grantManager.createGrant({ access_token: accessToken }).then(grant => {
             keycloak.adapter.storeGrant(grant, req, res);
+            req.tokenInfo.header = grant.access_token.header;
+            return checkUser(decoded);
+        }).then(isInDB => {
+            if (!isInDB) {
+                return addUserToDB(decoded);
+            }
+            return Promise.resolve();
+        }).then(() => {
             next();
         }).catch(() => {
             next();

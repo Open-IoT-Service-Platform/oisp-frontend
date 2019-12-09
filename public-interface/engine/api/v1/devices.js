@@ -42,7 +42,7 @@ var cloneObject = function(object) {
 };
 
 var generateToken = function(device, activationCode) {
-    return Q.nfcall(auth.generateToken, device.uid, device.id, activationCode, auth.tokenTypes.device)
+    return Q.nfcall(auth.generateToken, device.uid, device.deviceId, activationCode, auth.tokenTypes.device)
         .catch(function(err) {
             logger.error("The Token could not be generated " + JSON.stringify(err));
             throw errBuilder.build(errBuilder.Errors.Device.ActivationError);
@@ -208,11 +208,12 @@ exports.registerDevice = function (deviceToRegister, activationCode, resultCallb
                     if (!grant) {
                         throw errBuilder.Errors.Device.ActivationError;
                     }
-                    resultCallback(null, {
-                        deviceToken: grant.access_token,
+                    var ret = {
+                        deviceToken: grant.token,
                         refreshToken: grant.refresh_token,
                         domainId: activationResult.accountId
-                    });
+                    };
+                    resultCallback(null, ret);
                 });
         })
         .catch(function(err) {
