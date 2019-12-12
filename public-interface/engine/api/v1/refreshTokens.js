@@ -33,13 +33,8 @@ var refreshJWTToken = function(oldToken, refreshToken, deviceUID) {
         headers['X-Activation-Code'] = keycloak.placeholder;
     }
     return keycloak.customGrants.ensureFreshness(refreshToken, headers)
-        .then(grant => {
-            return {
-                token: grant.access_token,
-                refreshToken: grant.refresh_token
-            };
-        }).catch(err => {
-            logger.error("The Token could not be generated " + JSON.stringify(err));
+        .catch(err => {
+            logger.error("Could not refresh token: " + JSON.stringify(err));
             throw errBuilder.build(errBuilder.Errors.RefreshToken.RefreshError);
         });
 };

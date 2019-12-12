@@ -23,7 +23,12 @@ const pathConfigs = require('./config').getKeycloakConfig()['policy-enforcer'].p
     SCOPES_ENFORCEMENT_MODES = {
         ALL: 'ALL', // default
         ANY: 'ANY'
-    };
+    },
+    CONFLICTING_PATHS = [
+        { method: 'get', originalPath: '/v1/api/users/:userId', toSkip: '/v1/api/users/forgot_password' },
+        { method: 'put', originalPath: '/v1/api/users/:userId', toSkip: '/v1/api/users/forgot_password' },
+        { method: 'post', originalPath: '/v1/api/accounts/:accountId/data/:deviceId', toSkip: '/v1/api/accounts/:accountId/data/search'}
+    ];
 
 function getClaims(request) {
     return {
@@ -60,6 +65,28 @@ function enforceAllScopes(permissions, keycloak) {
     return keycloak.enforcer(permissions, { claims: getClaims });
 }
 
+function isParameter(str) {
+    return str.startsWith(':');
+}
+
+function pathsMatch(path1, path2) {
+    const pathParts1 = path1.split('/');
+    const pathParts2 = path2.split('/');
+    if (pathParts1.length !== pathParts2.length) {
+        return false;
+    }
+    const combined = [];
+    for (var i = 0; i < pathParts1.length; i++) {
+        combined.push([pathParts1[i], pathParts2[i]]);
+    }
+    return combined.every(partTuple => {
+        if (isParameter(partTuple[0]) || isParameter(partTuple[1])) {
+            return true;
+        }
+        return partTuple[0] === partTuple[1];
+    });
+}
+
 module.exports.register = function(app, keycloak) {
     pathConfigs.forEach(pathConfig => {
         if (pathConfig['enforcement-mode'] === ENFORCEMENT_MODES.DISABLED) {
@@ -70,11 +97,25 @@ module.exports.register = function(app, keycloak) {
         pathConfig.methods.forEach(methodConfig => {
             const method = methodConfig.method.toLowerCase();
             const scopes = methodConfig.scopes;
+            var middleware;
             if (methodConfig['scopes-enforcement-mode'] === SCOPES_ENFORCEMENT_MODES.ANY) {
-                app[method](path, enforceAnyScope(name, scopes, keycloak));
+                middleware = enforceAnyScope(name, scopes, keycloak);
             } else {
                 const permissions = scopes.map(scope => name + ':' + scope);
-                app[method](path, enforceAllScopes(permissions, keycloak));
+                middleware = enforceAllScopes(permissions, keycloak);
+            }
+            const conflict = CONFLICTING_PATHS.find(conflict => conflict.method === method && conflict.originalPath === path);
+            if (conflict) {
+                var precheck = function(req, res, next) {
+                    if (pathsMatch(req.path, conflict.toSkip)) {
+                        next('route');
+                    } else {
+                        next();
+                    }
+                };
+                app[method](path, precheck, middleware);
+            } else {
+                app[method](path, middleware);
             }
         });
     });

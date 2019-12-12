@@ -130,16 +130,11 @@ function addNewUser(data, host) {
             if (!result) {
                 throw errBuilder.Errors.Generic.InternalServerError;
             }
-
-            if (!data.provider) {
-                return Q.nfcall(sendActivationEmail, host, data.email)
-                    .thenResolve(result)
-                    .catch(function () {
-                        throw errBuilder.Errors.User.CannotSendActivationEmail;
-                    });
-            } else {
-                return Q.resolve(result);
-            }
+            return Q.nfcall(sendActivationEmail, host, data.email)
+                .thenResolve(result)
+                .catch(function () {
+                    throw errBuilder.Errors.User.CannotSendActivationEmail;
+                });
         })
         .catch(function (err) {
             var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
@@ -306,25 +301,20 @@ exports.deleteUserFromAccount = function (email, accountId, isSelf) {
 exports.addPasswordToken = function (email, host, resultCallback) {
     user.findByEmail(email, function (err, user) {
         if (user) {
-            if (user.password && user.salt) {
-
-                var options = {
-                    subject: 'OISP recover password - Intel(r) Corporation',
-                    email: email,
-                    type: userInteractionToken.TYPE.PASSWORD_RESET,
-                    tokenExpiration: config.biz.domain.defaultPasswordTokenExpiration,
-                    host: host,
-                    path: config.biz.domain.defaultPasswordResetPath
-                };
-                sendMail(options)
-                    .then(function () {
-                        resultCallback(null);
-                    }).catch(function(err) {
-                        resultCallback(err);
-                    });
-            } else {
-                resultCallback(null, { provider: user.provider });
-            }
+            var options = {
+                subject: 'OISP recover password - Intel(r) Corporation',
+                email: email,
+                type: userInteractionToken.TYPE.PASSWORD_RESET,
+                tokenExpiration: config.biz.domain.defaultPasswordTokenExpiration,
+                host: host,
+                path: config.biz.domain.defaultPasswordResetPath
+            };
+            sendMail(options)
+                .then(function () {
+                    resultCallback(null);
+                }).catch(function(err) {
+                    resultCallback(err);
+                });
         } else {
             logger.error('users.addPasswordToken - User not found: ' + JSON.stringify(err));
             resultCallback(null);
@@ -344,7 +334,7 @@ exports.getPasswordToken = function (tokenId, resultCallback) {
 
 exports.changePasswordOfUser = function (email, userIdentifier, data, resultCallback) {
     if (entropy.check(data.password)) {
-        keycloak.adapter.obtainDirectly(email, data.currentpwd)
+        keycloak.adapter.grantManager.obtainDirectly(email, data.currentpwd)
             .then(() => {
                 return user.findByEmail(email, function(err, usr) {
                     return keycloak.serviceAccount.changeUserPassword(usr.id, data.password)
@@ -488,7 +478,7 @@ exports.activate = function (options, callback) {
                 throw errBuilder.Errors.User.Activation.TokenError;
             }
             var userData = {
-                verified: true
+                verified: true,
             };
 
             return keycloak.serviceAccount.updateUserById(token.userId, userData)
@@ -497,7 +487,7 @@ exports.activate = function (options, callback) {
                         .catch(function (err) {
                             logger.error('users. activate, could not remove interaction token, error: ' + JSON.stringify(err));
                         });
-                }).catch(function () {
+                }).catch(function() {
                     throw errBuilder.Errors.User.Activation.CannotUpdate;
                 });
         })

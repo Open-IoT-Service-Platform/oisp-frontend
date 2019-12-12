@@ -363,7 +363,8 @@
                             "user-create"
                         ]
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"account",
@@ -837,6 +838,18 @@
                         "method":"POST",
                         "scopes":[
                             "data-write"
+                        ]
+                    }
+                ]
+            },
+            {
+                "name":"data",
+                "path":"/v1/api/accounts/:accountId/data/:deviceId",
+                "methods":[
+                    {
+                        "method":"POST",
+                        "scopes":[
+                            "data-user-write"
                         ]
                     }
                 ]

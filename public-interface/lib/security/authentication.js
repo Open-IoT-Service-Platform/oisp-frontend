@@ -46,12 +46,17 @@ var loginWithKeycloak = function(req, res) {
         .then(grant => {
             res.status(200).send({
                 token: grant.access_token.token,
-                refresh_token: grant.refresh_token.token,
-                id_token: grant.id_token.token
+                refreshToken: grant.refresh_token.token,
+                idToken: grant.id_token.token
             });
-        }).catch(() => {
+        }).catch(err => {
+            console.log(err);
             res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(errBuilder.Errors.Generic.NotAuthorized.message);
         });
+};
+
+var logout = function(req, res) {
+    res.status(200).send();
 };
 
 module.exports = function (cfg, forceSSL) {
@@ -63,6 +68,7 @@ module.exports = function (cfg, forceSSL) {
 
     app.get('/api/auth/me', getCurrentUser);
     app.get('/auth/me', getCurrentUser);
+    app.delete('/auth/me', logout);
 
     app.post('/auth/local', loginWithKeycloak);
 

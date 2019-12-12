@@ -37,6 +37,7 @@ module.exports = {
         app.post(VERSION + PATH + "/admin/:deviceId", schemaValidator.validateSchema(schemas.data.POST), data.collectDataAdmin);
 
         app.post(VERSION + PATH + "/:deviceId", schemaValidator.validateSchema(schemas.data.POST), data.collectData);
+        app.post(VERSION + FULL_PATH + "/:deviceId", schemaValidator.validateSchema(schemas.data.POST), data.collectData);
 
         app.get(VERSION + FULL_PATH + "/totals", data.getTotals);
     }

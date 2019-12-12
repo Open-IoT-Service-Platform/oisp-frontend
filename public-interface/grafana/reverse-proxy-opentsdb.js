@@ -16,42 +16,49 @@ app.use(cookieParser());
 
 function verifyResponse(jwt, res, cb) {
     return tokenInfo(jwt, null, function(result) {
-        cb(res, Object.keys(result.payload.accounts));
+        return cb(res, result.payload.accounts);
     });
+}
+
+function getAccountMatcher(accountId) {
+    return account => account.id === accountId;
 }
 
 function verifySuggestion(res, accounts) {
     for (var i = 0; i < res.length; i++) {
         var splitted = res[i].split(".");
-        if (accounts.indexOf(splitted[0]) === -1) {
+        var isAllowed = accounts.some(getAccountMatcher(splitted[0]));
+        if (!isAllowed) {
             res.splice(i, 1);
             i--;
         }
     }
+    return Promise.resolve(res);
 }
 
 function verifyQuery(res, accounts) {
     for (var i = 0; i < res.length; i++) {
         var splitted = res[i].metric.split(".");
-        if (accounts.indexOf(splitted[0]) === -1) {
-            while (res.length !== 0) {
-                res.pop();
-            }
-            break;
+        var isAllowed = accounts.some(getAccountMatcher(splitted[0]));
+        if (!isAllowed) {
+            return Promise.resolve([]);
         }
     }
+    return Promise.resolve(res);
 }
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
     modifyResponse(res, proxyRes, function(body) {
         if (body) {
             if (req.url.indexOf(SUGGESTION_PATH) !== -1) {
-                verifyResponse(req.cookies.jwt, body, verifySuggestion);
+                return verifyResponse(req.cookies.jwt, body, verifySuggestion);
             } else if (req.url.indexOf(QUERY_PATH) !== -1) {
-                verifyResponse(req.cookies.jwt, body, verifyQuery);
-                if (body.length === 0) {
-                    res.statusCode = 400;
-                }
+                return verifyResponse(req.cookies.jwt, body, verifyQuery).then(d => {
+                    if (d.length === 0) {
+                        res.statusCode = 400;
+                    }
+                    return d;
+                });
             }
         }
         return body;
@@ -67,10 +74,14 @@ proxy.on('error', function(err, req, res) {
 
 app.all('(/*)?', function (req, res) {
     if (req.cookies.jwt) {
-        tokenInfo(req.cookies.jwt, null, function() {
-            proxy.web(req, res, {
-                target: dataSourceAddress,
-            });
+        tokenInfo(req.cookies.jwt, null, function(result) {
+            if (result) {
+                proxy.web(req, res, {
+                    target: dataSourceAddress,
+                });
+            } else {
+                res.sendStatus(401);
+            }
         });
     } else {
         res.sendStatus(401);

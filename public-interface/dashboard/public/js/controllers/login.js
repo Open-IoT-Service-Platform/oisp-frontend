@@ -56,12 +56,10 @@ iotController.controller('LoginCtrl', function($scope,
         loginService.currentUser(
             function (data) {
                 $scope.currentUser = data;
-                if(data.verified || data.provider || (!getServicesConfig('verifyUserEmail') && login)) {
-                    if(data.termsAndConditions){
-                        $window.location = '/ui/dashboard';
-                    } else {
-                        $window.location = '/ui/auth#/termsAndConditions';
-                    }
+                // skipped email verifyUserEmail page temporarily,
+                // will be fixed after keycloak based redirect login
+                if(login) {
+                    $window.location = '/ui/dashboard';
                 } else if (!login) {
                     if(!getServicesConfig('verifyUserEmail')) {
                         $window.location = '/ui/auth#/no_validate';
@@ -101,6 +99,7 @@ iotController.controller('LoginCtrl', function($scope,
         loginService.login(user,
             function(data){
                 sessionService.setJwt(data.token);
+                sessionService.setRefreshJwt(data.refreshToken);
                 $scope.getCurrentUser(login);
             },
             function(data, status) {
@@ -189,16 +188,6 @@ iotController.controller('LoginCtrl', function($scope,
         });
     };
 
-    $scope.checkSocialLoginAvailability = function() {
-        loginService.getSocialConfig(function success(data) {
-            $scope.isFacebookAvailable = data.facebook;
-            $scope.isGoogleAvailable = data.google;
-            $scope.isGithubAvailable = data.github;
-        }, function error() {});
-    };
-
-    $scope.checkSocialLoginAvailability();
-
     $scope.addUser = function(){
         if (checkEntropy($scope.password)) {
             var user = {
@@ -261,5 +250,6 @@ iotController.controller('LoginCtrl', function($scope,
 
 iotController.controller('LogoutCtrl', function ($window, loginService, sessionService) {
     sessionService.clearJwt();
+    sessionService.clearRefreshJwt();
     $window.location = '/';
 });
