@@ -225,10 +225,12 @@ iotController.controller('DashboardCtrl', function($scope, $location, $rootScope
         };
         accountsService.addAccount(newAccount,
             function(data){
-                loginService.refreshToken(function(jwt) {
-                    sessionService.setJwt(jwt.token);
+                var accountId = data.id;
+                loginService.refreshToken(sessionService.getRefreshJwt(), function(data) {
+                    sessionService.setJwt(data.jwt);
+                    sessionService.setRefreshJwt(data.refreshToken);
                     $scope.getCurrentUser(function(){
-                        $scope.selectAccount(data.id);
+                        $scope.selectAccount(accountId);
                         $location.path('/');
                         $route.reload();
                     });
@@ -284,13 +286,15 @@ iotController.controller('DashboardCtrl', function($scope, $location, $rootScope
 
     $scope.changeInviteStatus = function(inviteId, accept){
         invitesService.updateUserInvite(inviteId, { "accept": accept }, function(data){
-            loginService.refreshToken(function(jwt) {
-                sessionService.setJwt(jwt.token);
+            var domainId = data.domainId;
+            loginService.refreshToken(sessionService.getRefreshJwt(), function(data) {
+                sessionService.setJwt(data.jwt);
+                sessionService.setRefreshJwt(data.refreshToken);
                 $scope.getCurrentUser(function() {
                     $scope.getUserInvites();
                     if(accept) {
                         $location.path('/');
-                        $scope.selectAccount(data.domainId);
+                        $scope.selectAccount(domainId);
                     }
                     $route.reload();
                 });

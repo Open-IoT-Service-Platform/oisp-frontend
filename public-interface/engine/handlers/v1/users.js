@@ -77,6 +77,9 @@ exports.getUser = function (req, res, next) {
 exports.addUser = function (req, res, next) {
     var data = req.body;
     delete data.accounts;
+    data.verified = false;
+    // Temporary change for test compatibility will be fixed after keycloak redirect login
+    data.termsAndConditions = true;
 
     if (!data) {
         next(errBuilder.build(errBuilder.Errors.User.InvalidData));

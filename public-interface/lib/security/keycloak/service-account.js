@@ -79,22 +79,35 @@ module.exports = function ServiceAccount(keycloakAdapter) {
     this.updateUserById = function(id, userData) {
         return this.ensureServiceAccountGrant().then(() => {
             var data = {};
-            if (userData.verified) {
-                data.emailVerified = userData.verified;
-            }
-            if (userData.termsAndConditions) {
-                data.termsAndConditions = userData.termsAndConditions;
-            }
             if (userData.attributes) {
-                delete userData.attributes.accounts;
                 data.attributes = userData.attributes;
             }
+
+            data.requiredActions = [];
+
+            if (userData.verified === false) {
+                data.requiredActions.push(VERIFY_EMAIL);
+            } else if (userData.verified) {
+                data.emailVerified = userData.verified;
+            }
+
+            if (userData.termsAndConditions === false) {
+                data.requiredActions.push(TERMS_AND_CONDITIONS);
+            } else if (userData.termsAndConditions) {
+                data.termsAndConditions = userData.termsAndConditions;
+            }
+
             return this.admin.users.findOne({id: id}).then(user => {
-                Object.keys(user.attributes).forEach(attr => {
-                    if (!data.attributes[attr]) {
-                        data.attributes[attr] = user.attributes[attr];
+                if (user.attributes) {
+                    if (!data.attributes) {
+                        data.attributes = {};
                     }
-                });
+                    Object.keys(user.attributes).forEach(attr => {
+                        if (!data.attributes[attr]) {
+                            data.attributes[attr] = user.attributes[attr];
+                        }
+                    });
+                }
                 return this.admin.users.update({id: id}, data);
             });
         });

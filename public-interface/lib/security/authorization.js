@@ -33,7 +33,7 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                 .then(grant => {
                     callback(null, {
                         token: grant.access_token,
-                        refresh_token: grant.refresh_token
+                        refreshToken: grant.refresh_token
                     });
                 });
         } else {
@@ -48,7 +48,7 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                 .then(grant => {
                     callback(null, {
                         token: grant.access_token,
-                        refresh_token: grant.refresh_token
+                        refreshToken: grant.refresh_token
                     });
                 });
         }
@@ -62,17 +62,20 @@ module.exports.decodeToken = function(token) {
 };
 
 var getTokenInfo = function(token, req, callback){
-    var payload = jwt_decode(token);
-    var result = {
-        payload: payload
-    };
-    if (req) {
-        req.identiy = payload.sub;
-        req.tokenInfo = {
-            payload: payload
+    var decoded = jwt_decode(token);
+    return keycloak.adapter.grantManager.createGrant({ access_token: token }).then(grant => {
+        var tokenInfo = {
+            header: grant.access_token.header,
+            payload: decoded
         };
-    }
-    callback(result);
+        if (req) {
+            req.identity = decoded.sub;
+            req.tokenInfo = tokenInfo;
+        }
+        return callback(tokenInfo);
+    }).catch(() => {
+        return callback(null);
+    });
 };
 
 var checkUser = function(token) {

@@ -22,6 +22,8 @@ iotServices.factory('sessionService', ['ipCookie', '$q', function(ipCookie, $q){
     var currentAccountDeferred = $q.defer();
 
     var JWT = 'jwt';
+    var JWT_REFRESH = 'jwt_refresh';
+
     var getStandardExpirationDate = function () {
         return 24 * 60 * 60;
     };
@@ -30,7 +32,7 @@ iotServices.factory('sessionService', ['ipCookie', '$q', function(ipCookie, $q){
         getCurrentAccount: function (){
             return currentAccount;
         },
-        
+
         getCurrentAccountPromise: function() {
             return currentAccountDeferred.promise;
         },
@@ -56,6 +58,24 @@ iotServices.factory('sessionService', ['ipCookie', '$q', function(ipCookie, $q){
                 expirationPeriod = getStandardExpirationDate();
             }
             ipCookie(JWT, jwt, {expires: expirationPeriod, expirationUnit: 'seconds'});
+        },
+
+        getRefreshJwt: function() {
+            return ipCookie(JWT_REFRESH);
+        },
+
+        setRefreshJwt: function(refreshToken) {
+            var expirationPeriod;
+            try {
+                expirationPeriod = (new JwtHelper(refreshToken)).getExpirationPeriod();
+            } catch (err) {
+                expirationPeriod = getStandardExpirationDate();
+            }
+            ipCookie(JWT_REFRESH, refreshToken, {expires: expirationPeriod, expirationUnit: 'seconds'});
+        },
+
+        clearRefreshJwt: function() {
+            ipCookie.remove(JWT_REFRESH);
         },
 
         clearJwt: function () {

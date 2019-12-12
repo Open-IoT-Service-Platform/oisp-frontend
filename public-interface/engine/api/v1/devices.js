@@ -210,7 +210,7 @@ exports.registerDevice = function (deviceToRegister, activationCode, resultCallb
                     }
                     var ret = {
                         deviceToken: grant.token,
-                        refreshToken: grant.refresh_token,
+                        refreshToken: grant.refreshToken,
                         domainId: activationResult.accountId
                     };
                     resultCallback(null, ret);

@@ -41,10 +41,11 @@ iotServices.factory('loginService', ['$http', function($http){
                     errorCallback(data, status);
                 });
         },
-        refreshToken: function(successCallback, errorCallback){
+        refreshToken: function(refreshToken, successCallback, errorCallback){
             $http({
                 method: 'PUT',
-                url: '/ui/auth/me'
+                url: '/v1/api/auth/refresh',
+                data: { refreshToken: refreshToken }
             })
                 .success(function(data, status){
                     successCallback(data, status);
@@ -65,17 +66,6 @@ iotServices.factory('loginService', ['$http', function($http){
                     if(errorCallback){
                         errorCallback(data, status);
                     }
-                });
-        },
-        getSocialConfig: function (successCallback, errorCallback) {
-            $http({
-                method: 'GET',
-                url: '/ui/auth/social/config'
-            })
-                .success(function (data, status) {
-                    successCallback(data, status);
-                }).error(function (data, status) {
-                    errorCallback(data, status);
                 });
         }
     };
