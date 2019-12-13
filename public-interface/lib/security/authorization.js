@@ -23,13 +23,17 @@ var jwt_decode = require('jwt-decode'),
     users = require('./../../iot-entities/postgresql').users,
     tokenTypes;
 
-var generateToken = function(deviceUID, deviceId, activationcode, type, callback, email) {
+var generateToken = function(deviceUID, deviceId, activationcode, type, callback, email, expire) {
     if ((!deviceUID || !activationcode) && !email) {
         callback("Can't create token, not enough information.");
     }
+    var headers = {};
     keycloak.serviceAccount.ensureServiceAccountGrant().then(grant => {
+        if (expire) {
+            headers["X-Token-Expire"] = "" + expire;
+        }
         if (email) {
-            keycloak.customGrants.impersonateUser(grant.access_token.token, email, {})
+            keycloak.customGrants.impersonateUser(grant.access_token.token, email, headers)
                 .then(grant => {
                     callback(null, {
                         token: grant.access_token,
@@ -37,7 +41,7 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                     });
                 });
         } else {
-            var headers = {};
+
             if (type === tokenTypes.device) {
                 headers["X-Access-Type"] = type;
                 headers["X-DeviceID"] = deviceId;

@@ -17,4 +17,4 @@ RUN node_modules/grunt-cli/bin/grunt build-api
 RUN adduser -D nodeuser
 USER nodeuser
 
-EXPOSE 4001 4002 4003
+EXPOSE 4001 4002 4003 4004

@@ -30,6 +30,8 @@ const keycloakAdapter = new Keycloak({}, config),
         keycloakAdapter.grantManager.secret, keycloakAdapter.grantManager.realmUrl,
         keycloakAdapter.grantManager.public);
 
+keycloakAdapter.redirectToLogin = () => false;
+
 module.exports = {
     keycloakListener: keycloakListener,
     serviceAccount: serviceAccount,

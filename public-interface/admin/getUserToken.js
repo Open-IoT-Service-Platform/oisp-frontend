@@ -1,19 +1,9 @@
-var users = require('../engine/api/v1/users');
-
-var authorization,
-    secConfig,
-    generateToken,
-    tokenTypes;
-
-try {
-    authorization = require('../lib/security/authorization');
+const authorization = require('../lib/security/authorization'),
     secConfig = require('../lib/security/config');
-    authorization.middleware(secConfig);
-    generateToken = authorization.generateToken;
-    tokenTypes = authorization.tokenTypes;
-} catch(err) {
-    console.log("An error has occurred by getUserToken tool.");
-}
+
+authorization.middleware(secConfig);
+
+const generateToken = authorization.generateToken;
 
 module.exports = function() {
     if (arguments.length < 2) {
@@ -21,31 +11,24 @@ module.exports = function() {
         console.log("Usage: node admin getUserToken [email] [expires after in minutes]");
         process.exit(1);
     }
-    if (!authorization || !secConfig || !generateToken || !tokenTypes) {
+    if (!authorization || !secConfig || !generateToken) {
         console.log("Authorization module has failed to initialize, exiting...");
         process.exit(1);
     }
     var email = arguments[0],
         expiresAfterInMinutes = arguments[1],
-        expire = expiresAfterInMinutes * 60 * 1000;
-    users.searchUser(email, function(err, user) {
-        if (err) {
-            console.error(err);
-            process.exit(1);
-        }
-        generateToken(user.id, user.accounts, user.type, expire, tokenTypes.user,
-            function(err, token) {
-                if (err) {
-                    console.error(err);
-                    process.exit(1);
-                }
-                console.log("\nToken will be valid " + expiresAfterInMinutes +
-                    " minutes for the user: " + email + "\n");
-                console.log("---------------- BEGIN TOKEN ----------------");
-                console.log(token);
-                console.log("----------------- END TOKEN -----------------");
-                process.exit(0);
+        expire = expiresAfterInMinutes * 60;
+    generateToken(null, null, null, null,
+        function(err, token) {
+            if (err) {
+                console.error(err);
+                process.exit(1);
             }
-        );
-    });
+            console.log("\nToken will be valid " + expiresAfterInMinutes +
+                " minutes for the user: " + email + "\n");
+            console.log("---------------- BEGIN ----------------");
+            console.log(token);
+            console.log("----------------- END -----------------");
+            process.exit(0);
+        }, email, expire);
 };

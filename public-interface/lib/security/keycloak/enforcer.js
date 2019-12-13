@@ -98,7 +98,10 @@ module.exports.register = function(app, keycloak) {
             const method = methodConfig.method.toLowerCase();
             const scopes = methodConfig.scopes;
             var middleware;
-            if (methodConfig['scopes-enforcement-mode'] === SCOPES_ENFORCEMENT_MODES.ANY) {
+            if (!scopes) {
+                const role = methodConfig.role;
+                middleware = keycloak.protect(role);
+            } else if (methodConfig['scopes-enforcement-mode'] === SCOPES_ENFORCEMENT_MODES.ANY) {
                 middleware = enforceAnyScope(name, scopes, keycloak);
             } else {
                 const permissions = scopes.map(scope => name + ':' + scope);
