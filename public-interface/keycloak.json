@@ -608,9 +608,7 @@
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "alert-trigger"
-                        ]
+                        "role":"system"
                     }
                 ]
             },
@@ -644,9 +642,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "alert-trigger"
-                        ]
+                        "role":"system"
                     }
                 ]
             },
@@ -728,9 +724,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "rules-admin"
-                        ]
+                        "role":"system"
                     }
                 ]
             },
@@ -740,9 +734,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "rules-admin"
-                        ]
+                        "role": "system"
                     }
                 ]
             },
@@ -752,9 +744,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "rules-admin"
-                        ]
+                        "role":"system"
                     }
                 ]
             },
@@ -764,9 +754,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "rules-admin"
-                        ]
+                        "role":"system"
                     }
                 ]
             },
@@ -824,9 +812,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-writeany"
-                        ]
+                        "role":"system"
                     }
                 ]
             },

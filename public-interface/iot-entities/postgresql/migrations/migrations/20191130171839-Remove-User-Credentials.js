@@ -44,7 +44,7 @@ module.exports = {
     },
 
     down: (queryInterface, Sequelize) => {
-        return queryInterface.removeColumn(
+        return queryInterface.addColumn(
             {
                 schema: 'dashboard',
                 tableName: 'users'
@@ -56,7 +56,7 @@ module.exports = {
                 allowNull: false
             }
         ).then(() => {
-            return queryInterface.removeColumn(
+            return queryInterface.addColumn(
                 {
                     schema: 'dashboard',
                     tableName: 'users'
@@ -69,7 +69,7 @@ module.exports = {
                 }
             );
         }).then(() => {
-            return queryInterface.removeColumn(
+            return queryInterface.addColumn(
                 {
                     schema: 'dashboard',
                     tableName: 'users'
@@ -82,7 +82,7 @@ module.exports = {
                 }
             );
         }).then(() => {
-            return queryInterface.removeColumn(
+            return queryInterface.addColumn(
                 {
                     schema: 'dashboard',
                     tableName: 'users'
@@ -95,7 +95,7 @@ module.exports = {
                 }
             );
         }).then(() => {
-            return queryInterface.removeColumn(
+            return queryInterface.addColumn(
                 {
                     schema: 'dashboard',
                     tableName: 'users'
