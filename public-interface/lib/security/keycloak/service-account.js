@@ -93,8 +93,6 @@ module.exports = function ServiceAccount(keycloakAdapter) {
 
             if (userData.termsAndConditions === false) {
                 data.requiredActions.push(TERMS_AND_CONDITIONS);
-            } else if (userData.termsAndConditions) {
-                data.termsAndConditions = userData.termsAndConditions;
             }
 
             return this.admin.users.findOne({id: id}).then(user => {
