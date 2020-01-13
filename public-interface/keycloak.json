@@ -822,9 +822,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-write"
-                        ]
+                        "local-enforcer": "data-write"
                     }
                 ]
             },
