@@ -19,6 +19,7 @@ var users = require('./models').users,
     userAccounts = require('./models').userAccounts,
     accounts = require('./models').accounts,
     sequelize = require('./models').sequelize,
+    Op = require('sequelize').Op,
     Q = require('q'),
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').users(),
@@ -117,10 +118,12 @@ var getUsersWithAllAccounts = function(users) {
 
 exports.getUsers = function (accountId, queryParameters, resultCallback) {
     var filters = modelsHelper.setQueryParameters(queryParameters, users.attributes, {});
-    filters.include = [{
-        model: accounts,
-        where: {id: accountId}
-    }];
+    if (accountId) {
+        filters.include = [{
+            model: accounts,
+            where: {id: accountId}
+        }];
+    }
     users.findAll(filters)
         .then(function (users) {
             return getUsersWithAllAccounts(users)
@@ -131,6 +134,20 @@ exports.getUsers = function (accountId, queryParameters, resultCallback) {
         .catch(function (err) {
             return resultCallback(err);
         });
+};
+
+exports.getUsersNotInSet = function(idSet, emailSet) {
+    var filters = {
+        where: {
+            id: {
+                [Op.notIn]: idSet ? idSet : []
+            },
+            email: {
+                [Op.notIn]: emailSet ? emailSet : []
+            }
+        }
+    };
+    return users.findAll(filters);
 };
 
 exports.findById = function (id, transaction) {

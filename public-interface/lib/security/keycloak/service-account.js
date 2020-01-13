@@ -119,6 +119,7 @@ module.exports = function ServiceAccount(keycloakAdapter) {
             const data = {
                 username: userData.username ? userData.username : userData.email,
                 email: userData.email,
+                attributes: userData.attributes ? userData.attributes : {},
                 requiredActions: [],
                 enabled: true
             };

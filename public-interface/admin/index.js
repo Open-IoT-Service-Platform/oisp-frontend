@@ -26,6 +26,7 @@ var CreateDB = require('./createDB');
 var UpdateDB = require('./updateDB');
 var getUserToken = require('./getUserToken');
 var resetKeycloakUsers = require('./resetKeycloakUsers');
+var importExistingUsersToKeycloak = require('./importExistingUsersToKeycloak');
 var command = process.argv[2];
 var arg = process.argv[3];
 
@@ -66,6 +67,9 @@ case 'getUserToken':
     break;
 case 'resetKeycloakUsers':
     resetKeycloakUsers.apply(null, null);
+    break;
+case 'importExistingUsersToKeycloak':
+    importExistingUsersToKeycloak.apply(null, null);
     break;
 default:
     console.log ("Command : ", command , " not supported ");
