@@ -16,6 +16,7 @@
 
 'use strict';
 const pathConfigs = require('./config').getKeycloakConfig()['policy-enforcer'].paths,
+    localEnforcers = require('./local-enforcers'),
     ENFORCEMENT_MODES = {
         DISABLED: 'DISABLED',
         ENFORCING: 'ENFORCING' // default
@@ -98,9 +99,10 @@ module.exports.register = function(app, keycloak) {
             const method = methodConfig.method.toLowerCase();
             const scopes = methodConfig.scopes;
             var middleware;
-            if (!scopes) {
-                const role = methodConfig.role;
-                middleware = keycloak.protect(role);
+            if (methodConfig.role) {
+                middleware = keycloak.protect(methodConfig.role);
+            } else if (methodConfig["local-enforcer"]){
+                middleware = localEnforcers[methodConfig["local-enforcer"]];
             } else if (methodConfig['scopes-enforcement-mode'] === SCOPES_ENFORCEMENT_MODES.ANY) {
                 middleware = enforceAnyScope(name, scopes, keycloak);
             } else {
