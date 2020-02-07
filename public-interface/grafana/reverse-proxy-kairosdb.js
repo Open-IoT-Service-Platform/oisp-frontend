@@ -21,8 +21,9 @@ var express = require('express'),
     modifyResponse = require('node-http-proxy-json'),
     grafanaConf = require('./../config').grafana;
 
-const SUGGESTION_PATH = "/api/suggest",
-    QUERY_PATH = "/api/query",
+const SUGGESTION_PATH = '/metricnames',
+    QUERY_TAGS_PATH = '/datapoints/query/tags',
+    QUERY_PATH = '/datapoints/query',
     app = express(),
     proxy = httpProxy.createProxyServer({}),
     dataSourceAddress = 'http://' + grafanaConf.dataSourceHost + ':' +
@@ -41,11 +42,11 @@ function getAccountMatcher(accountId) {
 }
 
 function verifySuggestion(res, accounts) {
-    for (var i = 0; i < res.length; i++) {
-        var splitted = res[i].split(".");
+    for (var i = 0; i < res.results.length; i++) {
+        var splitted = res.results[i].split(".");
         var isAllowed = accounts.some(getAccountMatcher(splitted[0]));
         if (!isAllowed) {
-            res.splice(i, 1);
+            res.results.splice(i, 1);
             i--;
         }
     }
@@ -53,24 +54,34 @@ function verifySuggestion(res, accounts) {
 }
 
 function verifyQuery(res, accounts) {
-    for (var i = 0; i < res.length; i++) {
-        var splitted = res[i].metric.split(".");
-        var isAllowed = accounts.some(getAccountMatcher(splitted[0]));
-        if (!isAllowed) {
-            return Promise.resolve([]);
-        }
+    var isAllowed = res.queries.every(query => {
+        return query.results.every(result => {
+            var splitted = result.name.split('.');
+            return accounts.some(getAccountMatcher(splitted[0]));
+        });
+    });
+    if (isAllowed) {
+        return Promise.resolve(res);
     }
-    return Promise.resolve(res);
+    return Promise.resolve(null);
 }
+
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
     modifyResponse(res, proxyRes, function(body) {
         if (body) {
             if (req.url.indexOf(SUGGESTION_PATH) !== -1) {
                 return verifyResponse(req.cookies.jwt, body, verifySuggestion);
+            } else if (req.url.indexOf(QUERY_TAGS_PATH) !== -1) {
+                return verifyResponse(req.cookies.jwt, body, verifyQuery).then(d => {
+                    if (!d) {
+                        res.statusCode = 400;
+                    }
+                    return d;
+                });
             } else if (req.url.indexOf(QUERY_PATH) !== -1) {
                 return verifyResponse(req.cookies.jwt, body, verifyQuery).then(d => {
-                    if (d.length === 0) {
+                    if (!d) {
                         res.statusCode = 400;
                     }
                     return d;
