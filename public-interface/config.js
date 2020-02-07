@@ -280,6 +280,7 @@ var config = {
         port: grafana_config.port,
         adminUser: grafana_config.adminUser,
         adminPassword: grafana_config.adminPassword,
+        dataSource: grafana_config.dataSource,
         dataSourceHost: grafana_config.dataSourceHost,
         dataSourcePort: grafana_config.dataSourcePort,
         proxyPort: grafana_config.proxyPort || 4002,

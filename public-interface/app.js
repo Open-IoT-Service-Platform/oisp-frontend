@@ -144,7 +144,7 @@ if (appServer.get("env") === 'local') {
 }
 
 grafana.reverseProxyDataSource.listen(config.grafana.dataSourceProxyPort, () => {
-    console.log('OpenTSDB Reverse Proxy listening on port ' + config.grafana.dataSourceProxyPort);
+    console.log('Data Source Reverse Proxy listening on port ' + config.grafana.dataSourceProxyPort);
 });
 
 grafana.reverseProxyGrafana.listen(config.grafana.proxyPort, () => {
