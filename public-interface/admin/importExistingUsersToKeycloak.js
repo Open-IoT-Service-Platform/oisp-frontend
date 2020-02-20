@@ -37,7 +37,7 @@ module.exports = function() {
                 },
                 verified: oispUser.verified === false ? false : true,
                 termsAndConditions: oispUser.termsAndConditions === false ? false : true,
-                roles: oispUser.type ? [oispUser.type] : []
+                roles: oispUser.type ? [oispUser.type] : ['user']
             };
             promises.push(keycloak.serviceAccount.createUser(userData));
         });
