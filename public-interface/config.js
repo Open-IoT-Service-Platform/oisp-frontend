@@ -215,7 +215,11 @@ var config = {
             topicsObservations: kafka_config.topicsObservations,
             topicsRuleEngine: kafka_config.topicsRuleEngine,
             topicsHeartbeatName: kafka_config.topicsHeartbeatName,
-            topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval
+            topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval,
+            replication: kafka_config.replication,
+            requestTimeout: kafka_config.requestTimeout,
+            maxRetryTime: kafka_config.maxRetryTime,
+            retries: kafka_config.retries
         },
         ingestion: 'Kafka',
         userScheme: null // default

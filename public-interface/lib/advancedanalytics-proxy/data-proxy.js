@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/* esversion: 8 */
 'use strict';
 var MQTTConnector = require('./../../lib/mqtt'),
-    kafka = require('kafka-node'),
-    Producer = kafka.Producer,
+    { Kafka, logLevel } = require('kafkajs'),
+    //Producer = kafka.Producer,
     request = require('request'),
     util = require('../dateUtil'),
     logger = require('../logger').init(),
@@ -102,9 +102,8 @@ function finishSpan(span) {
 module.exports = function(config) {
 
     var connector = new MQTTConnector.Broker(config.mqtt, logger);
-
-    var kafkaClient, kafkaProducer;
-
+    var kafkaAdmin, kafkaProducer;
+    var metricsTopic = config.kafka.topicsObservations;
     var prepareErrorMessage = function (res) {
         var body = JSON.parse(res.body);
         var message = '';
@@ -118,16 +117,34 @@ module.exports = function(config) {
 
     if (config.ingestion === 'Kafka') {
         try {
-            kafkaClient = new kafka.KafkaClient({kafkaHost: config.kafka.uri});
-        } catch (exception) {
-            logger.error("Exception occured creating Kafka Client: " + exception);
-        }
-        try {
-            kafkaProducer = new Producer(kafkaClient);
+            var brokers = config.kafka.uri.split(',');
+            const kafka = new Kafka({
+                logLevel: logLevel.INFO,
+                brokers: brokers,
+                clientId: 'frontend-metrics',
+                requestTimeout: config.kafka.requestTimeout,
+                retry: {
+                    maxRetryTime: config.kafka.maxRetryTime,
+                    retries: config.kafka.retries
+                }
+            });
+            kafkaProducer = kafka.producer();
+            const { CONNECT, DISCONNECT } = kafkaProducer.events;
+
+            kafkaAdmin    = kafka.admin();
+            kafkaProducer.on(DISCONNECT, e => {
+                console.log(`Metric producer disconnected!: ${e.timestamp}`);
+                kafkaProducer.connect();
+            });
+            kafkaProducer.on(CONNECT, e => logger.debug("Kafka metric producer connected: " + e));
+            kafkaProducer.connect();
+
         } catch (exception) {
             logger.error("Exception occured creating Kafka Producer: " + exception);
         }
+
     }
+
 
     this.submitDataMQTT = function(data, callback){
         const span = createSpan('submitDataMQTT');
@@ -156,7 +173,7 @@ module.exports = function(config) {
         const span = createSpan('submitDataRest');
 
         var dataMetric = new Metric();
-	    var message = dataMetric.prepareDataIngestionMsg(data);
+        var message = dataMetric.prepareDataIngestionMsg(data);
 
         var body = JSON.stringify(message);
         var contentType = "application/json";
@@ -197,53 +214,89 @@ module.exports = function(config) {
      * {"dataType":"Number", "aid":"account_id", "cid":"component_id", "value":"1",
      * "systemOn": 1574262569420, "on": 1574262569420, "loc": null}
      */
-    this.submitDataKafka = function(data, callback){
+    this.submitDataKafka = async (data, callback) => {
         const span = createSpan('submitDataKafka');
         var spanContext = {};
         injectSpanContext(span, opentracing.FORMAT_TEXT_MAP, spanContext);
         try {
-            var metricsTopic = 'metrics';
-	        data.data.forEach(function (item) {
-	        var value;
-		    if (item.dataType === "ByteArray") {
-		        value = item.bValue;
-		    } else {
-		        value = item.value;
-		    }
-		    const msg = {
-		        dataType: item.dataType,
-		        aid: data.domainId,
-		        cid: item.componentId,
-		        systemOn: data.systemOn,
-		        on: item.on,
-		        value: value.toString()
-		    };
-		    if (undefined !== item.attributes) {
-		        msg.attributes = item.attributes;
-		    }
-		    if (undefined !== item.loc) {
-		        msg.loc = item.loc;
-		    }
-		    kafkaProducer.send(
-                    [{
-			        topic: metricsTopic,
-			        messages: JSON.stringify(msg)
-		            }],
-                    function (err, data) {
-			        finishSpan(span);
+            // Moving back to put all samples into a single array.
+            // instead of sending all samples separately.
+            // Reason: Risk to lose single sample is too high otherwise
+            var msgList = data.data.map(function (item) {
+                var value;
+                if (item.dataType === "ByteArray") {
+                    value = item.bValue;
+                } else {
+                    value = item.value;
+                }
+                const msg = {
+                    dataType: item.dataType,
+                    aid: data.domainId,
+                    cid: item.componentId,
+                    systemOn: data.systemOn,
+                    on: item.on,
+                    value: value.toString()
+                };
+                if (undefined !== item.attributes) {
+                    msg.attributes = item.attributes;
+                }
+                if (undefined !== item.loc) {
+                    msg.loc = item.loc;
+                }
+                return msg;
+            });
 
-    			    if (err) {
-                            logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(err));
-                            callback(errBuilder.build(errBuilder.Errors.Data.SubmissionError));
-    			    } else {
-                            logger.debug("Response from Kafka after sending message: " + JSON.stringify(data));
-                            callback(null);
-    			   }
-    		    });
-	    });
+            // separate byteArray from the rest. ByteArrays will not be sent as arrays but separately
+            var nonByteArrayList = msgList.filter(item => item.dataType !== "ByteArray");
+            var byteArrayList = msgList.filter(item => item.dataType === "ByteArray");
+
+            var trySendingArray = async (msg) => {
+                if (msg.length === 1) { // if only one sample, omit the []
+                    msg = msg[0];
+                }
+                try {
+                    var messages = [{key: data.domainId, value: JSON.stringify(msg)}];
+                    var result = await kafkaProducer.send({
+                        topic: metricsTopic,
+                        messages
+                    });
+                    logger.debug("Response from Kafka after sending message: " + JSON.stringify(result));
+                    return true;
+                } catch (e) {
+                    logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(e.message));
+                    //kafkaProducer.disconnect();
+                    return false;
+                }
+            };
+
+            var getSendPromises = function (data) {
+                return data.map(function (msg) {
+                    var messages = [{key: data.domainId, value: JSON.stringify(msg)}];
+                    return kafkaProducer.send({
+                        topic: metricsTopic,
+                        messages
+                    })
+                        .then((result) => {
+                            return logger.debug("Response from Kafka after sending message: " + JSON.stringify(result));
+                        })
+                        .catch((e) => {
+                            logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(e.message));
+                            return callback(errBuilder.build(errBuilder.Errors.Data.SubmissionError));
+                        });
+                });
+            };
+
+            if (nonByteArrayList !== undefined && nonByteArrayList.length > 0) {
+                await trySendingArray(nonByteArrayList);
+            }
+            if (byteArrayList !== undefined && byteArrayList.length > 0) {
+                var promises = getSendPromises(byteArrayList);
+                await Promise.all(promises);
+            }
+            finishSpan(span);
+            callback(null);
         } catch(exception) {
             finishSpan(span);
-
             logger.error("Exception occured when forwarding observation to Kafka: " + exception);
             callback(errBuilder.build(errBuilder.Errors.Data.SubmissionError));
         }
