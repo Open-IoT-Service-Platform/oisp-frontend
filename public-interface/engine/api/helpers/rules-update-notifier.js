@@ -24,14 +24,14 @@ var { Kafka, logLevel } = require('kafkajs'),
 
 var send = async function() {
     if (kafkaProducer) {
-        return kafkaProducer.send({
-            topic: config.drsProxy.kafka.topicsRuleEngine,
-            messages: [{key: "", value: "updated"}]
-        })
-            .catch(async (e) => {
-                logger.error("Error while sending rule-update: " + e);
-                await kafkaProducer.disconnect();
+        try {
+            await kafkaProducer.send({
+                topic: config.drsProxy.kafka.topicsRuleEngine,
+                messages: [{key: "", value: "updated"}]
             });
+        } catch(e) {
+            logger.error("Error while sending rule-update: " + e);
+        }
     }
 };
 
@@ -65,10 +65,14 @@ exports.notify = async function () {
             kafkaProducer.connect();
         });
         kafkaProducer.on(CONNECT, e => logger.debug("Kafka rule-update producer connected: " + e));
-        await kafkaProducer.connect();
-        await kafkaAdmin.createTopics({
-            topics: [{topic: config.drsProxy.kafka.topicsRuleEngine, replicationFactor: config.drsProxy.kafka.replication }]
-        });
+        try {
+            await kafkaProducer.connect();
+            await kafkaAdmin.createTopics({
+                topics: [{topic: config.drsProxy.kafka.topicsRuleEngine, replicationFactor: config.drsProxy.kafka.replication }]
+            });
+        } catch (error) {
+            return logger.error("Could not connect or create topic with Kafka in rules-update: " + error);
+        }
     }
     send();
 };
