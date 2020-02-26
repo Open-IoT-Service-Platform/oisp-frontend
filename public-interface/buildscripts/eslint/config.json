@@ -24,5 +24,6 @@
         "moment": "writeable",
         "flipCounter": "writeable",
         "uuid": "writeable"
-    }
+    },
+    "parser": "esprima"
 }

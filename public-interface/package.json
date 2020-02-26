@@ -67,6 +67,7 @@
   "devDependencies": {
     "cfenv": "^1.0.0",
     "chai": "^4.2.0",
+    "esprima": "^4.0.1",
     "expect.js": "^0.3.1",
     "express": "^4.12.4",
     "grunt": "^1.0.3",
