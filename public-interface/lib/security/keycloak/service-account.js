@@ -27,7 +27,7 @@ module.exports = function ServiceAccount(keycloakAdapter) {
     this.keycloak = keycloakAdapter;
     this.grant = null;
 
-    this.ensureServiceAccountGrant = function ensureServiceAccountGrant() {
+    this.ensureServiceAccountGrant = function() {
         if (this.grant && !this.grant.isExpired()) {
             return Promise.resolve(this.grant);
         }

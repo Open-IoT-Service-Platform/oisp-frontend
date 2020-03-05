@@ -37,7 +37,7 @@ module.exports = {
     serviceAccount: serviceAccount,
     adapter: keycloakAdapter,
     customGrants: customGrants,
-    placeholder: 'placeholder',
+    placeholder: config.placeholder,
     placeholdermail: authConfig.placeholderUser,
     registerEnforcer: registerEnforcer,
     config: config

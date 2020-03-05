@@ -22,7 +22,7 @@
  * @param header
  * @returns {*}
  */
-var getBearerToken = function (header) {
+var getBearerToken = function(header) {
     var token = null;
     if (header && header.indexOf("Bearer") !== -1) {
         token = header.replace(/Bearer\s+/i,"");
@@ -30,6 +30,15 @@ var getBearerToken = function (header) {
     return token;
 };
 
+var getBasicToken = function(header) {
+    var token = null;
+    if (header && header.indexOf("Basic") !== -1) {
+        token = header.replace(/Basic\s+/i, "");
+    }
+    return token;
+};
+
 module.exports = {
-    getBearerToken: getBearerToken
+    getBearerToken: getBearerToken,
+    getBasicToken: getBasicToken
 };

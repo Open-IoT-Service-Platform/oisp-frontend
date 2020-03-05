@@ -243,15 +243,17 @@ var deleteUserAccounts = function(userId, transaction) {
 
 exports.deleteUser = function (userId) {
     var transaction;
-    return keycloak.serviceAccount.deleteUser(userId).then(() => {
-        return postgresProvider.startTransaction();
-    }).then(function(t) {
+    // always delete from own database first to avoid
+    // conflict with oisp event listener in keycloak
+    return postgresProvider.startTransaction().then(t => {
         transaction = t;
         return deleteUserAccounts(userId, transaction);
     }).then(function () {
         return Q.nfcall(user.delete, userId, transaction);
     }).then(function() {
         return postgresProvider.commit(transaction);
+    }).then(() => {
+        return keycloak.serviceAccount.deleteUser(userId);
     }).catch (function (err) {
         return postgresProvider.rollback(transaction).done(function() {
             if (err && err.code) {
