@@ -21,7 +21,21 @@ const express = require('express'),
     accounts = require('./../../../iot-entities/postgresql').accounts,
     httpStatuses = require('./../../../engine/res/httpStatuses'),
     app = express(),
-    PLACEHOLDER = require('./index').placeholder;
+    kcConfig = require('./config').getKeycloakConfig(),
+    utils = require('./../utils'),
+    errBuilder = require('./../../errorHandler').errBuilder,
+    notAuthorizedCode = errBuilder.Errors.Generic.NotAuthorized.code,
+    notAuthorizedMessage = errBuilder.Errors.Generic.NotAuthorized.message;
+
+function checkSecret(req, res, next) {
+    var secret = utils.getBasicToken(req.headers.authorization);
+    if (!secret || secret !== kcConfig.credentials.secret) {
+        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+    }
+    return next();
+}
+
+app.use('/', checkSecret);
 
 app.get('/keycloak/users/:userId/accounts', (req, res) => {
     if (!req.params.userId) {
@@ -50,7 +64,7 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
         return res.status(httpStatuses.OK.code).send([]);
     }
     devices.findByDeviceUIDWithAccountId(req.params.deviceUID).then(d => {
-        if (req.params.activationCode === PLACEHOLDER) {
+        if (req.params.activationCode === kcConfig.placeholder) {
             return res.status(httpStatuses.OK.code).send([{
                 id: d.accountId,
                 name: "",
@@ -71,6 +85,17 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
     }).catch(() => {
         // Send empty array for compatibility with keycloak
         res.status(httpStatuses.OK.code).send([]);
+    });
+});
+
+app.delete('/keycloak/users/:userId', (req, res) => {
+    if (!req.params.userId) {
+        return res.status(httpStatuses.BadRequest.code).send();
+    }
+    return users.delete(req.params.userId).then(() => {
+        return res.status(httpStatuses.DeleteOK.code).send();
+    }).catch(err => {
+        return res.status(httpStatuses.BadRequest.code).send(err);
     });
 });
 

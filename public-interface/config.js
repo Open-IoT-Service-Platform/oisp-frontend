@@ -17,45 +17,45 @@
 // Gets the config for the configName from the OISP_FRONTEND_CONFIG environment variable
 // Returns empty object if the config can not be found
 var getOISPConfig = (function () {
-	if (!process.env.OISP_FRONTEND_CONFIG) {
-		return function () { return {}; };
-	}
-	var frontendConfig = JSON.parse(process.env.OISP_FRONTEND_CONFIG);
+    if (!process.env.OISP_FRONTEND_CONFIG) {
+        return function () { return {}; };
+    }
+    var frontendConfig = JSON.parse(process.env.OISP_FRONTEND_CONFIG);
 
-	var resolveConfig = function (config, stack) {
-		if (!stack) {
-			stack = ["OISP_FRONTEND_CONFIG"];
-		}
-		for (var property in config) {
-			if (typeof config[property] === "string" &&
+    var resolveConfig = function (config, stack) {
+        if (!stack) {
+            stack = ["OISP_FRONTEND_CONFIG"];
+        }
+        for (var property in config) {
+            if (typeof config[property] === "string" &&
 					(config[property].substring(0,2) === "@@" || config[property].substring(0,2) === "%%")) {
-				var configName = config[property].substring(2, config[property].length);
-				if (!process.env[configName]) {
-					console.log("Config environment variable (" + configName + ") is missing...");
-					config[property] = {};
-				} else if (stack.indexOf(configName) !== -1) {
-					console.log("Detected cyclic reference in config decleration: " + configName + ", stopping recursion...");
-					config[property] = {};
-				} else {
-					config[property] = JSON.parse(process.env[configName]);
-					stack.push(configName);
-					resolveConfig(config[property], stack);
-					stack.pop();
-				}
-			}
-		}
-	};
+                var configName = config[property].substring(2, config[property].length);
+                if (!process.env[configName]) {
+                    console.log("Config environment variable (" + configName + ") is missing...");
+                    config[property] = {};
+                } else if (stack.indexOf(configName) !== -1) {
+                    console.log("Detected cyclic reference in config decleration: " + configName + ", stopping recursion...");
+                    config[property] = {};
+                } else {
+                    config[property] = JSON.parse(process.env[configName]);
+                    stack.push(configName);
+                    resolveConfig(config[property], stack);
+                    stack.pop();
+                }
+            }
+        }
+    };
 
-	resolveConfig(frontendConfig);
+    resolveConfig(frontendConfig);
 
-	return function(configName) {
-			if (!frontendConfig[configName] && frontendConfig[configName] !== false)
-				return {};
-			else {
-				console.log(configName + " is set to: " + JSON.stringify(frontendConfig[configName]));
-				return frontendConfig[configName];
-			}
-		};
+    return function(configName) {
+        if (!frontendConfig[configName] && frontendConfig[configName] !== false)
+        {return {};}
+        else {
+            console.log(configName + " is set to: " + JSON.stringify(frontendConfig[configName]));
+            return frontendConfig[configName];
+        }
+    };
 })();
 
 var postgres_config = getOISPConfig("postgresConfig"),
@@ -67,7 +67,7 @@ var postgres_config = getOISPConfig("postgresConfig"),
     redis_config = getOISPConfig("redisConfig"),
     ruleEngine_config = getOISPConfig("ruleEngineConfig"),
     gateway_config = getOISPConfig("gatewayConfig"),
-    dashboardSecurity_config = getOISPConfig("frontendSecurityConfig")
+    dashboardSecurity_config = getOISPConfig("frontendSecurityConfig"),
     kafka_config = getOISPConfig("kafkaConfig"),
     jaeger_enabled = getOISPConfig("jaegerTracing"),
     grafana_config = getOISPConfig("grafanaConfig"),
@@ -80,22 +80,22 @@ var postgresReadReplicas = [],
     postgresWriteConf = {};
 
 if (postgres_config.readReplicas) {
-	postgresReadReplicas = postgres_config.readReplicas;
+    postgresReadReplicas = postgres_config.readReplicas;
 } else if (postgres_config.readHostname) {
-	postgresReadReplicas.push({
-		host: postgres_config.readHostname,
-		port: postgres_config.readPort
-	});
+    postgresReadReplicas.push({
+        host: postgres_config.readHostname,
+        port: postgres_config.readPort
+    });
 } else {
-	// Use default db config as read
-	postgresReadReplicas.push({});
+    // Use default db config as read
+    postgresReadReplicas.push({});
 }
 
 if (postgres_config.writeHostname) {
-	postgresWriteConf = {
-		host: postgres_config.writeHostname,
-		port: postgres_config.writePort
-	};
+    postgresWriteConf = {
+        host: postgres_config.writeHostname,
+        port: postgres_config.writePort
+    };
 }
 
 var smtp_tls;
@@ -141,7 +141,7 @@ var config = {
             email: 'placeholder@placeholder.org',
         },
         keycloak: {
-			keycloakListenerPort: keycloak_config.listenerPort,
+            keycloakListenerPort: keycloak_config.listenerPort,
             realm: keycloak_config.realm,
             "auth-server-url": keycloak_config["auth-server-url"],
             resource: keycloak_config.resource,
@@ -277,7 +277,7 @@ var config = {
         logSpans: true,
         samplerType: 'probabilistic',
         samplerParam: 0.1,
-		tracing: jaeger_enabled
+        tracing: jaeger_enabled
     },
     grafana : {
         host: 'grafana',
@@ -313,7 +313,7 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
 
 /* override for testing if rateLimit wants to be disabled */
 if (process.argv && (process.argv.indexOf("--disable-rate-limits") !== -1)) {
-	config.rateLimit = 'limitless';
+    config.rateLimit = 'limitless';
 }
 
 

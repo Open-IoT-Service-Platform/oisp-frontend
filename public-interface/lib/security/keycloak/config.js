@@ -16,7 +16,8 @@
 
 'use strict';
 const fs = require('fs'),
-    keycloakConfig = require('./../../../config').auth.keycloak;
+    keycloakConfig = require('./../../../config').auth.keycloak,
+    PLACEHOLDER = 'placeholder';
 
 // singleton
 var config;
@@ -30,6 +31,7 @@ module.exports.getKeycloakConfig = function() {
     Object.keys(keycloakConfig).forEach(option => {
         conf[option] = keycloakConfig[option];
     });
+    conf.placeholder = PLACEHOLDER;
     config = conf;
     return config;
 };

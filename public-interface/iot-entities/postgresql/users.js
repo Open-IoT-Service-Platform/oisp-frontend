@@ -337,13 +337,19 @@ exports.delete = function (userId, transaction, resultCallback) {
         where: {
             id: userId
         },
-        transaction: transaction
+        transaction: transaction ? transaction : undefined
     };
-    users.destroy(filter)
-        .then(function (res) {
+    return users.destroy(filter)
+        .then(res => {
+            if (!resultCallback) {
+                return res;
+            }
             resultCallback(null, res);
         })
-        .catch(function (err) {
+        .catch(err => {
+            if (!resultCallback) {
+                return err;
+            }
             resultCallback(err);
         });
 };
