@@ -47,7 +47,6 @@ app.get('/keycloak/users/:userId/accounts', (req, res) => {
             Object.keys(result.accounts).forEach(accId => {
                 ret.push({
                     id: accId,
-                    name: result.accounts[accId].name,
                     role: result.accounts[accId].role
                 });
             });
@@ -67,7 +66,6 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
         if (req.params.activationCode === kcConfig.placeholder) {
             return res.status(httpStatuses.OK.code).send([{
                 id: d.accountId,
-                name: "",
                 role: 'device'
             }]);
         }
@@ -75,7 +73,6 @@ app.get('/keycloak/activationcode/:activationCode/devices/:deviceUID/account', (
             if (!err && account && d && account.public_id === d.accountId) {
                 return res.status(httpStatuses.OK.code).send([{
                     id: account.public_id,
-                    name: account.name,
                     role: 'device'
                 }]);
             } else {

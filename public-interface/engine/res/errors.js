@@ -103,6 +103,7 @@ module.exports = {
             SavingErrorAddOrUpdate: {code: 3510, status: 500, message: "Error saving Account"},
             DeletionError: {code: 3511, status: 500, message: "Error deleting Account locally"},
             DeletionErrorAA: {code: 3512, status: 500, message: "Error deleting Account on AA Proxy"},
+            MaximumAccountsLimitReached: {code: 3513, status: 400, message: "User has reached maximum amount of accounts"},
             LeavingError : {
                 IsSoleAdminForAccount :{ code: 3601, status: 401, message: "Could not leave Account"}
             }

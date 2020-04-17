@@ -19,6 +19,7 @@
 
 var postgresProvider = require('../../../iot-entities/postgresql'),
     account = postgresProvider.accounts,
+    user = postgresProvider.users,
     logger = require('../../../lib/logger').init(),
     errBuilder  = require("../../../lib/errorHandler").errBuilder,
     uuid = require('node-uuid'),
@@ -93,7 +94,13 @@ exports.addAccountWithGlobalCode = function (data, userId, resultCallback) {
     data.created = Math.floor(Date.now() / 1000) * 1000;
     data.updated = data.created;
 
-    return account.new(data, userId)
+    return user.accountsCount(userId)
+        .then(accountCount => {
+            if (accountCount > config.accountsPerUserLimit) {
+                throw errBuilder.Errors.Account.MaximumAccountsLimitReached;
+            }
+            return account.new(data, userId);
+        })
         .then(function(userWithNewAccount){
             if (!userWithNewAccount) {
                 throw errBuilder.Errors.User.NotFound;
