@@ -152,6 +152,7 @@ var config = {
         }
     },
     verifyUserEmail: true,
+    accountsPerUserLimit: 30,
     redis:{
         host: redis_config.hostname,
         password: redis_config.password,

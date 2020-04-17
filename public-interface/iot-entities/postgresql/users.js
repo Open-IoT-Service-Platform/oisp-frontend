@@ -353,3 +353,12 @@ exports.delete = function (userId, transaction, resultCallback) {
             resultCallback(err);
         });
 };
+
+exports.accountsCount = function(userId) {
+    var filter = {
+        where: {
+            userId: userId
+        }
+    };
+    return userAccounts.count(filter);
+};
