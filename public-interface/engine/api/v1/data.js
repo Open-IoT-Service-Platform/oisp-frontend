@@ -347,10 +347,13 @@ var getFromDependingOnPeriod = function(period) {
         'last_week':    -3600 * 24 * 7,
         'last_day':     -3600 * 24,
         'last_hour':    -3600,
+        'last_10minutes':  -60 * 10,
+        'last_5minutes':  -60 * 5,
+        'last_minute':  -60,
         'total':         0.0
     };
     if (PERIOD_AS_SECONDS[period]  === undefined) {
-        return PERIOD_AS_SECONDS.last_hour;
+        return PERIOD_AS_SECONDS.last_minute;
     } else {
         return PERIOD_AS_SECONDS[period];
     }
