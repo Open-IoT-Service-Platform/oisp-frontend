@@ -342,12 +342,9 @@
         "observations_period": "Observations period",
         "details": "Details",
         "period": {
-            "last_hour": "Last hour",
-            "last_day": "Last day",
-            "last_week": "Last week",
-            "last_month": "Last month",
-            "last_year": "Last year",
-            "total": "Total"
+            "last_minute": "Last minute",
+            "last_5minutes": "Last 5 minutes",
+            "last_10minutes": "Last 10 minutes"
         },
         "thereAreAlertsText": "You have %COUNT% unread alerts",
         "moreUnreadAlertsText": "%COUNT% more unread alerts",

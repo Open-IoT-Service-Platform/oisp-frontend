@@ -112,8 +112,8 @@ iotController.controller('HomeCtrl', function($scope,
     $scope.$on('$viewContentLoaded', function readyToTrick() {
         $scope.$watch(sessionService.getCurrentAccount, function(data) {
             if (data) {
-                pollerService.startPolling('deviceTotals', devicesService.getTotal);
-                pollerService.startPolling('dataTotals', getMessagesTotal);
+                pollerService.startPolling('deviceTotals', devicesService.getTotal, 60000);
+                pollerService.startPolling('dataTotals', getMessagesTotal, 60000);
             } else {
                 pollerService.stopPolling('dataTotals');
                 pollerService.stopPolling('deviceTotals');
