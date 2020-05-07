@@ -85,7 +85,10 @@ proxy.on('error', function(err, req, res) {
     res.writeHead(500, {
         'Content-Type': 'text/plain'
     });
-    res.end('Can\'t reach to datasource');
+    if (typeof err !== 'string' ) {
+        err = JSON.stringify(err);
+    }
+    res.end('Can\'t reach to datasource: ' + err);
 });
 
 app.all('(/*)?', function (req, res) {

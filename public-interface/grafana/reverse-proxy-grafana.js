@@ -45,7 +45,10 @@ proxy.on('error', function(err, req, res) {
     res.writeHead(500, {
         'Content-Type': 'text/plain'
     });
-    res.end('Can\'t reach to grafana');
+    if (typeof err !== 'string' ) {
+        err = JSON.stringify(err);
+    }
+    res.end('Can\'t reach to grafana: ' + err);
 });
 
 app.all('(/*)?', function (req, res) {
