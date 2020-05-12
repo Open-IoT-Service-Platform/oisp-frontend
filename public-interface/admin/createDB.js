@@ -17,9 +17,7 @@
 var {Client} = require('pg'),
     config = require('../config'),
     tracer = require('../lib/express-jaeger').tracer,
-    models = require('../iot-entities/postgresql/models'),
-    systemUsers = require('../lib/dp-users/systemUsers');
-
+    models = require('../iot-entities/postgresql/models');
 var CreateDB = function(){};
 
 CreateDB.prototype.create = function(){
@@ -94,10 +92,6 @@ CreateDB.prototype.create = function(){
         .catch(function(err) {
             console.log("Cannot create models: " + err);
             console.log("OK to continue ");
-        })
-        .then(function() {
-            console.log("Trying to create system users.");
-            return systemUsers.create();
         })
         .then(function() {
             models.sequelize.close();
