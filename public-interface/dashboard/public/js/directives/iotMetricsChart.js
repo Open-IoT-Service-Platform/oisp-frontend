@@ -188,6 +188,10 @@ iotApp.directive('iotMetricsChart', function(componentsService){
 
             series.forEach(function(deviceComponentPair){
                 deviceComponentPair.points.forEach(function(value){
+                    if (typeof value.value === "boolean") {
+                        value.value = value.value.toString();
+                    }
+
                     var data = {
                         deviceId: deviceComponentPair.deviceId,
                         deviceName: deviceComponentPair.deviceName,
@@ -195,7 +199,7 @@ iotApp.directive('iotMetricsChart', function(componentsService){
                         componentName: deviceComponentPair.componentName,
                         componentId: deviceComponentPair.componentId,
                         timestamp: scope.getLocalTimeFromUTC(parseInt(value.ts)),
-                        value: isNaN(value.value)? value.value: parseFloat(value.value)
+                        value: isNaN(value.value) ? value.value: parseFloat(value.value)
                     };
 
                     scope[attributes.rawData].push(data);
