@@ -179,7 +179,7 @@ function DataInquiryResponse(data, deviceLookUp, queryMeasureLocation) {
         serie.attributes = data.attributes || {};
         serie.points = [];
         component.samples.forEach(function(point) {
-	    var returnValue = new ReturnValuesTransformer(serie.componentType.dataType, point[1]).transform();
+	    var returnValue = new ReturnValuesTransformer(deviceLookUp[component.componentId].componentType.dataType, point[1]).transform();
             if (queryMeasureLocation) {
                 serie.points.push({ts:point[0], value:returnValue, lat:point[2], lon:point[3], alt:point[4]});
             } else {
@@ -208,7 +208,7 @@ exports.search = function(accountId, searchRequest, resultCallback) {
                             target.components.forEach(function(component) {
                                 if (metricsArray.indexOf(component.cid) > -1) {
                                     componentsWithDataType[component.cid] = {dataType: component.componentType.dataType};
-                                    deviceLookUp[component.cid] = {id:target.deviceId, name: component.name, type: component.type, deviceName:target.name};
+                                    deviceLookUp[component.cid] = {id:target.deviceId, name: component.name, type: component.type, componentType: component.componentType, deviceName:target.name};
                                 }
                             });
                         }
@@ -315,16 +315,16 @@ exports.searchAdvanced = function (accountId, searchRequest, resultCallback) {
             delete searchRequest.devCompAttributeFilter;
             proxy.dataInquiryAdvanced(searchRequest, function (err, result, isBinary) {
                 if (!err) {
-		    // Some error happens in this part, it is not about parsing
-		    result.data.forEach(function (dataItem) {
+                    // Some error happens in this part, it is not about parsing
+                    result.data.forEach(function (dataItem) {
                         dataItem.components.forEach(function (cmp) {
                             if ("samples" in cmp) {
                                 cmp.samples.forEach(function (sample) {
                                     sample[1] = new ReturnValuesTransformer(cmp.dataType, sample[1]).transform();
-			        });
+                                });
                             }
                         });
-		    });
+                    });
                     resultCallback(null, result, isBinary);
                 } else if (result) {
                     resultCallback(err, result);

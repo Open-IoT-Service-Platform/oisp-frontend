@@ -25,10 +25,10 @@ var transformer = function(dataType, value) {
             return Number(value);
         case 'Boolean':
 	    if (value === "1") {
-                return true;
+                return "1";
 	    }
 	    if (value === "0") {
-                return false;
+                return "0";
 	    }
 	    break;
         case 'String':
