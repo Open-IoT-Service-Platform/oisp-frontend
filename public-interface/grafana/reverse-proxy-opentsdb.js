@@ -17,6 +17,7 @@
 var express = require('express'),
     cookieParser = require('cookie-parser'),
     tokenInfo = require('./../lib/security').authorization.tokenInfo,
+    secUtils = require('./../lib/security/utils'),
     httpProxy = require('http-proxy'),
     modifyResponse = require('node-http-proxy-json'),
     grafanaConf = require('./../config').grafana;
@@ -92,8 +93,9 @@ proxy.on('error', function(err, req, res) {
 });
 
 app.all('(/*)?', function (req, res) {
-    if (req.cookies.jwt) {
-        tokenInfo(req.cookies.jwt, null, function(result) {
+    if (req.cookies.jwt || req.headers.authorization) {
+        var token = req.cookies.jwt || secUtils.getBearerToken(req.headers.authorization);
+        tokenInfo(token, null, function(result) {
             if (result) {
                 proxy.web(req, res, {
                     target: dataSourceAddress,
