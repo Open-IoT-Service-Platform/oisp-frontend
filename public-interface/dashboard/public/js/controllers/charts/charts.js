@@ -103,9 +103,7 @@ iotController.controller('ChartCtrl', function( $scope,
             {id:2, text:$rootScope.i18n.charts.pastHour, value:-3600, unit:"minute"},
             {id:3, text:$rootScope.i18n.charts.pastDay, value:-24*3600, unit:"hour"},
             {id:4, text:$rootScope.i18n.charts.pastWeek, value:-24*3600*7, unit:"day"},
-            {id:5, text:$rootScope.i18n.charts.pastMonth,value:-24*3600*30, unit:"day"},
-            {id:6, text:$rootScope.i18n.charts.pastYear,value:-24*3600*365, unit:"month"},
-            {id:7, text:$rootScope.i18n.charts.custom,value:-1, unit:"hour"}
+            {id:7, text:$rootScope.i18n.charts.custom,value:-1, unit:"minute"}
         ],
         renderType: {
             line: {id:"line", text:"Line"},
@@ -123,7 +121,7 @@ iotController.controller('ChartCtrl', function( $scope,
         {text: $rootScope.i18n.charts.refreshRates.noRefresh, seconds: 31536000} // about 1 year
     ];
 
-    $scope.refreshRateSeconds = 5;
+    $scope.refreshRateSeconds = 10;
 
     $scope.filters = {
         chart: {
@@ -239,7 +237,7 @@ iotController.controller('ChartCtrl', function( $scope,
         }
 
         if (period.id !== 1) {
-            $scope.selectRefreshRate($scope.refreshRates[0].seconds);
+            $scope.selectRefreshRate($scope.refreshRates[2].seconds); //10s should be the default
         }
 
         if (period.id === customTimeId) {
@@ -441,7 +439,7 @@ iotController.controller('ChartCtrl', function( $scope,
         }
 
         if($scope.filters.chart.timePeriod.unit !== 'minute'){
-            filters.maxItems = angular.element("#chartTab").width() || 1000; // default
+            filters.maxItems = angular.element("#chartTab").width() || 4000; // default
         }
 
         Object.keys($scope.filters.chart.devices).forEach(function(item){

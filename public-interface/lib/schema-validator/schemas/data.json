@@ -75,8 +75,6 @@
                 "required": true,
 		"description": "The filter object that will be used to select devices",
 		"examples": [ "criteria or deviceList object" ],
-
-
                 "properties": {
                     "criteria": {
                         "type": "object",
@@ -166,22 +164,60 @@
                 "type":"array",
                 "minItems": 1,
                 "required": true,
-		"description": "array of metrics (data series) to return - each object in array contains ID that represents the ID of component. Up to 10 such objects can be provided.",
+		            "description": "array of metrics (data series) to return - each object in array contains ID that represents the ID of component. Up to 10 such objects can be provided.",
                 "items": {
                     "type": "object",
                     "properties": {
                         "id": {
                             "type": "string",
                             "required": true,
-			    "description": "Component ID",
-			    "examples": "436e7e74-6771-4898-9057-26932f5eb7e1"
+			                      "description": "Component ID",
+			                      "examples": "436e7e74-6771-4898-9057-26932f5eb7e1"
                         },
                         "op": {
                             "type": "string",
                             "required": false
+                        },
+
+                    "aggregator": {
+                        "type": "object",
+                        "requrired": false,
+                        "properties": {
+                            "name": {
+                                "required": true,
+                                "type": "string",
+                                "description": "point aggregator, e.g. calculate averages over a period.",
+                                "examples": ["avg", "raw"]
+                            },
+                            "sampling": {
+                                "required": false,
+                                "type": "object",
+                                "description": "sampling interval, e.g. 10 seconds, 1 minute, etc.",
+                                "examples": ["{\"value\": 1, \"unit\": \"minutes\"}"],
+                                "properties": {
+                                    "value": {
+                                        "required": true,
+                                        "description": "value of sampling interval",
+                                        "type": "number"
+                                    },
+                                    "unit": {
+                                        "required": true,
+                                        "description": "Unit of sampling interval.",
+                                        "examples": ["milliseconds", "seconds", "minute", "hours"],
+                                        "type": "string"
+                                    }
+                                }
+                            }
                         }
                     },
-                    "additionalProperties": false
+                    "order": {
+                        "type": "string",
+                        "description": "Order in which the data points are provided, ascending or descending. Ascending is the default.",
+                        "examples": ["asc", "desc"]
+                    }
+                  },
+
+                  "additionalProperties": false
                 }
             },
             "recipients": {
