@@ -206,8 +206,15 @@ exports.search = function(accountId, searchRequest, resultCallback) {
                     resolvedDevices.forEach(function(target) {
                         if (target.components) {
                             target.components.forEach(function(component) {
-                                if (metricsArray.indexOf(component.cid) > -1) {
+                                var index = metricsArray.indexOf(component.cid);
+                                if ( index > -1) {
                                     componentsWithDataType[component.cid] = {dataType: component.componentType.dataType};
+                                    if (searchRequest.metrics[index].order !== undefined && searchRequest.metrics[index].order !== null) {
+                                        componentsWithDataType[component.cid].order = searchRequest.metrics[index].order;
+                                    }
+                                    if (searchRequest.metrics[index].aggregator !== undefined && searchRequest.metrics[index].aggregator !== null) {
+                                        componentsWithDataType[component.cid].aggregator = searchRequest.metrics[index].aggregator;
+                                    }
                                     deviceLookUp[component.cid] = {id:target.deviceId, name: component.name, type: component.type, componentType: component.componentType, deviceName:target.name};
                                 }
                             });
@@ -218,7 +225,7 @@ exports.search = function(accountId, searchRequest, resultCallback) {
                     searchRequest.domainId = foundAccount.public_id;
                     searchRequest.from = searchRequest.from || 0;
                     delete searchRequest.targetFilter;
-                    logger.debug("search Request: " + JSON.stringify(searchRequest));
+                    logger.info("search Request: " + JSON.stringify(searchRequest));
                     if (Object.keys(componentsWithDataType).length > 0) {
                         proxy.dataInquiry(searchRequest, function(err, result, isBinary) {
                             if (!err) {

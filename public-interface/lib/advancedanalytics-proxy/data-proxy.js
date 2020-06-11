@@ -310,7 +310,9 @@ module.exports = function(config) {
         if(data.queryMeasureLocation !== undefined){
             dataInquiryMessage.queryMeasureLocation = data.queryMeasureLocation;
         }
-
+        if (data.aggregator !== undefined){
+            dataInquiryMessage.aggregator = data.aggregator;
+        }
         var options = {
             url: config.url + '/v1/accounts/' + data.domainId + '/dataInquiry',
             method: 'POST',
