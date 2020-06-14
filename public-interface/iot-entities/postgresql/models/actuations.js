@@ -29,7 +29,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         transport: {
-            type: DataTypes.ENUM('mqtt', 'ws'),
+            type: DataTypes.ENUM('mqtt', 'ws', 'auto'),
             allowNull: false
         },
         conditions: {
