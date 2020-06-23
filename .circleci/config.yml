@@ -30,6 +30,11 @@ commands:
           command: |
             cd platform-launcher/util && \
             bash setup-ubuntu18.04.sh
+            # create 8GB swap
+            sudo dd if=/dev/zero of=/swapfile bs=1M count=8000
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+
   checkout-e2e:
     description: "Checkout E2E test"
     parameters:
