@@ -170,6 +170,67 @@ uriParameters:
             }
             ]
           }
+        Example for auto aggregation with reduced metric number: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "maxItems": 100,
+            "targetFilter": {
+              "deviceList": [
+              "24-a5-80-21-5b-29"
+              ]
+            },
+            "metrics": [
+            {
+              "id": "436e7e74-6771-4898-9057-26932f5eb7e1",
+              "op": "none",
+              "aggregator": {
+                "name": "avg"
+              }
+            }
+            ]
+          }
+        Example for aggregation with sampling: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "targetFilter": {
+              "deviceList": [
+              "24-a5-80-21-5b-29"
+              ]
+            },
+            "metrics": [
+            {
+              "id": "436e7e74-6771-4898-9057-26932f5eb7e1",
+              "op": "none",
+              "aggregator": {
+                "name": "avg",
+                "sampling": {
+                  "unit": "seconds",
+                  "value": 1
+                }
+              }
+            }
+            ]
+          }
+        Getting only the most recent sample: |
+          {
+            "from": 1407979291860,
+            "to": 1407979292860,
+            "maxItems": 1,
+            "targetFilter": {
+              "deviceList": [
+              "24-a5-80-21-5b-29"
+              ]
+            },
+            "metrics": [
+            {
+              "id": "436e7e74-6771-4898-9057-26932f5eb7e1",
+              "op": "none",
+              "order": "desc"
+            }
+            ]
+          }
     responses:
       201:
 /accounts/{accountId}/data/search/advanced:
