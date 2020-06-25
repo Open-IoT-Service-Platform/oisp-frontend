@@ -51,6 +51,7 @@ exports.findByDeviceId = function (accountId, deviceId, limit, dateFilter, resul
         include: getActuationRelations(),
         order:[['created','DESC']]
     };
+    filter.include[0]["required"] = true;
     filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
 
     if (dateFilter) {
@@ -91,6 +92,7 @@ exports.deleteByDeviceId = function (accountId, deviceId, resultCallback) {
         include: getActuationRelations(),
 
     };
+    filter.include[0]["required"] = true;
     filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
 
     actuations.destroy(filter)
