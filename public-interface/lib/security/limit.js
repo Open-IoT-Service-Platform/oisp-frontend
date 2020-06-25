@@ -66,7 +66,6 @@ var limit = function (req, res, next) {
             var route = routeConfigRow.path;
             var accountId = getAccountIdFromPath(route) || getTheOnlyAccountIdFromToken();
             var requester = accountId || req.identity;
-
             var processRequest = function (err, rateLimit) {
 
                 var reportDBError = function () {
@@ -119,15 +118,15 @@ var limit = function (req, res, next) {
                 if (err) {
                     reportDBError();
                 } else if (isAcquiredRateLimitCorrect(rateLimit)) {
-                    PurchasedLimitsRedis.getPurchasedLimitForRoute(requester, route, method, function (err, purchasedLimit) {
+                    PurchasedLimitsRedis.getPurchasedLimitForRoute(accountId, route, method, function (err, purchasedLimit) {
                         if (!err && purchasedLimit && purchasedLimit.limit) {
                             checkLimitAndProceed(err, purchasedLimit);
                         } else {
-                            PurchasedLimitsPostgres.getLimitForRoute(requester, route, method, function (err, purchasedLimit) {
+                            PurchasedLimitsPostgres.getLimitForRoute(accountId, route, method, function (err, purchasedLimit) {
                                 checkLimitAndProceed(err, purchasedLimit);
                                 if (!err) {
                                     purchasedLimit = purchasedLimit || {limit: routeConfigRow.limit || config.rateLimit};
-                                    PurchasedLimitsRedis.setPurchasedLimitForRoute(requester, route, method, purchasedLimit.limit);
+                                    PurchasedLimitsRedis.setPurchasedLimitForRoute(accountId, route, method, purchasedLimit.limit);
                                 }
 
                             });
@@ -139,7 +138,7 @@ var limit = function (req, res, next) {
                 }
             };
 
-            RateLimits.incrementCounter(requester, route, method, processRequest);
+            RateLimits.incrementCounter(accountId, route, method, processRequest);
             return true;
         } else {
             return false;
