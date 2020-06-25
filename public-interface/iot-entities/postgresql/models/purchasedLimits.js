@@ -26,11 +26,13 @@ module.exports = function (sequelize, DataTypes) {
         },
         accountId: {
             type: DataTypes.UUID,
-            allowNull: false
+            allowNull: false,
+            unique: 'accountId_route_method_unique'
         },
         route:{
             type: DataTypes.STRING(255),
-            allowNull: false
+            allowNull: false,
+            unique: 'accountId_route_method_unique'
         },
         limit:{
             type: DataTypes.BIGINT,
@@ -38,7 +40,8 @@ module.exports = function (sequelize, DataTypes) {
         },
         method:{
             type: DataTypes.STRING(10),
-            allowNull: false
+            allowNull: false,
+            unique: 'accountId_route_method_unique'
         }
 
     },

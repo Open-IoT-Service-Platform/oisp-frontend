@@ -15,15 +15,13 @@
  */
 
 'use strict';
-var
-    purchasedLimits = require('./models').purchasedLimits;
+var purchasedLimits = require('./models').purchasedLimits;
 
-
-module.exports.getLimitForRoute = function (identity, route, method, resultCallback) {
+module.exports.getLimitForRoute = function (accountId, route, method, resultCallback) {
 
     var query = {
         where: {
-            accountId: identity,
+            accountId: accountId,
             route: route,
             method: method
         }
@@ -35,4 +33,13 @@ module.exports.getLimitForRoute = function (identity, route, method, resultCallb
         }).catch(function (err) {
             resultCallback(err);
         });
+};
+
+module.exports.setLimitForRoute = function (accountId, route, method, limit) {
+    return purchasedLimits.upsert({
+        accountId: accountId,
+        route: route,
+        method: method,
+        limit: limit,
+    });
 };
