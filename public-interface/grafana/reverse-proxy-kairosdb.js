@@ -32,8 +32,9 @@ const SUGGESTION_PATH = '/metricnames',
 
 app.use(cookieParser());
 
-function verifyResponse(jwt, res, cb) {
-    return tokenInfo(jwt, null, function(result) {
+function verifyResponse(req, res, cb) {
+    var token = req.cookies.jwt || secUtils.getBearerToken(req.headers.authorization);
+    return tokenInfo(token, null, function(result) {
         return cb(res, result.payload.accounts);
     });
 }
@@ -72,16 +73,16 @@ proxy.on('proxyRes', function (proxyRes, req, res) {
     modifyResponse(res, proxyRes, function(body) {
         if (body) {
             if (req.url.indexOf(SUGGESTION_PATH) !== -1) {
-                return verifyResponse(req.cookies.jwt, body, verifySuggestion);
+                return verifyResponse(req, body, verifySuggestion);
             } else if (req.url.indexOf(QUERY_TAGS_PATH) !== -1) {
-                return verifyResponse(req.cookies.jwt, body, verifyQuery).then(d => {
+                return verifyResponse(req, body, verifyQuery).then(d => {
                     if (!d) {
                         res.statusCode = 400;
                     }
                     return d;
                 });
             } else if (req.url.indexOf(QUERY_PATH) !== -1) {
-                return verifyResponse(req.cookies.jwt, body, verifyQuery).then(d => {
+                return verifyResponse(req, body, verifyQuery).then(d => {
                     if (!d) {
                         res.statusCode = 400;
                     }
