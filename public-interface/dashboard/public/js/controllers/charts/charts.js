@@ -456,9 +456,11 @@ iotController.controller('ChartCtrl', function( $scope,
 
                 if(availableMetric && availableMetric[0]){
                     availableMetric[0].components.forEach(function(component){
+                        // switch on auto aggregation to get points over the whole interval
+                        var aggregator = {"name": "avg"};
                         filters.metrics.push({
                             "id": component.id,
-                            "op": "none"
+                            "aggregator": aggregator
                         });
                     });
                     filters.metrics.push({
