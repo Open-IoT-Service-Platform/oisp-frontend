@@ -11,12 +11,9 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -24,12 +21,9 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -37,12 +31,9 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"auth",
@@ -50,12 +41,9 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -63,12 +51,9 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -76,12 +61,9 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -89,24 +71,17 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -114,12 +89,9 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"api",
@@ -127,12 +99,9 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "api-public"
-                        ]
+                        "local-enforcer": "api-public"
                     }
-                ],
-                "enforcement-mode":"DISABLED"
+                ]
             },
             {
                 "name":"ui",
@@ -197,9 +166,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "auth-read"
-                        ]
+                        "local-enforcer": "auth-read"
                     }
                 ]
             },
@@ -776,15 +743,13 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "catalog-read"
-                        ]
+                        "local-enforcer": "catalog-read"
                     }
                 ]
             },
             {
                 "name":"catalog",
-                "path":"/v1/api/accounts/:accountId/cmpcatalog/componentId",
+                "path":"/v1/api/accounts/:accountId/cmpcatalog/:componentId",
                 "methods":[
                     {
                         "method":"GET",
@@ -800,9 +765,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "catalog-read"
-                        ]
+                        "local-enforcer": "catalog-read"
                     }
                 ]
             },
@@ -940,15 +903,11 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"GET",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -982,15 +941,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     }
                 ]
             },
