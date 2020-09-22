@@ -51,7 +51,7 @@ function AlertProcessor(executors) {
     }
 
     function processAlert(data){
-        logger.info("AlertProcessor - Alert arrived: " + JSON.stringify(data, null, "\t"));
+        logger.info("AlertProcessor - Alert arrived: " + JSON.stringify(data));
         async.each(data.rule.actions, function(action, done){
             if (action.type === ACTUATOR_TYPE) {
                 async.each(action.messages, function (message, parallelCallback) {

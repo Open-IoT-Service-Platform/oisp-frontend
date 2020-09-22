@@ -18,11 +18,11 @@
 var injectHeaders = function(req, res, next){
     var fwdHost = req.headers['x-forwarded-host'] || req.headers['host'],
         fwdFor = req.headers['x-forwarded-for'],
-        fwdProto = req.headers['x-forwarded-proto'];
+        fwdProto = req.headers['x-forwarded-proto'] || req.protocol;
 
     req.forwardedHeaders = {
         host: fwdHost,
-        "for": fwdFor,
+        for: fwdFor,
         proto: fwdProto,
         baseUrl: fwdProto + '://' + fwdHost
     };
