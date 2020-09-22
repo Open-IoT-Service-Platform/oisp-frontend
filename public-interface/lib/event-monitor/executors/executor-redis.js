@@ -22,14 +22,14 @@ var RedisConnector = require('./../../../lib/redis/connector'),
 
 var redisConfig = config.controlChannel.redis;
 
- 
+
 module.exports = function() {
 
     return {
         execute: function (message, done) {
             var accountId = message.content.accountId || message.content.domainId;
-            logger.info("============> "+accountId + " : "+message.content.accountId + "  :  " +message.content.domainId);
-            message.channel = accountId+"/"+message.content.deviceId;
+            logger.info("============> " + accountId + " : " + message.content.accountId + "  :  " + message.content.domainId);
+            message.channel = accountId + "/" + message.content.deviceId;
             var connector = RedisConnector.RedisClient(redisConfig, logger);
             connector.publish(message);
             done();
