@@ -125,7 +125,7 @@ var command = function (accountId, commands, complexCommands, resultCallback) {
             type: MESSAGE_TYPE_COMMAND,
             transport: command.transport,
             content: {
-                accountId: accountId,
+                domainId: accountId,
                 deviceUID: command.deviceUID,
                 deviceId: command.deviceId,
                 gatewayId: command.gatewayId,
