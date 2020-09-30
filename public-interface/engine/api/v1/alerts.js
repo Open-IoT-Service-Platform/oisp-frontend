@@ -195,7 +195,7 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
                         checkResetted(accountId, alert, rule)
                             .then((found) => new Promise(function(resolve){
                                 if (found) {
-                                    logger.info("Active alert found with same ruleid. Creating silent alert instead.");
+                                    logger.info("Active alert found with same ruleid. Skipping alert.");
                                     suppressAlert = true;
                                 }
                                 resolve();
@@ -209,36 +209,40 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
                                 if (suppressAlert) {
                                     internalAlert["suppressed"] = suppressAlert;
                                 }
-                                Alert.new(internalAlert, function(err){
-                                    if (err) {
-                                        logger.error('alerts. trigger, error: ' + JSON.stringify(err));
-                                        alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
-                                        reject(alert);
-                                    } else {
-                                        if (!suppressAlert) {
-                                            if(hostUrl.indexOf('internal-') > -1) {
-                                                internalAlert.host = hostUrl.substr(hostUrl.indexOf('-')+1);
-                                            }
-                                            else {
-                                                internalAlert.host = hostUrl;
-                                            }
+                                if (!suppressAlert) { // suppressAlert
+                                    Alert.new(internalAlert, function(err){
+                                        if (err) {
+                                            logger.error('alerts. trigger, error: ' + JSON.stringify(err));
+                                            alert.err = errBuilder.build(errBuilder.Errors.Alert.SavingErrorAA).asResponse();
+                                            reject(alert);
+                                        } else {
+                                            if (!suppressAlert) {
+                                                if(hostUrl.indexOf('internal-') > -1) {
+                                                    internalAlert.host = hostUrl.substr(hostUrl.indexOf('-')+1);
+                                                }
+                                                else {
+                                                    internalAlert.host = hostUrl;
+                                                }
 
-                                            internalAlert.externalRule = rule;
-                                            actuationAlerts.addCommandsToActuationActions(accountId, rule)
-                                                .then(function onSuccess() {
-                                                    actuationAlerts.saveAlertActuations(rule.actions, function (err) {
-                                                        if (err) {
-                                                            logger.error('alerts.saveActuations - unable to add new actuation message into DB: ' + JSON.stringify(err));
-                                                        }
+                                                internalAlert.externalRule = rule;
+                                                actuationAlerts.addCommandsToActuationActions(accountId, rule)
+                                                    .then(function onSuccess() {
+                                                        actuationAlerts.saveAlertActuations(rule.actions, function (err) {
+                                                            if (err) {
+                                                                logger.error('alerts.saveActuations - unable to add new actuation message into DB: ' + JSON.stringify(err));
+                                                            }
+                                                        });
+                                                        process.emit("incoming_alert", {alert: internalAlert, rule: rule});
+                                                    }, function onError(err) {
+                                                        logger.error('alerts.getCommands, error: ' + JSON.stringify(err));
                                                     });
-                                                    process.emit("incoming_alert", {alert: internalAlert, rule: rule});
-                                                }, function onError(err) {
-                                                    logger.error('alerts.getCommands, error: ' + JSON.stringify(err));
-                                                });
+                                            }
+                                            resolve(alert);
                                         }
-                                        resolve(alert);
-                                    }
-                                });
+                                    });
+                                } else {
+                                    resolve(alert);
+                                }
                             }))
                             .then((alert) => {done(null, alert);})
                             .catch((err) => {
@@ -272,7 +276,7 @@ exports.getUnreadAlerts = function (params, resultCallback) {
 
 exports.getAlerts = function (params, resultCallback) {
 
-    Alert.findByStatus(params.accountId, params.status, params.active, function (err, result) {
+    Alert.findByStatus(params.accountId, params.status, params.active, params.maxAlerts, function (err, result) {
         resultCallback(err, result);
     });
 };

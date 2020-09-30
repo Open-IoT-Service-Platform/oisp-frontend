@@ -53,7 +53,7 @@ exports.new = function (newAlert, callback) {
 
 };
 
-exports.findByStatus = function (accountId, status, isActive, callback) {
+exports.findByStatus = function (accountId, status, isActive, maxAlerts, callback) {
     var filter = {
         where: {
             accountId: accountId
@@ -66,6 +66,10 @@ exports.findByStatus = function (accountId, status, isActive, callback) {
     }
     if (isActive) {
         filter.where["suppressed"] = false;
+    }
+
+    if (maxAlerts !== undefined) {
+        filter.limit = maxAlerts;
     }
 
     return alerts.findAll(filter)
