@@ -15,6 +15,7 @@
  */
 
 'use strict';
+const MAX_ALERTS = 100; // Max amount of alerts to return - hardcoded :-(
 iotServices.factory('alertsService', ['$http', 'utilityService','sessionService', function($http, utilityService, sessionService){
     var fireStatusUpdatedEvent = function(ngScope, data) {
         if (ngScope) {
@@ -41,7 +42,8 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                         url: url,
                         params: {
                             "_" : utilityService.timeStamp(),
-                            "active": true
+                            "active": true,
+                            "maxAlerts": MAX_ALERTS
                         }
                     }).success(function(data){
                         summary.unread = data;
@@ -58,7 +60,8 @@ iotServices.factory('alertsService', ['$http', 'utilityService','sessionService'
                         url: url,
                         params: {
                             "_" : utilityService.timeStamp(),
-                            "active": true
+                            "active": true,
+                            "maxAlerts": MAX_ALERTS
                         }
                     }).success(function(data) {
                         summary.unread = removeReadAlerts(data);

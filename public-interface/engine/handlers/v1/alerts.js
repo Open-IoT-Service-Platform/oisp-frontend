@@ -111,6 +111,12 @@ exports.getAlerts = function(req, res, next) {
     if (req.query.active) {
         params.active = req.query.active;
     }
+
+    // query parameter maxAlerts to limit amount of returned alerts
+    if (req.query.maxAlerts) {
+        params.maxAlerts = req.query.maxAlerts;
+    }
+
     alert.getAlerts(params, function(err, result){
         if(!err && result){
             res.status(httpStatuses.OK.code).send(result);

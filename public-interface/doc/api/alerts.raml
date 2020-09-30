@@ -21,6 +21,10 @@ uriParameters:
     description: |
       The ID of an Account. In order to obtain the Account Id, we need first obtain an Authorization Token and then get the Authorization Token Info
     example: 321ef007-8449-477f-9ea0-d702d77e64b9
+ queryParameters:
+   maxAlerts:
+     description: |
+       Maximal amount of alerts to return. Ordered by creation time, descending.
 get:
   description: |
     **Get List of Alerts**
