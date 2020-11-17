@@ -21,6 +21,7 @@ const Keycloak = require('keycloak-connect'),
     getCustomGrants = require('./custom-grants'),
     registerEnforcer = require('./enforcer').register,
     authConfig = require('./../../../config').auth,
+    errors = require('./../../../engine/res/errors').Errors,
     config = require('./config').getKeycloakConfig();
 
 const keycloakAdapter = new Keycloak({}, config),
@@ -31,6 +32,10 @@ const keycloakAdapter = new Keycloak({}, config),
         keycloakAdapter.grantManager.public);
 
 keycloakAdapter.redirectToLogin = () => false;
+keycloakAdapter.accessDenied = (req, res) => {
+    res.status(errors.Generic.NotAuthorized.status).send(errors.Generic.NotAuthorized);
+};
+
 
 module.exports = {
     keycloakListener: keycloakListener,
