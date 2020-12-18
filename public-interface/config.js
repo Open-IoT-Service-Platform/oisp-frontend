@@ -304,20 +304,11 @@ var config = {
 
 /* override for local development if NODE_ENV is defined to local */
 if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local") !== -1)) {
+    console.log("NODE_ENV = local selected.");
     config.api.forceSSL = false;
     config.auth.captcha.enabled = false;
 
-    //config.mail.smtp.requiresAuth = false;
-    //config.mail.smtp.auth = undefined;
-
-    //config.redis = {};
-
-    // config.logger.transport.console.json = false;
-    // config.logger.transport.console.prettyPrint = false;
-    // config.logger.transport.console.logstash = false;
-    // config.logger.logLevel = 'debug';
-    // config.logger.maxLines = 60000;
-
+    config.logger.level = process.env.LOGLEVEL === undefined?'info':process.env.LOGLEVEL;
     config.controlChannel.ws.secure = false;
 }
 
