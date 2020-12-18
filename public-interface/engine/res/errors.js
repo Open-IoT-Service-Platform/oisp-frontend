@@ -193,7 +193,7 @@ module.exports = {
             DeviceNotFound: {code: 8403, status: 400, message: "Device associated to this alert was not found"},
             NotFound: {code: 8404, status: 404, message: "Alert not found"},
             WrongAlertStatus: {code:8405, status: 400, message: "Wrong alert status"},
-            RuleNotActive: {code:8406, status: 400, message: "Rule is not active."},
+            RuleNotActive: {code:8406, status: 420, message: "Rule is not active."},
             AlreadyExists: {code: 8409, status: 409, message: "Alert already Exists"}, //Duplicate Alert
             SavingErrorAA: {code: 8500, status: 500, message: "Error saving Alert"}, //Error saving in Advanced Analytics Backend
             SavingError: {code: 8501, status: 500, message: "Error saving Alert"}, //Error saving locally

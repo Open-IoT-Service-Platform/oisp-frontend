@@ -187,9 +187,8 @@ exports.trigger = function (alertData, accountId, hostUrl, resultCallback) {
                     // The check for rule status makes sure that a rule which just has been disabled is no
                     // longer triggering anything
                     if (rule == null || rule.status !== "Active") {
-                        alert.err = errBuilder.build(errBuilder.Errors.Alert.RuleNotActive).asResponse();
                         logger.error('alerts. trigger, error: ' + JSON.stringify(alert));
-                        done(null, alert);
+                        done(errBuilder.build(errBuilder.Errors.Alert.RuleNotActive));
                     } else {
                         var suppressAlert = false;
                         checkResetted(accountId, alert, rule)
