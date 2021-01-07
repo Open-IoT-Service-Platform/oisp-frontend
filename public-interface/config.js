@@ -305,12 +305,13 @@ var config = {
 /* override for local development if NODE_ENV is defined to local */
 if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local") !== -1)) {
     console.log("NODE_ENV = local selected.");
-    config.api.forceSSL = false;
+    config.rateLimit = 'limitless';
     config.auth.captcha.enabled = false;
 
     config.logger.level = process.env.LOGLEVEL === undefined?'info':process.env.LOGLEVEL;
-    config.controlChannel.ws.secure = false;
 }
+config.api.forceSSL = false;
+config.controlChannel.ws.secure = false;
 
 /* override for testing if rateLimit wants to be disabled */
 if (process.argv && (process.argv.indexOf("--disable-rate-limits") !== -1)) {
