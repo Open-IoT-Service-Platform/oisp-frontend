@@ -104,20 +104,20 @@ commands:
           # because on k8s the tests run inside the debug contianer
           command: |
             cd platform-launcher
-            export CONTAINERS="<< parameters.container >> debugger"
+            export CONTAINERS="<< parameters.container >>"
             if docker login  -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD};
             then
                 DOCKER_TAG="latest" docker-compose pull
             else
                 unset CONTAINERS
             fi
-            yes | make build DOCKER_TAG="test" DEBUG=true
             # Tag pulled "latest" images as "test"
             images=$(docker images --format "{{.Repository}}:{{.Tag}}"| grep :latest)
             for image in $images; do
               newimage=$(echo $image | sed -r "s/:latest/:test/g");
               docker tag $image $newimage;
             done
+            yes | make build DOCKER_TAG="test" DEBUG=true
   e2e-test:
     description: "Execute E2E test"
     steps:
@@ -130,8 +130,15 @@ commands:
             make import-images DOCKER_TAG=test DEBUG=true
             npm install nodemailer
             export NODOCKERLOGIN=true
-            make deploy-oisp-test DOCKER_TAG=test
-            make test
+            retval=2;
+            until [ ${retval} -eq 0 ]; do
+              make undeploy-oisp
+              make deploy-oisp-test DOCKER_TAG=test
+              sleep 100
+              make test
+              retval=$?
+            done
+          no_output_timeout: 20m
 jobs:
   e2e-test:
     executor: vm-executor
