@@ -31,33 +31,29 @@ const KEY_NAME = 'grafana-viewer-key:' + uuid.v4(),
 var viewerToken;
 
 function createViewerToken() {
-    if (viewerToken) {
-        return Promise.resolve(viewerToken);
-    } else {
-        var reqBody = {
-            name: KEY_NAME,
-            role: ROLE,
-        };
-        var options = {
-            url: HTTP + BASIC_AUTH + HOST_PORT + PATH_TO_GRAFANA + API_KEY_PATH,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(reqBody)
-        };
-        return request(options).then(res => {
-            viewerToken = JSON.parse(res).key;
-            return viewerToken;
-        }).catch(err => {
-            logger.error('Cannot create Grafana API Token:\n' + err);
-            return null;
-        });
-    }
+    var reqBody = {
+        name: KEY_NAME,
+        role: ROLE,
+    };
+    var options = {
+        url: HTTP + BASIC_AUTH + HOST_PORT + PATH_TO_GRAFANA + API_KEY_PATH,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reqBody)
+    };
+    return request(options).then(res => {
+        viewerToken = JSON.parse(res).key;
+        return viewerToken;
+    }).catch(err => {
+        logger.error('Cannot create Grafana API Token:\n' + err);
+        return null;
+    });
 }
 
-function refreshViewerToken() {
-    if (viewerToken) {
+function getViewerToken(forceRefresh = false) {
+    if (viewerToken && !forceRefresh) {
         return Promise.resolve(viewerToken);
     }
     return createViewerToken()
@@ -83,7 +79,7 @@ function refreshViewerToken() {
                     }
                     return null;
                 }
-                return refreshViewerToken();
+                return getViewerToken();
             });
         })
         .catch(err => {
@@ -92,4 +88,4 @@ function refreshViewerToken() {
         });
 }
 
-module.exports = refreshViewerToken;
+module.exports = getViewerToken;
