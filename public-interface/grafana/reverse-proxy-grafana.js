@@ -28,6 +28,12 @@ const urlRegex =  new RegExp('^/ui/' + grafanaConf.host, 'gm'),
 
 app.use(cookieParser());
 
+proxy.on('proxyRes', function(proxyRes) {
+    if (proxyRes.statusCode === 401) {
+        viewerToken(true);
+    }
+});
+
 proxy.on('proxyReq', function(proxyReq, req) {
     // Rewrite body to pass POST and PUT requests
     if (req.body) {
