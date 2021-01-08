@@ -17,6 +17,7 @@
 'use strict';
 var express = require('../express-jaeger').express,
     user = require('../../engine/api/v1/users'),
+    users = require('./../../iot-entities/postgresql').users,
     schemaValidator = require('./../schema-validator'),
     schemas = require('./../schema-validator/schemas'),
     errBuilder = require('./../errorHandler').errBuilder,
@@ -44,14 +45,26 @@ var loginWithKeycloak = function(req, res) {
     var password = req.body.password;
     keycloak.adapter.grantManager.obtainDirectly(username, password)
         .then(grant => {
-            res.status(200).send({
-                token: grant.access_token.token,
-                refreshToken: grant.refresh_token.token,
-                idToken: grant.id_token.token
+            var email = grant.access_token.content.email;
+            var uid = grant.access_token.content.sub;
+            users.findByEmail(email, function(err, user) {
+                if (user) {
+                    if (user.id !== uid) {
+                        console.log("Keycloak user uid and client user uid mismatch for user: " + email);
+                        return res.status(errBuilder.Errors.Generic.NotAuthorized.code)
+                            .send(errBuilder.Errors.Generic.NotAuthorized.message);
+                    }
+                }
+                return res.status(200).send({
+                    token: grant.access_token.token,
+                    refreshToken: grant.refresh_token.token,
+                    idToken: grant.id_token.token
+                });
             });
         }).catch(err => {
             console.log(err);
-            res.status(errBuilder.Errors.Generic.NotAuthorized.code).send(errBuilder.Errors.Generic.NotAuthorized.message);
+            res.status(errBuilder.Errors.Generic.NotAuthorized.code)
+                .send(errBuilder.Errors.Generic.NotAuthorized.message);
         });
 };
 
