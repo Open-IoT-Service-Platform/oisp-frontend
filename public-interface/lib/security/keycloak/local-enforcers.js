@@ -18,7 +18,7 @@
 const clientId = require('./config').getKeycloakConfig().resource,
     errBuilder = require('./../../errorHandler').errBuilder,
     notAuthorizedCode = errBuilder.Errors.Generic.NotAuthorized.code,
-    notAuthorizedMessage = errBuilder.Errors.Generic.NotAuthorized.message,
+    notAuthorizedMessage = errBuilder.Errors.Generic.NotAuthorized,
     clientRoles = {
         user: "user",
         sysadmin: "sysadmin",
@@ -50,8 +50,22 @@ function hasTokenClientRole(req, clientRole) {
         !req.tokenInfo.payload['resource_access'][clientId].roles) {
         return false;
     }
-    if (req.tokenInfo.payload['resource_access'][clientId].roles.includes[clientRole]) {
+    if (req.tokenInfo.payload['resource_access'][clientId].roles.includes(clientRole)) {
         return true;
+    }
+    return false;
+}
+
+function hasAccessToAccountWithCorrectTokenType(req) {
+    if (!isTokenValid(req)) {
+        return false;
+    }
+    if (!req.params.accountId && req.tokenInfo.payload.type === tokenTypes.device) {
+        return true;
+    }
+    if (req.params.accountId && req.tokenInfo.payload.type === tokenTypes.user) {
+        return req.tokenInfo.payload.accounts
+            .some(account => account.id === req.params.accountId);
     }
     return false;
 }
@@ -63,7 +77,7 @@ function hasAccessToAccount(req) {
     if (!req.params.accountId && req.tokenInfo.payload.type === tokenTypes.device) {
         return true;
     }
-    if (req.params.accountId && req.tokenInfo.payload.type === tokenTypes.user) {
+    if (req.params.accountId) {
         return req.tokenInfo.payload.accounts
             .some(account => account.id === req.params.accountId);
     }
@@ -94,29 +108,30 @@ function authReadAccess(req, res, next) {
     if (isTokenValid(req)) {
         return next();
     }
-    return res.status(notAuthorizedCode.send(notAuthorizedMessage));
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
 }
 
 function catalogReadAccess(req, res, next) {
     if (hasTokenClientRole(req, clientRoles.sysadmin) ||
-        hasTokenClientRole(req, clientRoles.system) || hasAccessToAccount(req)) {
+        hasTokenClientRole(req, clientRoles.system) ||
+        hasAccessToAccountWithCorrectTokenType(req)) {
         return next();
     }
-    return res.status(notAuthorizedCode.send(notAuthorizedMessage));
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
 }
 
 function deviceAdminAccess(req, res, next) {
     if (isAdminOfAccount(req)){
         return next();
     }
-    return res.status(notAuthorizedCode.send(notAuthorizedMessage));
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
 }
 
 function deviceReadAccess(req, res, next) {
-    if (hasAccessToAccount(req)) {
+    if (hasAccessToAccountWithCorrectTokenType(req)) {
         return next();
     }
-    return res.status(notAuthorizedCode.send(notAuthorizedMessage));
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
 }
 
 function dataWriteAccess(req, res, next) {
@@ -126,11 +141,131 @@ function dataWriteAccess(req, res, next) {
     return next();
 }
 
+function userAdminAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    if (!hasTokenClientRole(req, clientRoles.user) ||
+        req.tokenInfo.payload.type !== tokenTypes.user) {
+        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+    }
+    if (req.params.userId && req.tokenInfo.payload.sub !== req.params.userId) {
+        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+    }
+    return next();
+}
+
+function accountAdminAccess(req, res, next) {
+    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function platformAdminAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function accountOrPlatformAdminAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function accountReadAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    if (hasAccessToAccountWithCorrectTokenType(req) &&
+        req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function accountWriteAccess(req, res, next) {
+    if (hasAccessToAccountWithCorrectTokenType(req) &&
+        req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function accountCreateAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.user) &&
+        req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function alertReadAccess(req, res, next) {
+    if (hasAccessToAccountWithCorrectTokenType(req) &&
+        req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function systemAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.system)) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function alertWriteAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    if (hasAccessToAccountWithCorrectTokenType(req) &&
+        req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function dataUserWriteAccess(req, res, next) {
+    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
+function dataReadAccess(req, res, next) {
+    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
+        return next();
+    }
+    if (hasAccessToAccount(req)) {
+        return next();
+    }
+    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+}
+
 module.exports = {
     "api-public": apiPublicAccess,
     "auth-read": authReadAccess,
     "data-write": dataWriteAccess,
     "catalog-read": catalogReadAccess,
     "device-admin": deviceAdminAccess,
-    "device-read": deviceReadAccess
+    "device-read": deviceReadAccess,
+    "user-admin": userAdminAccess,
+    "account-admin": accountAdminAccess,
+    "platform-admin": platformAdminAccess,
+    "account-or-platform-admin": accountOrPlatformAdminAccess,
+    "account-read": accountReadAccess,
+    "account-write": accountWriteAccess,
+    "account-create": accountCreateAccess,
+    "alert-read": alertReadAccess,
+    "system": systemAccess,
+    "alert-write": alertWriteAccess,
+    "data-user-write": dataUserWriteAccess,
+    "data-read": dataReadAccess
 };

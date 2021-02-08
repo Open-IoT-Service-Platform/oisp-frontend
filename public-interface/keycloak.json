@@ -176,15 +176,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -194,9 +190,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -206,9 +200,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -218,9 +210,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -230,27 +220,19 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -260,27 +242,19 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -290,9 +264,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     }
                 ]
             },
@@ -302,21 +274,15 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "user-admin"
-                        ]
+                        "local-enforcer": "user-admin"
                     }
                 ]
             },
@@ -339,17 +305,11 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "platform-admin",
-                            "account-admin"
-                        ],
-                        "scopes-enforcement-mode":"ANY"
+                        "local-enforcer": "account-or-platform-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     }
                 ]
             },
@@ -359,9 +319,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -371,9 +329,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -383,9 +339,7 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -395,9 +349,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -407,9 +359,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -419,15 +369,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -437,21 +383,15 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -461,9 +401,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-create"
-                        ]
+                        "local-enforcer": "account-create"
                     }
                 ]
             },
@@ -473,9 +411,7 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     }
                 ]
             },
@@ -485,15 +421,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     },
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     }
                 ]
             },
@@ -503,9 +435,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "account-read"
-                        ]
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -515,15 +445,11 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "account-admin"
-                        ]
+                        "local-enforcer": "account-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -533,9 +459,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -545,9 +469,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -557,9 +479,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "account-write"
-                        ]
+                        "local-enforcer": "account-write"
                     }
                 ]
             },
@@ -569,13 +489,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "alert-read"
-                        ]
+                        "local-enforcer": "alert-read"
                     },
                     {
                         "method":"POST",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -585,9 +503,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "alert-read"
-                        ]
+                        "local-enforcer": "alert-read"
                     }
                 ]
             },
@@ -597,9 +513,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "alert-read"
-                        ]
+                        "local-enforcer": "alert-read"
                     }
                 ]
             },
@@ -609,7 +523,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -619,9 +533,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -631,9 +543,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -643,9 +553,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -655,9 +563,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -667,9 +573,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -679,9 +583,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "alert-write"
-                        ]
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -691,7 +593,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -701,7 +603,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "role": "system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -711,7 +613,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -721,7 +623,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -731,9 +633,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "catalog-read"
-                        ]
+                        "local-enforcer": "catalog-read"
                     }
                 ]
             },
@@ -753,9 +653,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "catalog-read"
-                        ]
+                        "local-enforcer": "catalog-read"
                     }
                 ]
             },
@@ -775,7 +673,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "role":"system"
+                        "local-enforcer": "system"
                     }
                 ]
             },
@@ -795,9 +693,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-user-write"
-                        ]
+                        "local-enforcer": "data-user-write"
                     }
                 ]
             },
@@ -807,9 +703,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-read"
-                        ]
+                        "local-enforcer": "data-read"
                     }
                 ]
             },
@@ -819,9 +713,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-read"
-                        ]
+                        "local-enforcer": "data-read"
                     }
                 ]
             },
@@ -831,9 +723,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-read"
-                        ]
+                        "local-enforcer": "data-read"
                     }
                 ]
             },
@@ -843,9 +733,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "data-read"
-                        ]
+                        "local-enforcer": "data-read"
                     }
                 ]
             },
@@ -855,9 +743,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "data-read"
-                        ]
+                        "local-enforcer": "data-read"
                     }
                 ]
             },
@@ -867,15 +753,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"GET",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -885,15 +767,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"GET",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -917,21 +795,15 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"GET",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -955,15 +827,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"DELETE",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     }
                 ]
             },
@@ -973,9 +841,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     }
                 ]
             },
@@ -985,15 +851,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     },
                     {
                         "method":"PUT",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     }
                 ]
             },
@@ -1003,9 +865,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "scopes":[
-                            "device-admin"
-                        ]
+                        "local-enforcer": "device-admin"
                     }
                 ]
             },
@@ -1015,9 +875,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -1027,9 +885,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             },
@@ -1039,9 +895,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "scopes":[
-                            "device-read"
-                        ]
+                        "local-enforcer": "device-read"
                     }
                 ]
             }
