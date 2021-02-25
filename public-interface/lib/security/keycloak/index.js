@@ -43,7 +43,7 @@ module.exports = {
     adapter: keycloakAdapter,
     customGrants: customGrants,
     placeholder: config.placeholder,
-    placeholdermail: authConfig.placeholderUser,
+    placeholdermail: authConfig.placeholderUser.email,
     registerEnforcer: registerEnforcer,
     config: config
 };
