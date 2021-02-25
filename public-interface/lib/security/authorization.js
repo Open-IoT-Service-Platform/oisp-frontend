@@ -57,6 +57,8 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                         token: grant.access_token,
                         refreshToken: grant.refresh_token
                     });
+                }).catch(err => {
+                    callback(err);
                 });
         }
     }).catch(err => {
