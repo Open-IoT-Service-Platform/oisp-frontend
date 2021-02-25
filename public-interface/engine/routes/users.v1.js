@@ -49,7 +49,6 @@ module.exports = {
         * Allows to change user password if you provide correct password-reset token generated in POST request
         * */
         app.put(VERSION + PATH + '/forgot_password', schemaValidator.validateSchema(schemas.user.CHANGE_PASSWORD_USING_TOKEN), users.changePassword);
-        app.put(VERSION + FULL_PATH + '/forgot_password', schemaValidator.validateSchema(schemas.user.CHANGE_PASSWORD_USING_TOKEN), users.changePassword);
 
         /*
         * Retrieve single setting by account, category and settingId.
@@ -72,7 +71,6 @@ module.exports = {
         * UserId provided in URI must match id from token in Authorization header.
         * Otherwise 401 Not Authorized is returned
         * */
-        app.get(VERSION + FULL_PATH + '/:userId', users.getUser);
         app.get(VERSION + PATH + '/:userId', users.getUser);
 
         /*
@@ -85,7 +83,6 @@ module.exports = {
         * Adds new user, without accounts. Created & updated times are set to current time.
         * User metadata is propagated to AA, user is created in db, then activation email is sent.
         * */
-        app.post(VERSION + FULL_PATH, schemaValidator.validateSchema(schemas.user.POST), users.addUser);
         app.post(VERSION + PATH, schemaValidator.validateSchema(schemas.user.POST), users.addUser);
 
         /*
@@ -100,13 +97,11 @@ module.exports = {
         * Deletes user from both AA and db.
         * User can only delete herself.UserId provided in URI must match id from token in Authorization header.
         * */
-        app.delete(VERSION + FULL_PATH + '/:userId', users.deleteUser);
         app.delete(VERSION + PATH + '/:userId', users.deleteUser);
 
         /*
         * Allows change of password for user when provided email, old password and new password.
         * */
-        app.put(VERSION + FULL_PATH + '/:email/change_password', schemaValidator.validateSchema(schemas.user.CHANGE_PASSWORD_USING_OLD), users.changePasswordWithCurrentPwd);
         app.put(VERSION + PATH +  '/:email/change_password', schemaValidator.validateSchema(schemas.user.CHANGE_PASSWORD_USING_OLD), users.changePasswordWithCurrentPwd);
 
         /*
@@ -136,14 +131,12 @@ module.exports = {
         * Activate user and removes provided userInteraction token of type activate-user from db.
         * Does not propagate this change to AA side.
         * */
-        app.post(VERSION + FULL_PATH + '/activate', schemaValidator.validateSchema(schemas.user.ACTIVATE), users.activate);
         app.post(VERSION + PATH + '/activate', schemaValidator.validateSchema(schemas.user.ACTIVATE), users.activate);
 
         /*
          * Generates new activation token for provided user and sends it by email.
          * Previous tokens are removed and become expired.
          * */
-        app.post(VERSION + FULL_PATH + '/request_user_activation', schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
         app.post(VERSION + PATH + '/request_user_activation', schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
 
     }

@@ -310,6 +310,10 @@
                     {
                         "method":"PUT",
                         "local-enforcer": "account-admin"
+                    },
+                    {
+                        "method":"GET",
+                        "local-enforcer": "account-read"
                     }
                 ]
             },
@@ -372,7 +376,15 @@
                         "local-enforcer": "account-read"
                     },
                     {
+                        "method":"PUT",
+                        "local-enforcer": "account-write"
+                    },
+                    {
                         "method":"POST",
+                        "local-enforcer": "account-write"
+                    },
+                    {
+                        "method":"DELETE",
                         "local-enforcer": "account-write"
                     }
                 ]
@@ -494,6 +506,10 @@
                     {
                         "method":"POST",
                         "local-enforcer": "system"
+                    },
+                    {
+                        "method":"DELETE",
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -514,6 +530,10 @@
                     {
                         "method":"GET",
                         "local-enforcer": "alert-read"
+                    },
+                    {
+                        "method":"DELETE",
+                        "local-enforcer": "alert-write"
                     }
                 ]
             },
@@ -570,16 +590,6 @@
             {
                 "name":"alert",
                 "path":"/v1/api/accounts/:accountId/resets",
-                "methods":[
-                    {
-                        "method":"POST",
-                        "local-enforcer": "alert-write"
-                    }
-                ]
-            },
-            {
-                "name":"alert",
-                "path":"/v1/api/resets",
                 "methods":[
                     {
                         "method":"POST",
@@ -847,6 +857,16 @@
             },
             {
                 "name":"device",
+                "path":"/v1/api/accounts/:accountId/control/commands",
+                "methods":[
+                    {
+                        "method":"GET",
+                        "local-enforcer": "device-admin"
+                    }
+                ]
+            },
+            {
+                "name":"device",
                 "path":"/v1/api/accounts/:accountId/control/commands/:commandName",
                 "methods":[
                     {
@@ -855,6 +875,10 @@
                     },
                     {
                         "method":"PUT",
+                        "local-enforcer": "device-admin"
+                    },
+                    {
+                        "method": "DELETE",
                         "local-enforcer": "device-admin"
                     }
                 ]
