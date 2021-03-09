@@ -63,7 +63,6 @@ var postgres_config = getOISPConfig("postgresConfig"),
     smtp_config = getOISPConfig("smtpConfig"),
     mail_config = getOISPConfig("mailConfig"),
     websocketUser_config = getOISPConfig("websocketUserConfig"),
-    recaptcha_config = getOISPConfig("recaptchaConfig"),
     redis_config = getOISPConfig("redisConfig"),
     ruleEngine_config = getOISPConfig("ruleEngineConfig"),
     gateway_config = getOISPConfig("gatewayConfig"),
@@ -122,13 +121,6 @@ var config = {
         }
     },
     auth: {
-        captcha: {
-            googleUrl: 'http://www.google.com/recaptcha/api/verify',
-            privateKey: recaptcha_config.secretKey,
-            publicKey: recaptcha_config.siteKey,
-            enabled: (recaptcha_config.enabled !== "false"),
-            testsCode: dashboardSecurity_config.captcha_test_code
-        },
         gatewayUser: {
             email: gateway_config.username,
             password: gateway_config.password
@@ -306,8 +298,6 @@ var config = {
 if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local") !== -1)) {
     console.log("NODE_ENV = local selected.");
     config.rateLimit = 'limitless';
-    config.auth.captcha.enabled = false;
-
     config.logger.level = process.env.LOGLEVEL === undefined?'info':process.env.LOGLEVEL;
 }
 config.api.forceSSL = false;
