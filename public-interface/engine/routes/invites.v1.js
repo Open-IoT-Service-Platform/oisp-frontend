@@ -17,8 +17,6 @@
 var invites = require ('../handlers/v1/invites'),
     schemaValidator = require('../../lib/schema-validator'),
     schemas = require('../../lib/schema-validator/schemas'),
-    captcha = require('../../lib/security/recaptcha'),
-    authConfig = require('../../config').auth,
     VERSION = '/v1/api',
     PATH = '/invites',
     FULL_PATH = '/accounts/:accountId/invites';
@@ -27,7 +25,7 @@ module.exports = {
     register:  function (app) {
         app.options(VERSION + FULL_PATH, invites.usage);
         app.get(VERSION + FULL_PATH, invites.getInvites);
-        app.post(VERSION + FULL_PATH, captcha.protectWithCaptcha(authConfig), schemaValidator.validateSchema(schemas.invite.POST), invites.addInvite);
+        app.post(VERSION + FULL_PATH, schemaValidator.validateSchema(schemas.invite.POST), invites.addInvite);
         app.get(VERSION + PATH + '/:email', invites.getUserInvites);
         app.put(VERSION + PATH + '/:inviteId/status', schemaValidator.validateSchema(schemas.invite.PUT), invites.updateInviteStatus);
         app.delete(VERSION + FULL_PATH + '/:email', schemaValidator.validateSchema(schemas.invite.DELETE), invites.deleteUser);

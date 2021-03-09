@@ -215,10 +215,6 @@ module.exports = {
             SavingError: {code: 12501, status: 500, message: "Error saving actuation command."},
             DeviceNotFound: {code: 12404, status: 404, message: "Device not found in IoT cloud."}
         },
-        Captcha: {
-            InvalidCaptcha: {code: 13422, status: 422, message: "Invalid captcha"},
-            MissingCaptcha: {code: 13423, status: 422, message: "Missing 'challenge' and 'response' fields"}
-        },
         Time: {
             DateReceiveError: {code: 14500, status: 500, message: "Did not received date from system."}
         },

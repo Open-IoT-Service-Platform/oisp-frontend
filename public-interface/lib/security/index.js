@@ -17,12 +17,10 @@
 'use strict';
 var authentication = require('./authentication'),
     authorization = require('./authorization'),
-    limit = require('./limit.js'),
-    recaptcha = require('./recaptcha');
+    limit = require('./limit.js');
 
 module.exports = {
     authentication: authentication,
     authorization: authorization,
-    rateLimiter: limit,
-    recaptcha: recaptcha
+    rateLimiter: limit
 };

@@ -17,8 +17,6 @@
 var users = require ('../handlers/v1/users'),
     schemaValidator = require('../../lib/schema-validator'),
     schemas = require('../../lib/schema-validator/schemas'),
-    captcha = require('../../lib/security/recaptcha'),
-    authConfig = require('../../config').auth,
     VERSION = '/v1/api',
     PATH = '/users',
     FULL_PATH = '/accounts/:accountId/users';
@@ -87,8 +85,8 @@ module.exports = {
         * Adds new user, without accounts. Created & updated times are set to current time.
         * User metadata is propagated to AA, user is created in db, then activation email is sent.
         * */
-        app.post(VERSION + FULL_PATH, captcha.protectWithCaptcha(authConfig), schemaValidator.validateSchema(schemas.user.POST), users.addUser);
-        app.post(VERSION + PATH, captcha.protectWithCaptcha(authConfig), schemaValidator.validateSchema(schemas.user.POST), users.addUser);
+        app.post(VERSION + FULL_PATH, schemaValidator.validateSchema(schemas.user.POST), users.addUser);
+        app.post(VERSION + PATH, schemaValidator.validateSchema(schemas.user.POST), users.addUser);
 
         /*
          * Delete single setting by account, category and settingId.
@@ -145,8 +143,8 @@ module.exports = {
          * Generates new activation token for provided user and sends it by email.
          * Previous tokens are removed and become expired.
          * */
-        app.post(VERSION + FULL_PATH + '/request_user_activation', captcha.protectWithCaptcha(authConfig), schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
-        app.post(VERSION + PATH + '/request_user_activation', captcha.protectWithCaptcha(authConfig), schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
+        app.post(VERSION + FULL_PATH + '/request_user_activation', schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
+        app.post(VERSION + PATH + '/request_user_activation', schemaValidator.validateSchema(schemas.user.REACTIVATE), users.reactivate);
 
     }
 };

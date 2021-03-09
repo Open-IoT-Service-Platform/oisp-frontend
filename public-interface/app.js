@@ -35,7 +35,6 @@ var http = require('http'),
     nodeErrorHandler = require('errorhandler'),
     httpHeadersInjector = require('./lib/http-headers-injector'),
     contextProvider = require('./lib/context-provider'),
-    google = require('./lib/google'),
     models = require('./iot-entities/postgresql/models'),
     forceSSL = require('express-force-ssl'),
     heartBeat = require('./lib/heartbeat'),
@@ -110,7 +109,6 @@ appServer.use(keycloak.adapter.middleware());
         appServer.use(endpoints[i], security.authorization.middleware(secConfig, forceSSL));
         appServer.use(endpoints[i], security.authentication(config.auth, forceSSL));
         appServer.use(endpoints[i], security.rateLimiter.limit);
-        appServer.use(endpoints[i], google.getCaptchaPublicKey());
     }
 })();
 
