@@ -10,126 +10,112 @@
                 "path":"/v1/api/health",
                 "methods":[
                     {
-                        "method":"GET",
-                        "local-enforcer": "api-public"
+                        "method":"GET"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/time",
                 "methods":[
                     {
-                        "method":"GET",
-                        "local-enforcer": "api-public"
+                        "method":"GET"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/auth/token",
                 "methods":[
                     {
-                        "method":"POST",
-                        "local-enforcer": "api-public"
+                        "method":"POST"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"auth",
                 "path":"/v1/api/auth/refresh",
                 "methods":[
                     {
-                        "method":"PUT",
-                        "local-enforcer": "api-public"
+                        "method":"PUT"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/devices/:deviceId/activation",
                 "methods":[
                     {
-                        "method":"PUT",
-                        "local-enforcer": "api-public"
+                        "method":"PUT"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/devices/register",
                 "methods":[
                     {
-                        "method":"POST",
-                        "local-enforcer": "api-public"
+                        "method":"POST"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/users/forgot_password",
                 "methods":[
                     {
-                        "method":"GET",
-                        "local-enforcer": "api-public"
+                        "method":"GET"
                     },
                     {
-                        "method":"PUT",
-                        "local-enforcer": "api-public"
+                        "method":"PUT"
                     },
                     {
-                        "method":"POST",
-                        "local-enforcer": "api-public"
+                        "method":"POST"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/users/activate",
                 "methods":[
                     {
-                        "method":"POST",
-                        "local-enforcer": "api-public"
+                        "method":"POST"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"api",
                 "path":"/v1/api/users/request_user_activation",
                 "methods":[
                     {
-                        "method":"POST",
-                        "local-enforcer": "api-public"
+                        "method":"POST"
                     }
-                ]
+                ],
+                "enforcement-mode":"DISABLED"
             },
             {
                 "name":"ui",
                 "path":"/ui/*",
                 "methods":[
                     {
-                        "method":"GET",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"GET"
                     },
                     {
-                        "method":"PUT",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"PUT"
                     },
                     {
-                        "method":"POST",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"POST"
                     },
                     {
-                        "method":"DELETE",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"DELETE"
                     }
                 ],
                 "enforcement-mode":"DISABLED"
@@ -139,10 +125,7 @@
                 "path":"/",
                 "methods":[
                     {
-                        "method":"GET",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"GET"
                     }
                 ],
                 "enforcement-mode":"DISABLED"
@@ -152,10 +135,7 @@
                 "path":"/ui",
                 "methods":[
                     {
-                        "method":"GET",
-                        "scopes":[
-                            "ui-public"
-                        ]
+                        "method":"GET"
                     }
                 ],
                 "enforcement-mode":"DISABLED"
@@ -166,7 +146,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "auth-read"
+                        "roles": ["all"]
                     }
                 ]
             },
@@ -176,11 +156,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -190,7 +170,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -200,7 +180,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -210,7 +190,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -220,19 +200,19 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -242,19 +222,19 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -264,7 +244,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -274,15 +254,15 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "user-admin"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -305,15 +285,15 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-or-platform-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -323,7 +303,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -333,7 +313,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -343,7 +323,7 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -353,7 +333,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -363,7 +343,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -373,19 +353,19 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -395,15 +375,15 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -413,7 +393,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "account-create"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -423,7 +403,7 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin"]
                     }
                 ]
             },
@@ -433,11 +413,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin"]
                     }
                 ]
             },
@@ -447,7 +427,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "account-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -457,11 +437,11 @@
                 "methods":[
                     {
                         "method":"DELETE",
-                        "local-enforcer": "account-admin"
+                        "roles": ["account-admin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -471,7 +451,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -481,7 +461,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -491,7 +471,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "account-write"
+                        "roles": ["account-user"]
                     }
                 ]
             },
@@ -501,15 +481,15 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "alert-read"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"POST",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -519,7 +499,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "alert-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -529,11 +509,11 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "alert-read"
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -543,7 +523,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -553,7 +533,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -563,7 +543,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -573,7 +553,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -583,7 +563,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -593,7 +573,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "alert-write"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -603,7 +583,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -613,7 +593,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -623,7 +603,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -633,7 +613,7 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -643,7 +623,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "catalog-read"
+                        "roles": ["account-user", "sysadmin", "system"]
                     }
                 ]
             },
@@ -653,7 +633,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "catalog-read"
+                        "roles": ["account-user", "sysadmin", "system"]
                     }
                 ]
             },
@@ -663,7 +643,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "catalog-read"
+                        "roles": ["account-user", "sysadmin", "system"]
                     }
                 ]
             },
@@ -673,7 +653,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "catalog-read"
+                        "roles": ["account-user", "sysadmin", "system"]
                     }
                 ]
             },
@@ -683,7 +663,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "system"
+                        "roles": ["system"]
                     }
                 ]
             },
@@ -693,7 +673,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-write"
+                        "roles": ["device"]
                     }
                 ]
             },
@@ -703,7 +683,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-user-write"
+                        "roles": ["account-admin"]
                     }
                 ]
             },
@@ -713,7 +693,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-read"
+                        "roles": ["account-user", "device", "sysadmin"]
                     }
                 ]
             },
@@ -723,7 +703,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-read"
+                        "roles": ["account-user", "device", "sysadmin"]
                     }
                 ]
             },
@@ -733,7 +713,8 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-read"
+                        "roles": ["account-user", "device",
+                             "sysadmin"]
                     }
                 ]
             },
@@ -743,7 +724,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "data-read"
+                        "roles": ["account-user", "device", "sysadmin"]
                     }
                 ]
             },
@@ -753,7 +734,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "data-read"
+                        "roles": ["account-user", "device", "sysadmin"]
                     }
                 ]
             },
@@ -763,11 +744,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"GET",
-                        "local-enforcer": "device-read"
+                        "roles": ["device", "sysadmin"]
                     }
                 ]
             },
@@ -777,11 +758,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"GET",
-                        "local-enforcer": "device-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -791,11 +772,11 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"GET",
-                        "local-enforcer": "device-read"
+                        "roles": ["device", "sysadmin"]
                     }
                 ]
             },
@@ -805,15 +786,15 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"GET",
-                        "local-enforcer": "device-read"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -823,11 +804,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -837,11 +818,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"DELETE",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -851,7 +832,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -861,7 +842,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -871,15 +852,15 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method":"PUT",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     },
                     {
                         "method": "DELETE",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -889,7 +870,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "local-enforcer": "device-admin"
+                        "roles": ["account-admin", "sysadmin"]
                     }
                 ]
             },
@@ -899,7 +880,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -909,7 +890,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -919,7 +900,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "local-enforcer": "device-read"
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             }

@@ -101,8 +101,8 @@ module.exports.register = function(app, keycloak) {
             var middleware;
             if (methodConfig.role) {
                 middleware = keycloak.protect(methodConfig.role);
-            } else if (methodConfig["local-enforcer"]){
-                middleware = localEnforcers[methodConfig["local-enforcer"]];
+            } else if (methodConfig["roles"]) {
+                middleware = localEnforcers.createRoleEnforcer(methodConfig["roles"]);
             } else if (methodConfig['scopes-enforcement-mode'] === SCOPES_ENFORCEMENT_MODES.ANY) {
                 middleware = enforceAnyScope(name, scopes, keycloak);
             } else {
