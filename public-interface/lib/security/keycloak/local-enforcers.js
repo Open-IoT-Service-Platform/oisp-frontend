@@ -70,20 +70,6 @@ function hasAccessToAccountWithCorrectTokenType(req) {
     return false;
 }
 
-function hasAccessToAccount(req) {
-    if (!isTokenValid(req)) {
-        return false;
-    }
-    if (!req.params.accountId && req.tokenInfo.payload.type === tokenTypes.device) {
-        return true;
-    }
-    if (req.params.accountId) {
-        return req.tokenInfo.payload.accounts
-            .some(account => account.id === req.params.accountId);
-    }
-    return false;
-}
-
 function isAdminOfAccount(req) {
     if (!isTokenValid(req)) {
         return false;
@@ -100,172 +86,62 @@ function isAdminOfAccount(req) {
 
 // Local enforcer functions
 
-function apiPublicAccess(req, res, next) {
-    return next();
+function allRoleCheck(req) {
+    return isTokenValid(req);
 }
 
-function authReadAccess(req, res, next) {
-    if (isTokenValid(req)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+function accountAdminRoleCheck(req) {
+    return hasTokenClientRole(req, clientRoles.user) &&
+        req.tokenInfo.payload.type === tokenTypes.user &&
+        req.tokenInfo.payload.type === tokenTypes.user &&
+        (req.params.accountId ? isAdminOfAccount(req) : true);
 }
 
-function catalogReadAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin) ||
-        hasTokenClientRole(req, clientRoles.system) ||
-        hasAccessToAccountWithCorrectTokenType(req)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+function accountUserRoleCheck(req) {
+    return hasTokenClientRole(req, clientRoles.user) &&
+        req.tokenInfo.payload.type === tokenTypes.user &&
+        req.tokenInfo.payload.type === tokenTypes.user &&
+        (req.params.accountId ? hasAccessToAccountWithCorrectTokenType(req) : true);
 }
 
-function deviceAdminAccess(req, res, next) {
-    if (isAdminOfAccount(req)){
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+function deviceRoleCheck(req) {
+    return hasAccessToAccountWithCorrectTokenType(req) &&
+        req.tokenInfo.payload.type === tokenTypes.device;
 }
 
-function deviceReadAccess(req, res, next) {
-    if (hasAccessToAccountWithCorrectTokenType(req)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+function sysadminRoleCheck(req) {
+    return hasTokenClientRole(req, clientRoles.sysadmin);
 }
 
-function dataWriteAccess(req, res, next) {
-    if (!isTokenValid(req) || req.tokenInfo.payload.type !== tokenTypes.device) {
-        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-    }
-    return next();
+function systemRoleCheck(req) {
+    return hasTokenClientRole(req, clientRoles.system);
 }
 
-function userAdminAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    if (!hasTokenClientRole(req, clientRoles.user) ||
-        req.tokenInfo.payload.type !== tokenTypes.user) {
-        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-    }
-    if (req.params.userId && req.tokenInfo.payload.sub !== req.params.userId) {
-        return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-    }
-    return next();
-}
+const roleCheck = {
+    "all": allRoleCheck,
+    "account-admin": accountAdminRoleCheck,
+    "account-user": accountUserRoleCheck,
+    "device": deviceRoleCheck,
+    "sysadmin": sysadminRoleCheck,
+    "system": systemRoleCheck
+};
 
-function accountAdminAccess(req, res, next) {
-    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function platformAdminAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function accountOrPlatformAdminAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function accountReadAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    if (hasAccessToAccountWithCorrectTokenType(req) &&
-        req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function accountWriteAccess(req, res, next) {
-    if (hasAccessToAccountWithCorrectTokenType(req) &&
-        req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function accountCreateAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.user) &&
-        req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function alertReadAccess(req, res, next) {
-    if (hasAccessToAccountWithCorrectTokenType(req) &&
-        req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function systemAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.system)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function alertWriteAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    if (hasAccessToAccountWithCorrectTokenType(req) &&
-        req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function dataUserWriteAccess(req, res, next) {
-    if (isAdminOfAccount(req) && req.tokenInfo.payload.type === tokenTypes.user) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
-}
-
-function dataReadAccess(req, res, next) {
-    if (hasTokenClientRole(req, clientRoles.sysadmin)) {
-        return next();
-    }
-    if (hasAccessToAccount(req)) {
-        return next();
-    }
-    return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+function createRoleEnforcer(roles) {
+    return (req, res, next) => {
+        console.log(roles);
+        var accessGranted = roles.some(role => {
+            console.log(role);
+            console.log(roleCheck[role]);
+            return roleCheck[role](req);
+        });
+        if (accessGranted) {
+            return next();
+        } else {
+            return res.status(notAuthorizedCode).send(notAuthorizedMessage);
+        }
+    };
 }
 
 module.exports = {
-    "api-public": apiPublicAccess,
-    "auth-read": authReadAccess,
-    "data-write": dataWriteAccess,
-    "catalog-read": catalogReadAccess,
-    "device-admin": deviceAdminAccess,
-    "device-read": deviceReadAccess,
-    "user-admin": userAdminAccess,
-    "account-admin": accountAdminAccess,
-    "platform-admin": platformAdminAccess,
-    "account-or-platform-admin": accountOrPlatformAdminAccess,
-    "account-read": accountReadAccess,
-    "account-write": accountWriteAccess,
-    "account-create": accountCreateAccess,
-    "alert-read": alertReadAccess,
-    "system": systemAccess,
-    "alert-write": alertWriteAccess,
-    "data-user-write": dataUserWriteAccess,
-    "data-read": dataReadAccess
+    "createRoleEnforcer": createRoleEnforcer
 };
