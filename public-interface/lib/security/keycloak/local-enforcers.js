@@ -128,10 +128,7 @@ const roleCheck = {
 
 function createRoleEnforcer(roles) {
     return (req, res, next) => {
-        console.log(roles);
         var accessGranted = roles.some(role => {
-            console.log(role);
-            console.log(roleCheck[role]);
             return roleCheck[role](req);
         });
         if (accessGranted) {
