@@ -794,7 +794,7 @@
                     },
                     {
                         "method":"GET",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
