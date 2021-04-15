@@ -109,27 +109,24 @@ function deviceRoleCheck(req) {
         req.tokenInfo.payload.type === tokenTypes.device;
 }
 
-function sysadminRoleCheck(req) {
-    return hasTokenClientRole(req, clientRoles.sysadmin);
-}
-
-function systemRoleCheck(req) {
-    return hasTokenClientRole(req, clientRoles.system);
-}
-
+// These roles require specific checks, therefore they have an explicit routine
+// If a role is not listed here, then the token will be genericly checked to
+// determine whether the user has the corresponding role
 const roleCheck = {
     "all": allRoleCheck,
     "account-admin": accountAdminRoleCheck,
     "account-user": accountUserRoleCheck,
     "device": deviceRoleCheck,
-    "sysadmin": sysadminRoleCheck,
-    "system": systemRoleCheck
 };
 
 function createRoleEnforcer(roles) {
     return (req, res, next) => {
         var accessGranted = roles.some(role => {
-            return roleCheck[role](req);
+            if (roleCheck[role]) {
+                return roleCheck[role](req);
+            } else {
+                return hasTokenClientRole(req, role);
+            }
         });
         if (accessGranted) {
             return next();
