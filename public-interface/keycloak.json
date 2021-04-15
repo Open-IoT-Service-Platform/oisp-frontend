@@ -156,7 +156,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-user"]
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"POST",
@@ -271,10 +271,7 @@
                 "path":"/v1/api/users",
                 "methods":[
                     {
-                        "method":"POST",
-                        "scopes":[
-                            "user-create"
-                        ]
+                        "method":"POST"
                     }
                 ],
                 "enforcement-mode":"DISABLED"
@@ -375,7 +372,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-user"]
+                        "roles": ["account-user", "sysadmin"]
                     },
                     {
                         "method":"PUT",
@@ -653,7 +650,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-user", "sysadmin", "system"]
+                        "roles": ["device"]
                     }
                 ]
             },
@@ -693,7 +690,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-user", "device", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -703,7 +700,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-user", "device", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -713,8 +710,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-user", "device",
-                             "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -724,7 +720,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-user", "device", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -734,7 +730,7 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-user", "device", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -744,11 +740,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["device"]
                     },
                     {
                         "method":"GET",
-                        "roles": ["device", "sysadmin"]
+                        "roles": ["device"]
                     }
                 ]
             },
@@ -772,11 +768,11 @@
                 "methods":[
                     {
                         "method":"PUT",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["device"]
                     },
                     {
                         "method":"GET",
-                        "roles": ["device", "sysadmin"]
+                        "roles": ["device"]
                     }
                 ]
             },
@@ -804,11 +800,11 @@
                 "methods":[
                     {
                         "method":"POST",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["device"]
                     },
                     {
                         "method":"DELETE",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["device"]
                     }
                 ]
             },
