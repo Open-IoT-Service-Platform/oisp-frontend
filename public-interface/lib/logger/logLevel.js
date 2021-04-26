@@ -35,6 +35,12 @@ exports.logLevels = {
     }
 };
 
+exports.all = 'all';
+exports.debug = 'debug';
+exports.info = 'info';
+exports.warn = 'warn';
+exports.error = 'error';
+exports.critical = 'critical';
 
 exports.compareLevel = function(level1, level2) {
     var rv = false;
