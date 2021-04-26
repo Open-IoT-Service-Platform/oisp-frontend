@@ -23,6 +23,7 @@ winston.addColors(logLevel.logLevels.colors);
 
 module.exports = winston.createLogger({
     format: loggerConf.format,
+    level: loggerConf.level,
     levels: logLevel.logLevels.levels,
     transports: loggerConf.frontendTransports,
     exitOnError: loggerConf.exitOnError,
@@ -33,7 +34,7 @@ module.exports.httpLogger = function () {
     expressWinston.requestWhitelist.push('body');
     expressWinston.responseWhitelist.push('body');
     return expressWinston.logger({
-    	level: loggerConf.level,
+    	level: logLevel.info,
         format: loggerConf.format,
         transports: loggerConf.httpTransports,
         meta: false,
