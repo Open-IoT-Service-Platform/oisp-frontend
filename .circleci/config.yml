@@ -127,8 +127,7 @@ commands:
           command: |
             cd platform-launcher
             export PATH=$PATH:/snap/bin
-            make import-images DOCKER_TAG=test DEBUG=true
-            npm install nodemailer
+            make import-images DOCKER_TAG=test DEBUG=true USE_LOCAL_REGISTRY=true
             export NODOCKERLOGIN=true
             retval=2;
             until [ ${retval} -eq 0 ]; do

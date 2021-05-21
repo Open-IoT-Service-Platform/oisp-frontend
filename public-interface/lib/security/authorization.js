@@ -19,11 +19,7 @@ var jwt_decode = require('jwt-decode'),
     express = require('./../express-jaeger').express,
     utils = require('./utils'),
     keycloak = require('./keycloak'),
-    clientId = keycloak.config.resource,
     users = require('./../../iot-entities/postgresql').users,
-    errBuilder = require('./../errorHandler').errBuilder,
-    notAuthorizedCode = errBuilder.Errors.Generic.NotAuthorized.code,
-    notAuthorizedMessage = errBuilder.Errors.Generic.NotAuthorized.message,
     logger = require('./../logger').init(),
     tokenTypes;
 
@@ -80,7 +76,7 @@ var getTokenInfo = function(token, req, callback){
         if (req) {
             req.identity = decoded.sub;
             req.tokenInfo = tokenInfo;
-            logger.debug("Decoded token: " + JSON.stringify(req.tokenInfo))
+            logger.debug("Decoded token: " + JSON.stringify(req.tokenInfo));
         }
         return callback(tokenInfo);
     }).catch((err) => {
