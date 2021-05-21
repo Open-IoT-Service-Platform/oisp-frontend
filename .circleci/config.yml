@@ -127,14 +127,12 @@ commands:
           command: |
             cd platform-launcher
             export PATH=$PATH:/snap/bin
-            make import-images DOCKER_TAG=test DEBUG=true
-            npm install nodemailer
+            make import-images DOCKER_TAG=test DEBUG=true USE_LOCAL_REGISTRY=true
             export NODOCKERLOGIN=true
             retval=2;
             until [ ${retval} -eq 0 ]; do
               make undeploy-oisp
-              make deploy-oisp-test DOCKER_TAG=test
-              sleep 100
+              (for i in {1..20}; do sleep 60; echo .; done&) &&  make deploy-oisp-test DOCKER_TAG=test USE_LOCAL_REGISTRY=true
               make test
               retval=$?
             done
