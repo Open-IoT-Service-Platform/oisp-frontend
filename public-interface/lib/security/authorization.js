@@ -24,6 +24,7 @@ var jwt_decode = require('jwt-decode'),
     errBuilder = require('./../errorHandler').errBuilder,
     notAuthorizedCode = errBuilder.Errors.Generic.NotAuthorized.code,
     notAuthorizedMessage = errBuilder.Errors.Generic.NotAuthorized.message,
+    logger = require('./../logger').init(),
     tokenTypes;
 
 var generateToken = function(deviceUID, deviceId, activationcode, type, callback, email, expire) {
@@ -44,7 +45,6 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                     });
                 });
         } else {
-
             if (type === tokenTypes.device) {
                 headers["X-Access-Type"] = type;
                 headers["X-DeviceID"] = deviceId;
@@ -80,9 +80,11 @@ var getTokenInfo = function(token, req, callback){
         if (req) {
             req.identity = decoded.sub;
             req.tokenInfo = tokenInfo;
+            logger.debug("Decoded token: " + JSON.stringify(req.tokenInfo))
         }
         return callback(tokenInfo);
-    }).catch(() => {
+    }).catch((err) => {
+        logger.debug("Error when decoding token: " + err);
         return callback(null);
     });
 };
@@ -134,17 +136,6 @@ var parseTokenFromRequest = function(req, res, next) {
     }
 };
 
-var verifyTokenAudience = function(req, res, next) {
-    if (req.tokenInfo && req.tokenInfo.header) {
-        if (req.tokenInfo.payload.azp === clientId || req.tokenInfo.payload.aud.includes(clientId)) {
-            return next();
-        } else {
-            return res.status(notAuthorizedCode.send(notAuthorizedMessage));
-        }
-    }
-    return next();
-};
-
 module.exports.generateToken = generateToken;
 
 module.exports.tokenInfo = getTokenInfo;
@@ -160,7 +151,6 @@ module.exports.middleware = function(secConfig, forceSSL){
     module.exports.tokenTypes = tokenTypes;
 
     app.use(parseTokenFromRequest);
-    app.use(verifyTokenAudience);
 
     app.get("/api/auth/tokenInfo", function(req, res){
         res.status(200).send(req.tokenInfo);

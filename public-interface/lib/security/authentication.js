@@ -21,6 +21,7 @@ var express = require('../express-jaeger').express,
     schemaValidator = require('./../schema-validator'),
     schemas = require('./../schema-validator/schemas'),
     errBuilder = require('./../errorHandler').errBuilder,
+    logger = require('./../logger').init(),
     keycloak = require('./keycloak');
 
 var getCurrentUser = function (req, res, next) {
@@ -32,6 +33,7 @@ var getCurrentUser = function (req, res, next) {
     } else {
         user.getUser(req.identity, function (err, us) {
             if (err) {
+                logger.debug("Error getting current user: " + us + ", error: " + err);
                 next(err);
             } else {
                 res.status(200).send(us);
@@ -50,7 +52,7 @@ var loginWithKeycloak = function(req, res) {
             users.findByEmail(email, function(err, user) {
                 if (user) {
                     if (user.id !== uid) {
-                        console.log("Keycloak user uid and client user uid mismatch for user: " + email);
+                        logger.error("Keycloak user uid and client user uid mismatch for user: " + email);
                         return res.status(errBuilder.Errors.Generic.NotAuthorized.code)
                             .send(errBuilder.Errors.Generic.NotAuthorized.message);
                     }
@@ -62,7 +64,7 @@ var loginWithKeycloak = function(req, res) {
                 });
             });
         }).catch(err => {
-            console.log(err);
+            logger.debug("Error during keycloak login: " + err);
             res.status(errBuilder.Errors.Generic.NotAuthorized.code)
                 .send(errBuilder.Errors.Generic.NotAuthorized.message);
         });
