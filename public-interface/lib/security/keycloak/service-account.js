@@ -193,6 +193,15 @@ module.exports = function ServiceAccount(keycloakAdapter) {
         });
     };
 
+    this.deleteSession = function deleteSession(session) {
+        return this.ensureServiceAccountGrant(this).then(() => {
+            return this.admin.realms.deleteSession({
+                realm: this.keycloak.config.realm,
+                session: session
+            });
+        });
+    };
+
     this.admin = new KcAdminClient();
     this.admin.setConfig({
         realmName: this.keycloak.config.realm,
