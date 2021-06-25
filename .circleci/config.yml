@@ -15,7 +15,7 @@ executors:
       TZ: "Europe/Berlin"
   docker-executor:
     docker:
-      - image: circleci/node:10.0
+      - image: circleci/node:14.17.1
     working_directory: ~/repo
     environment:
       shell: /bin/bash

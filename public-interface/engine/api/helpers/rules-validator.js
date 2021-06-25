@@ -16,9 +16,11 @@
 
 'use strict';
 var postgresProvider = require('../../../iot-entities/postgresql'),
-    Device = postgresProvider.devices;
-var errorList = require('../../res/errors');
-var conditionTypes = {
+    Device = postgresProvider.devices,
+    Sequelize = require('sequelize'),
+    errorList = require('../../res/errors');
+
+const conditionTypes = {
     basic: 'basic',
     time: 'time',
     statistics: 'statistics',
@@ -38,7 +40,7 @@ var validateDevicesHasComponents = function(rule, accountId, cb) {
     // HAS_COMPONENTS
     // Device and Components needs to be there
 
-    Device.getDevices(accountId, {id: {$in: rule.population.ids}}, function(err, devices) {
+    Device.getDevices(accountId, {id: {[Sequelize.Op.in]: rule.population.ids}}, function(err, devices) {
         //each device should have at least one component
         if(!err){
             devices.forEach(function(device){

@@ -20,7 +20,10 @@ var componentTypes = require('./models').componentTypes,
     interpreterHelper = require('../../lib/interpreter/helper'),
     Q = require('q'),
     errBuilder = require("../../lib/errorHandler/index").errBuilder,
+    Sequelize = require('sequelize'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').componentTypes();
+
+const Op = Sequelize.Op;
 
 exports.new = function (data, t) {
     var componentModel = interpreter.toDb(data);
@@ -41,7 +44,7 @@ exports.new = function (data, t) {
 exports.all = function (accountId, detailed, resultCallback) {
     var query = {
         where: {
-            $or: [
+            [Op.or]: [
                 {
                     accountId: accountId
                 },
@@ -66,7 +69,7 @@ exports.all = function (accountId, detailed, resultCallback) {
 exports.findByIdAndAccount = function (compId, accountId, t) {
     var query = {
         where: {
-            $or: [
+            [Op.or]: [
                 {
                     accountId: accountId,
                     componentTypeId: compId
@@ -99,7 +102,7 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
 exports.findByDimensionAndAccount = function (dimension, accountId, t) {
     var query = {
 	        where: {
-	            $or: [
+	            [Op.or]: [
 	                {
 	                    accountId: accountId,
 	                    dimension: dimension

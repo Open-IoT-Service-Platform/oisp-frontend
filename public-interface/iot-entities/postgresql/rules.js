@@ -101,7 +101,7 @@ exports.addOrUpdateDraft = function (externalId, accountId, data) {
         returning: true
     };
 
-    return rules.find(filter)
+    return rules.findOne(filter)
         .then(function (rule) {
             if (rule) {
                 return update(externalId, accountId, data)
@@ -269,7 +269,7 @@ exports.findAccountWithRule = function (accountId, externalId) {
         ]
     };
 
-    return accounts.find(filter)
+    return accounts.findOne(filter)
         .then(function(result){
             if(result) {
                 var results = {
@@ -296,7 +296,7 @@ exports.findUserWithAccountAndRule = function (userId, accountId, ruleId) {
         }]
     };
 
-    return users.find(filter)
+    return users.findOne(filter)
         .then(function(result){
             if(result) {
                 var results = {

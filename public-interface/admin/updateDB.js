@@ -11,11 +11,7 @@ UpdateDB.prototype.update = function(test) {
         database = "test";
     }
 
-    var dbupdateCommand = "npx sequelize-cli db:migrate --url postgres://" +
-        config.postgres.su_username +
-        ":" + config.postgres.su_password +
-        "@" + config.postgres.options.replication.write.host +
-        "/" + database;
+    var dbupdateCommand = "npx sequelize-cli db:migrate --config sequelizeCliConfig.js";
     console.log("Executing " + cdCommand + dbupdateCommand);
     exec(cdCommand + dbupdateCommand, (err, stdout, stderr) => {
         if (err) {

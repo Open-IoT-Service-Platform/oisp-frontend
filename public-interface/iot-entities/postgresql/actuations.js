@@ -18,7 +18,10 @@
 var interpreter = require('../../lib/interpreter/postgresInterpreter').actuations(),
     actuations = require('./models').actuations,
     deviceComponents = require('./models').deviceComponents,
+    Sequelize = require('sequelize'),
     devices = require('./models').devices;
+
+const Op = Sequelize.Op;
 
 var getActuationRelations = function(){
     return [
@@ -56,7 +59,10 @@ exports.findByDeviceId = function (accountId, deviceId, limit, dateFilter, resul
 
     if (dateFilter) {
         filter["where"] = {
-            created:{$gt:dateFilter.from}};
+            created: {
+                [Op.gt]: dateFilter.from
+            }
+        };
         filter["limit"] = limit;
 
     }

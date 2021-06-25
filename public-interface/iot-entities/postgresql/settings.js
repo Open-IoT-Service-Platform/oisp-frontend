@@ -16,6 +16,7 @@
 
 var settings = require('./models').settings,
     interpreterHelper = require('../../lib/interpreter/helper'),
+    Sequelize = require('sequelize'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').settings();
 
 var parseAccountIdParam = function (accountId) {
@@ -25,6 +26,8 @@ var parseAccountIdParam = function (accountId) {
     }
     return accountId;
 };
+
+const Op = Sequelize.Op;
 
 exports.new = function (setting, resultCallback) {
     var settingModel = interpreter.toDb(setting);
@@ -44,7 +47,7 @@ exports.findByCategory = function (userId, accountId, type, resultCallback) {
         where: {
             accountId: parseAccountIdParam(accountId),
             type: type,
-            $or: [
+            [Op.or]: [
                 {userId: userId, public: false},
                 {public: true}
             ]
@@ -66,7 +69,7 @@ exports.findById = function (userId, accountId, category, settingId, resultCallb
             id: settingId,
             accountId: parseAccountIdParam(accountId),
             type: category,
-            $or: [
+            [Op.or]: [
                 {userId: userId, public: false},
                 {public: true}
             ]
@@ -158,7 +161,7 @@ exports.findDefault = function (userId, accountId, type, resultCallback) {
         }
     };
 
-    settings.find(filter)
+    settings.findOne(filter)
         .then(function (setting) {
             interpreterHelper.mapAppResults(setting, interpreter, resultCallback);
         })
