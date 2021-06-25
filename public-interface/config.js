@@ -160,6 +160,7 @@ var config = {
             host: postgres_config.hostname,
             port: postgres_config.port,
             dialect: 'postgres',
+            dialectOptions: {},
             databaseVersion: '9.4.21',
             replication: {
                 read: postgresReadReplicas,
@@ -302,6 +303,12 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
 }
 config.api.forceSSL = false;
 config.controlChannel.ws.secure = false;
+
+if (process.env.PGSSLMODE === "require") {
+    config.postgres.options.dialectOptions.ssl = {
+        rejectUnauthorized: false
+    };
+}
 
 /* override for testing if rateLimit wants to be disabled */
 if (process.argv && (process.argv.indexOf("--disable-rate-limits") !== -1)) {

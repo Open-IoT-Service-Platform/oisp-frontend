@@ -23,7 +23,10 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     devices = require('./models').devices,
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').deviceComponents(),
+    Sequelize = require('sequelize'),
     Q = require('q');
+
+const Op = Sequelize.Op;
 
 var filterByAccountId = function(accountId) {
     return {
@@ -32,7 +35,7 @@ var filterByAccountId = function(accountId) {
             {
                 model: devices,
                 where: {
-                    $and: {
+                    [Op.and]: {
                         accountId: accountId
                     }
                 },
@@ -44,7 +47,7 @@ var filterByAccountId = function(accountId) {
 
 exports.all = function (accountId, resultCallback) {
     var filter = filterByAccountId(accountId);
-    deviceComponents.all(filter)
+    deviceComponents.findAll(filter)
         .then(function (result) {
             interpreterHelper.mapAppResults(result, interpreter, resultCallback);
         })
@@ -55,23 +58,23 @@ exports.all = function (accountId, resultCallback) {
 
 var filterByDeviceProperties = function (customFilter, filter) {
     if (customFilter.deviceNames) {
-        filter.include[1].where.$and.name = {
-            $in: customFilter.deviceNames
+        filter.include[1].where[Op.and].name = {
+            [Op.in]: customFilter.deviceNames
         };
     }
     if (customFilter.deviceIds) {
-        filter.include[1].where.$and.id = {
-            $in: customFilter.deviceIds
+        filter.include[1].where[Op.and].id = {
+            [Op.in]: customFilter.deviceIds
         };
     }
     if (customFilter.gatewayIds) {
-        filter.include[1].where.$and.gatewayId = {
-            $in: customFilter.gatewayIds
+        filter.include[1].where[Op.and].gatewayId = {
+            [Op.in]: customFilter.gatewayIds
         };
     }
     if (customFilter.deviceStatuses) {
-        filter.include[1].where.$and.status = {
-            $in: customFilter.deviceStatuses
+        filter.include[1].where[Op.and].status = {
+            [Op.in]: customFilter.deviceStatuses
         };
     }
     if (customFilter.deviceTags) {
@@ -81,7 +84,7 @@ var filterByDeviceProperties = function (customFilter, filter) {
                 as: 'tags',
                 where: {
                     value: {
-                        $in: customFilter.deviceTags
+                        [Op.in]: customFilter.deviceTags
                     }
                 },
                 attributes: []
@@ -94,7 +97,7 @@ var filterByComponentProperties = function (customFilter, filter) {
     if (customFilter.componentIds) {
         filter.where = {
             componentId: {
-                $in: customFilter.componentIds
+                [Op.in]: customFilter.componentIds
             }
         };
     }
@@ -102,14 +105,14 @@ var filterByComponentProperties = function (customFilter, filter) {
         filter.where = {
             // id
             componentTypeId: {
-                $in: customFilter.componentTypes
+                [Op.in]: customFilter.componentTypes
             }
         };
     }
     if (customFilter.componentNames) {
         filter.where = {
             name: {
-                $in: customFilter.componentNames
+                [Op.in]: customFilter.componentNames
             }
         };
     }
@@ -164,7 +167,7 @@ exports.updateLastObservationTS = function (componentId, date, resultCallback) {
     };
     deviceComponents.findOne(filter).then(function (comp) {
         filter.where.last_observation_time = {
-            $lt: new Date(date)
+            [Op.lt]: new Date(date)
         };
         comp = interpreterHelper.mapAppResults(comp, interpreter);
         if (date > comp.last_observation_time) {

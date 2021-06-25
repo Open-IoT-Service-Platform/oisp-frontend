@@ -27,6 +27,7 @@ CreateDB.prototype.create = function(){
         database: 'postgres',
         password: config.postgres.su_password,
         port: config.postgres.options.port,
+        ssl: config.postgres.options.dialectOptions.ssl
     });
     const query = {text: 'CREATE DATABASE ' +
                          config.postgres.database + ';'

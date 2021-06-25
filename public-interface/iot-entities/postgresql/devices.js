@@ -117,7 +117,7 @@ exports.all = function (accountId, resultCallback) {
 exports.getDevices = function (accountId, queryParameters, resultCallback) {
     var queryParametersModel = interpreter.toDb(queryParameters);
     queryParametersModel = interpreter.toDbValues(queryParametersModel);
-    var filters = modelsHelper.setQueryParameters(queryParametersModel, devices.attributes, {});
+    var filters = modelsHelper.setQueryParameters(queryParametersModel, devices.rawAttributes, {});
     filters.include = getDeviceRelations();
     filters.where.accountId = accountId;
 
@@ -583,7 +583,7 @@ var criteriaQuery = function (criteria, queryParameters) {
         include: [],
         group: ['devices.uid']
     };
-    filter = modelsHelper.setQueryParameters(queryParametersModel, devices.attributes, filter);
+    filter = modelsHelper.setQueryParameters(queryParametersModel, devices.rawAttributes, filter);
 
     var tagsCriteria = criteriaModel.tags;
     var componentsCriteria = criteriaModel.components;
