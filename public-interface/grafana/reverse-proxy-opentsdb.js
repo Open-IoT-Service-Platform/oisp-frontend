@@ -67,6 +67,9 @@ function verifyQuery(res, accounts) {
 
 proxy.on('proxyRes', function (proxyRes, req, res) {
     modifyResponse(res, proxyRes, function(body) {
+        if (proxyRes.statusCode >= 300) {
+            return body;
+        }
         if (body) {
             if (req.url.indexOf(SUGGESTION_PATH) !== -1) {
                 return verifyResponse(req, body, verifySuggestion);
