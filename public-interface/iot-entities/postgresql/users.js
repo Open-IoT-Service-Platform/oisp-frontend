@@ -117,7 +117,7 @@ var getUsersWithAllAccounts = function(users) {
 };
 
 exports.getUsers = function (accountId, queryParameters, resultCallback) {
-    var filters = modelsHelper.setQueryParameters(queryParameters, users.attributes, {});
+    var filters = modelsHelper.setQueryParameters(queryParameters, users.rawAttributes, {});
     if (accountId) {
         filters.include = [{
             model: accounts,
