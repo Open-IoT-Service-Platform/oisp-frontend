@@ -60,7 +60,17 @@ module.exports = function ServiceAccount(keycloakAdapter) {
         return this.ensureServiceAccountGrant(this).then(() => {
             return this.admin.users.find(parameters);
         }).then(users => {
-            return users[0];
+            if (users) {
+                return users[0];
+            } else {
+                return null;
+            }
+        });
+    };
+
+    this.updateUserWithoutFetch = function(userData) {
+        return this.ensureServiceAccountGrant().then(() => {
+            return this.admin.users.update({ id: userData.id }, userData);
         });
     };
 
@@ -106,7 +116,7 @@ module.exports = function ServiceAccount(keycloakAdapter) {
                         }
                     });
                 }
-                return this.admin.users.update({id: id}, data);
+                return this.admin.users.update({ id: id }, data);
             });
         });
     };

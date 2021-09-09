@@ -354,6 +354,18 @@ exports.delete = function (userId, transaction, resultCallback) {
         });
 };
 
+exports.findAndCountAll = function(offset, limit) {
+    var filter = {
+        offset: offset,
+        limit: limit
+    };
+    return users.findAndCountAll(filter);
+};
+
+exports.usersCount = function() {
+    return users.count({});
+};
+
 exports.accountsCount = function(userId) {
     var filter = {
         where: {
