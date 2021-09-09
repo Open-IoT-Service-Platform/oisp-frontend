@@ -30,6 +30,7 @@ var importExistingUsersToKeycloak = require('./importExistingUsersToKeycloak');
 var addSystemUsers = require('./addSystemUsers');
 var setAccountRateLimit = require('./setAccountRateLimit');
 var removeDeviceKeycloakSession = require('./removeDeviceKeycloakSession');
+var migrateKeycloakUIDs = require('./migrateKeycloakUIDs');
 var command = process.argv[2];
 var arg = process.argv[3];
 
@@ -84,6 +85,10 @@ case 'setAccountRateLimit':
 case 'removeDeviceKeycloakSession':
     var arg = process.argv.slice(3);
     removeDeviceKeycloakSession.apply(null, arg);
+    break;
+case 'migrateKeycloakUIDs':
+    var arg = process.argv.slice(3);
+    migrateKeycloakUIDs.apply(null, arg);
     break;
 default:
     console.log ("Command : ", command , " not supported ");
