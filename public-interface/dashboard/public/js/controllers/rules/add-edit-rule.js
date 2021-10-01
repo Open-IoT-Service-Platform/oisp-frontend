@@ -545,7 +545,6 @@ iotController.controller('AddEditRuleCtrl', function($scope,
         if (tags !== undefined && tags.length > 0) {
             $scope.population.tags = tags;
         }
-        $scope.population.deviceName = $scope.filters.getName();
         $scope.components.length = 0;
         /**
          * it will iterate among all devices to get the Components.
