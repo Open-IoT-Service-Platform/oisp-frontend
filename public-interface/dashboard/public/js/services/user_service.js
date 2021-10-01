@@ -42,22 +42,17 @@ iotServices.factory('usersService', ['$http', 'utilityService','sessionService',
                 });
         },
         getUser: function(userId, successCallback, errorCallback){
-            sessionService.addAccountIdPrefix('/users/' + userId)
-                .then(function(url) {
-                    $http({
-                        method: 'GET',
-                        url: url
-                    }).success(successCallback).error(errorCallback);
-                });
+            $http({
+                method: 'GET',
+                url: '/users/' + userId
+            }).success(successCallback).error(errorCallback);
         },
         addUser: function(user, successCallback, errorCallback){
-
             $http({
                 method: 'POST',
                 url: '/users',
                 data: user
             }).success(successCallback).error(errorCallback);
-
         },
         requestVerifyMail: function(data, successCallback, errorCallback){
             $http({
