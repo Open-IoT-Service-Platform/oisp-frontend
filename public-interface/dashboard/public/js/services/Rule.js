@@ -149,7 +149,6 @@ iotServices.factory('Rule', ['$http', 'utilityService','sessionService',
             setPopulation: function (data) {
                 this.population.ids = data.devices;
                 this.population.tags = data.tags;
-                this.population.name = data.deviceName;
             },
             getPopulation: function (){
                 return this.population;
