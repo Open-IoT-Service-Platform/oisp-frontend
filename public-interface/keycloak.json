@@ -838,7 +838,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
@@ -866,7 +866,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-admin", "sysadmin"]
+                        "roles": ["account-user", "sysadmin"]
                     }
                 ]
             },
