@@ -69,36 +69,6 @@ module.exports = function (grunt) {
                 src: ['<%= dirs.jsfiles %>'],
             }
         },
-        karma: {
-            options: {
-                configFile: 'test/test.ui.conf.js',
-                runnerPort: 9999,
-                browsers: ['Chrome', 'Firefox']
-            },
-            local: {
-                singleRun: true,
-                browsers: ['PhantomJS'],
-                reporters: ['coverage'],
-                coverageReporter: {
-                    reporters: [{
-                        type: 'json',
-                        dir: '../coverage/partial_ui'
-                    } ]
-                }
-
-            },
-            teamcity: {
-                singleRun: true,
-                reporters: ['teamcity', 'coverage'],
-                browsers: ['PhantomJS'],
-                coverageReporter: {
-                    reporters: [{
-                        type: 'json',
-                        dir: '../coverage/partial_ui'
-                    } ]
-                }
-            }
-        },
         mocha_istanbul: {
             local: {
                 src: 'test/unit', // the folder, not the files,
@@ -267,23 +237,6 @@ module.exports = function (grunt) {
                 mangle: false
             }
         },
-        useminPrepare: {
-            html: ['dashboard/index.html', 'dashboard/dashboard.html'],
-            options: {
-                root: 'dashboard',
-                dest: '../build/dashboard'
-            }
-        },
-        usemin: {
-            html: ['../build/dashboard/index.html', '../build/dashboard/dashboard.html'],
-
-            options: {
-                assetsDirs: ['../build/dashboard'],
-                patterns:{
-                    css:[/.*\.eot|woff|svg/g,'rev']
-                }
-            }
-        },
         filerev: {
             default: {
                 src: [
@@ -316,7 +269,6 @@ module.exports = function (grunt) {
         done();
     });
 
-    grunt.loadNpmTasks('grunt-usemin');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-filerev');
 
@@ -330,7 +282,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-istanbul');
     grunt.loadNpmTasks('grunt-bumpup');
     grunt.loadNpmTasks('grunt-shell');
@@ -339,7 +290,6 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'eslint:local',
         'jshint:local',
-        'karma:local',
         'mocha_istanbul:local',
         'makeReport',
         'shell:build'
@@ -357,7 +307,6 @@ module.exports = function (grunt) {
 
     grunt.registerTask('teamcity_codevalidation', [
         'jshint:teamcity',
-        'karma:teamcity',
         'mocha_istanbul:teamcity',
         'makeReport'
     ]);
@@ -389,12 +338,10 @@ module.exports = function (grunt) {
     );
 
     grunt.registerTask('awesome', [
-        'useminPrepare',
         'concat',
         'cssmin',
         'uglify',
         'filerev',
-        'usemin'
     ]);
 
     grunt.registerTask('clean-api', ['shell:clean']);
