@@ -20,26 +20,6 @@ var crypto = require('crypto'),
     logger = require('./logger').init();
 
 module.exports = {
-    hash: function(password, salt) {
-        // salt is passed in by verify to hash a password using a previously stored salt
-        salt = salt || crypto.randomBytes(32).toString('base64');
-        var hashed = crypto.pbkdf2Sync(password, salt, 20000, 32,'sha1').toString('base64');
-        // store the method, algorithm, iterations and keylength with the hashed password
-        // this allows for backward compatibility when we implemented new hashing schemes
-        // salt is stored in a separate column
-        return {salt: salt,
-            password: "pbkdf2::SHA1::20000::32:" + hashed
-        };
-    },
-    hashData: function(data){
-        var hash = crypto.createHash('sha1');
-        hash.update(data, 'utf8');
-        return hash.digest('hex');
-    },
-    verify: function(compare, password, salt, callback){
-        var crypt = this.hash(compare, salt);
-        callback(crypt.password === password);
-    },
     generate: function(length){
         var aCode = null;
         try {
