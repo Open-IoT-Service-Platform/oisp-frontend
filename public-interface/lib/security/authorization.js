@@ -104,14 +104,23 @@ var addUserToDB = function(token) {
 
 var parseTokenFromRequest = function(req, res, next) {
     var accessToken = utils.getBearerToken(req.headers.authorization);
+    var decoded = {};
     if (accessToken) {
-        var decoded = jwt_decode(accessToken);
+        try {
+            decoded = jwt_decode(accessToken);
+        } catch (err) {
+            logger.error('Error occured in token parsing: ' + err);
+            return next();
+        }
         req.identity = decoded.sub;
         req.tokenInfo = {
             payload: decoded
         };
         if (!Object.keys(tokenTypes).some(type => tokenTypes[type] === decoded.type)) {
-            throw 'Invalid Token Type';
+            logger.error('Invalid Token Type: ' + decoded.type + ' for user: ' + decoded.sub);
+            req.identity = null;
+            req.tokenInfo = null;
+            return next();
         }
         keycloak.adapter.grantManager.createGrant({ access_token: accessToken }).then(grant => {
             keycloak.adapter.storeGrant(grant, req, res);
@@ -124,7 +133,8 @@ var parseTokenFromRequest = function(req, res, next) {
             return Promise.resolve();
         }).then(() => {
             next();
-        }).catch(() => {
+        }).catch(err => {
+            logger.debug("Non-critical error occured in token parsing: " + err);
             next();
         });
     } else {
