@@ -20,7 +20,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     rulesHandler = rewire('../../../../../engine/handlers/v1/rules'),
     httpStatuses = require('../../../../../engine/res/httpStatuses'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q');
 
 describe('rules handler', function(){

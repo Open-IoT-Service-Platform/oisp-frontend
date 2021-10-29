@@ -26,7 +26,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     logger = require('../../../lib/logger').init(),
     async = require('async'),
     actuationAlerts = require('../helpers/actuationAlerts'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 exports.reset = function (params, resultCallback) {
 

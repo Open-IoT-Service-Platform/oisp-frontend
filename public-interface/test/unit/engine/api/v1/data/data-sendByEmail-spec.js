@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     dataManager = rewire('../../../../../../engine/api/v1/data'),
     errBuilder = require('../../../../../../lib/errorHandler').errBuilder,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('dataApi.sendByEmail', function () {
     var accountId, searchRequest, dataMock, csv, response, user;

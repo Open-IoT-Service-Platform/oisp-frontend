@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     accountManager = rewire('../../../../../../engine/api/v1/accounts'),
     errBuilder = require('../../../../../../lib/errorHandler/index').errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     accountId = uuid.v4(),
     account = {public_id: accountId, id: accountId, activation_code: "xvLugHxL", activation_code_expire_date: Date.now() * 2};
 

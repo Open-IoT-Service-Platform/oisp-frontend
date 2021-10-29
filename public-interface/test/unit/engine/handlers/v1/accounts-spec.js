@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     accountHandler = rewire('../../../../../engine/handlers/v1/accounts'),
     httpStatuses = require('../../../../../engine/res/httpStatuses'),
     errBuilder  = require("../../../../../lib/errorHandler/errorHandler").errBuilder,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('accounts handler', function() {
     var reqMock, resMock, nextMock, attributesValidationMock, errorCode, responseCode, errorObj, error;
@@ -566,4 +566,3 @@ describe('accounts handler', function() {
         });
     });
 });
-

@@ -19,7 +19,7 @@ var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
     userDeleteManager = rewire('../../../../../engine/api/helpers/userDeleteManager'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 
 describe("User delete manager", function () {

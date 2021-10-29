@@ -20,7 +20,7 @@ var expect = require('chai').expect,
     sinon = require('sinon'),
     rewire = require('rewire'),
     errBuilder = require('../../../../../lib/errorHandler/index').errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     queryHelper = require('../../../../../iot-entities/postgresql/helpers/queryHelper'),
     Q = require('q'),
     callback;

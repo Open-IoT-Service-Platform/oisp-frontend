@@ -19,7 +19,7 @@
 var expect = require('chai').expect,
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     helper = require('../../../../lib/interpreter/helper');
 
 describe('helper.isObject', function() {

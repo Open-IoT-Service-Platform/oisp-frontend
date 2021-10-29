@@ -22,7 +22,7 @@ var expect = require('expect.js'),
     dataManager = rewire('../../../../../../engine/api/v1/data'),
     errBuilder = require('../../../../../../lib/errorHandler').errBuilder,
     config = require('../../../../../../config'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q');
 
 describe('dataApi.collectData', function () {

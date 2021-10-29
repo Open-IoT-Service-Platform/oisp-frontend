@@ -22,10 +22,10 @@ var expect = require('expect.js'),
     httpStatuses = require('../../../../../engine/res/httpStatuses'),
     errBuilder  = require("../../../../../lib/errorHandler/index").errBuilder,
     schemas = require('../../../../../lib/schema-validator/schemas'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     devicesHandler = rewire('../../../../../engine/handlers/v1/devices');
-    
+
 
 
 describe('devices handler', function(){
@@ -428,7 +428,7 @@ describe('devices handler', function(){
                 });
         });
     });
-    
+
     describe('search devices', function(){
         it('should search devices if they match the criteria', function(done){
             // prepare

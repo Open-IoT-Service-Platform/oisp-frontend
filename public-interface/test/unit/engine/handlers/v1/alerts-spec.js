@@ -18,7 +18,7 @@
 var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     alertsHandler = rewire('../../../../../engine/handlers/v1/alerts'),
     httpStatuses = require('../../../../../engine/res/httpStatuses');
 

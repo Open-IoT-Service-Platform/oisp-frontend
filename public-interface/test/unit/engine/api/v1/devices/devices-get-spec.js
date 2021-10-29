@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     errBuilder  = require("../../../../../../lib/errorHandler/index").errBuilder,
     Q = require('q'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     devicesManager = rewire('../../../../../../engine/api/v1/devices');
 
 var postgresProviderMock;

@@ -24,7 +24,7 @@ var users = require('./models').users,
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').users(),
     errBuilder  = require("../../lib/errorHandler").errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     modelsHelper = require('./helpers/modelsHelper'),
     userModelHelper = require('./helpers/userModelHelper');
 

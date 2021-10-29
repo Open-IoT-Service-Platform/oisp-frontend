@@ -20,7 +20,7 @@ var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
     errBuilder = require('../../../../../../lib/errorHandler/index').errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     accountManager = rewire('../../../../../../engine/api/v1/accounts'),
     Q = require('q');
 
@@ -111,4 +111,3 @@ describe('accountsApi.updateAccount', function () {
         });
     });
 });
-
