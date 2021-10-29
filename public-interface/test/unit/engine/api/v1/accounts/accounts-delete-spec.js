@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     accountManager = rewire('../../../../../../engine/api/v1/accounts'),
     errBuilder = require('../../../../../../lib/errorHandler/index').errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q');
 
 describe('accountsApi.delete', function () {

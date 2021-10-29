@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     errBuilder = require('../../../../../lib/errorHandler').errBuilder,
     rulesManager = rewire('../../../../../engine/api/v1/rules'),
     rulesValidator = rewire('../../../../../engine/api/helpers/rules-validator'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('rules api', function(){
     var domain = {
@@ -437,7 +437,7 @@ describe('rules api', function(){
     describe('update rule synchronization status', function () {
         var newSynchronizationStatus,
             externalId;
-        
+
         beforeEach(function () {
             newSynchronizationStatus = "Sync";
             externalId = uuid.v4();

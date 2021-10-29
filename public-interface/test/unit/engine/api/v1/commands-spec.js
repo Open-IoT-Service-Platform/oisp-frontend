@@ -20,7 +20,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     commandsManager = rewire('../../../../../engine/api/v1/commands'),
     errBuilder  = require("../../../../../lib/errorHandler").errBuilder,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 var domainId = uuid.v4(),
     devices = [{

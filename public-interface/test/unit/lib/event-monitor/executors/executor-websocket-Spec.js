@@ -18,7 +18,7 @@
 var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     config = require('../../../../../config.js'),
     Q = require('q'),
     executorWS = rewire('../../../../../lib/event-monitor/executors/executor-ws');
@@ -90,7 +90,7 @@ describe('executor-ws', function() {
 
 
         });
-        
+
 
         it('should not publish data if device is not connected via ws', function (done) {
             // prepare

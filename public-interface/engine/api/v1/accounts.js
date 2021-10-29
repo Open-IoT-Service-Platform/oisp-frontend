@@ -22,7 +22,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     user = postgresProvider.users,
     logger = require('../../../lib/logger').init(),
     errBuilder  = require("../../../lib/errorHandler").errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     config = require('../../../config'),
     cryptoUtils = require('./../../../lib/cryptoUtils');
 

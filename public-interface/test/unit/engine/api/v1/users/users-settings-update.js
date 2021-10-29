@@ -19,7 +19,7 @@
 var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     errBuilder = require('../../../../../../lib/errorHandler/index').errBuilder;
 

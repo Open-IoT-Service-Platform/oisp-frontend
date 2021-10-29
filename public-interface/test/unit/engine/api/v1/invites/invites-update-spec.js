@@ -22,7 +22,7 @@ var expect = require('expect.js'),
     errBuilder  = require("../../../../../../lib/errorHandler/index").errBuilder,
     Q = require('q'),
     invitesApi = rewire('../../../../../../engine/api/v1/invites'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('invitesApi.updateInviteStatus', function () {
 

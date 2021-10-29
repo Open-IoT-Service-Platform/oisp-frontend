@@ -18,7 +18,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     sinon = require('sinon'),
     postgresInterpreter = rewire('../../../../lib/interpreter/postgresInterpreter'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 
 describe('postgresInterpreter', function() {

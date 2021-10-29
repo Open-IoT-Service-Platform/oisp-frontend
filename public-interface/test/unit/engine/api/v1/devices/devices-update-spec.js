@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     Q = require('q'),
     errBuilder  = require("../../../../../../lib/errorHandler/index").errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     devicesManager = rewire('../../../../../../engine/api/v1/devices');
 
 describe('devicesApi.updateDevice', function () {

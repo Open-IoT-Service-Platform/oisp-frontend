@@ -21,7 +21,7 @@ var expect = require('chai').expect,
     Q = require('q'),
     deviceManager = rewire('../../../../../engine/api/helpers/deviceManager'),
     errBuilder = require("../../../../../lib/errorHandler").errBuilder,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 
 describe("device manager is device active", function () {

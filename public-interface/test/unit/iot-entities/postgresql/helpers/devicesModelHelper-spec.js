@@ -20,7 +20,7 @@ var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
     errBuilder = require('../../../../../lib/errorHandler/index').errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     deviceModelHelper = require('../../../../../iot-entities/postgresql/helpers/devicesModelHelper'),
     Q = require('q');
 

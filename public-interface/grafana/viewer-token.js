@@ -17,7 +17,7 @@
 var request = require('request-promise'),
     logger = require('./../lib/logger').init(),
     grafanaConf = require('./../config').grafana,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 const KEY_NAME = 'grafana-viewer-key:' + uuid.v4(),
     ROLE = 'Viewer',

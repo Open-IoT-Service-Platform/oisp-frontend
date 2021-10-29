@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     invitesApi = rewire('../../../../../../engine/api/v1/invites'),
     errBuilder = require("../../../../../../lib/errorHandler").errBuilder,
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('invitesApi.addInvite', function () {
 

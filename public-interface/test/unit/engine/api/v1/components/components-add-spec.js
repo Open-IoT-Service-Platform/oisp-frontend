@@ -22,7 +22,7 @@ var expect = require('expect.js'),
     Q = require('q'),
     errBuilder = require("../../../../../../lib/errorHandler/index").errBuilder,
     compManager = rewire('../../../../../../engine/api/v1/components'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('componentsApi.addComponent', function(){
 

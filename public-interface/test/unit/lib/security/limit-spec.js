@@ -18,7 +18,7 @@
 var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     shortPathLimit = 7,
     fullPathLimit = 7,
     mockedRoutesConfig = {

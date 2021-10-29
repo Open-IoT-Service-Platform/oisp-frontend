@@ -18,7 +18,7 @@
 var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     executorMQTT = rewire('../../../../../lib/event-monitor/executors/executor-mqtt');
 

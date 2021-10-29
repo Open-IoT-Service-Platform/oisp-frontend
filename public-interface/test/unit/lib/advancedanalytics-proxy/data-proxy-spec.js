@@ -23,7 +23,7 @@ var assert = require('chai').assert,
     DataProxy = rewire('./../../../../lib/advancedanalytics-proxy/data-proxy'),
     errBuilder = require('../../../../lib/errorHandler/errorHandler').errBuilder,
     responses = require('../../../../lib/advancedanalytics-proxy/utils/responses'),
-    uuid = require('node-uuid');
+    uuid = require('uuid');
 
 describe('Data proxy', function() {
     var con, MQTT, data;

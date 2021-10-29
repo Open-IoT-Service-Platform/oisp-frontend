@@ -17,7 +17,7 @@
 "use strict";
 var http = require('http'),
     express = require('./lib/express-jaeger').express,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     AlertMonitor = require('./lib/event-monitor'),
     commServer = require('./lib/comm-server'),
     IotWsAuth = require('./lib/comm-server/plugins/iot-ws-auth'),

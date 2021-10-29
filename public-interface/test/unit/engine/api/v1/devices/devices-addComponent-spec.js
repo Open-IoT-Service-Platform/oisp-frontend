@@ -20,7 +20,7 @@ var expect = require('expect.js'),
     sinon = require('sinon'),
     rewire = require('rewire'),
     errBuilder  = require("../../../../../../lib/errorHandler/index").errBuilder,
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     devicesManager = rewire('../../../../../../engine/api/v1/devices');
 

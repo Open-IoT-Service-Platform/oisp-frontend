@@ -23,7 +23,7 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     rulesBuilder = require('../helpers/rules-builder'),
     RuleValidator = require('../helpers/index').rulesValidator,
     validator = new RuleValidator(),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     rulesUpdateNotifier = require('../helpers/rules-update-notifier');
 

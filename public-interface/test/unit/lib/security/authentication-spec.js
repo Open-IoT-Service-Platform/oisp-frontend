@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     config = require('../../../../config'),
     users = require('../../../../engine/api/v1/users'),
     cryptoUtil = require('../../../../lib/cryptoUtils'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     Q = require('q'),
     errBuilder  = require("../../../../lib/errorHandler").errBuilder;
 

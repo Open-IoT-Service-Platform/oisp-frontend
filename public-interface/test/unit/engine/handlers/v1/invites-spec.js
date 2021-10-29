@@ -21,7 +21,7 @@ var expect = require('expect.js'),
     errBuilder = require('../../../../../lib/errorHandler').errBuilder,
     Q = require('q'),
     invitesHandler = rewire('../../../../../engine/handlers/v1/invites'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     httpStatuses = require('../../../../../engine/res/httpStatuses');
 
 describe('invites handler', function () {

@@ -25,7 +25,7 @@ var contextProvider = require('../../../lib/context-provider'),
     modelsHelper = require('../helpers/modelsHelper'),
     logger = require('../../../lib/logger').init(),
     Q = require('q'),
-    uuid = require('node-uuid'),
+    uuid = require('uuid'),
     postgresProvider = require('../../postgresql');
 
 var getSequelizeOptions = function() {
