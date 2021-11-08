@@ -1,6 +1,6 @@
 FROM node:14-alpine
 
-RUN apk add --no-cache ncurses make bash python g++
+RUN apk add --no-cache ncurses make bash python3 g++
 
 ADD ./package.json /app/package.json
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN npm install
 RUN npm audit fix
 
 # Remove build time dependencies
-RUN apk del python g++
+RUN apk del python3 g++
 
 ADD . /app
 ENV TERM xterm
