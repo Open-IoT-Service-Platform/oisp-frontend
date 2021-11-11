@@ -42,7 +42,6 @@ exports.middleware = function(_errDefinition) {
     /* jshint unused:false */
     /* express treats middleware with 3 arguments differently */
     return function(err, req, res, _next) {
-        console.log(err);
         logger.error('error-handler. error: ' + JSON.stringify(err));
         if(err.status) {
             if (err.business) {

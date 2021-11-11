@@ -104,7 +104,7 @@ exports.updateDevice = function (deviceId, device, accountId) {
                 })
                 .catch(function(err) {
                     return postgresProvider.rollback(transaction)
-                        .done(function() {
+                        .then(function() {
                             var errMsg = errBuilder.Errors.Device.SavingError;
                             if (err && err.code) {
                                 errMsg = err;

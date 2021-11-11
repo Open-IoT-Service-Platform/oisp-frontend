@@ -202,33 +202,24 @@ exports.updateByIdAndAccount = function (deviceId, accountId, updatedObject, tra
             id: deviceId,
             accountId: accountId
         },
-        returning: true,
         transaction: transaction
     };
 
     var deviceModel = interpreter.toDb(updatedObject);
-
-    return devices.update(deviceModel, filter)
-        .then(function (updatedDevice) {
-            if (updatedDevice && updatedDevice.length > 1) {
-                var device = updatedDevice[1][0];
-                return updateDeviceTags(deviceModel.tags, device, transaction)
-                    .then(function () {
-                        return updateDeviceAttributes(deviceModel.attributes, device, transaction);
-                    })
-                    .then(function () {
-                        return exports.findByIdAndAccount(device.id, device.accountId, transaction);
-                    });
-            } else {
-                throw errBuilder.Errors.Device.NotFound;
-            }
-        })
-        .then(function (device) {
-            return device;
-        })
-        .catch(function (err) {
-            throw err;
-        });
+    return devices.findOne(filter).then(function (device) {
+        if (!device) {
+            throw errBuilder.Errors.Device.NotFound;
+        }
+        return devices.update(deviceModel, filter)
+            .then(function () {
+                return updateDeviceTags(deviceModel.tags, device, transaction);
+            })
+            .then(function () {
+                return updateDeviceAttributes(deviceModel.attributes, device, transaction);
+            });
+    }).then(function() {
+        return exports.findByIdAndAccount(deviceId, accountId, transaction);
+    });
 };
 
 /**
