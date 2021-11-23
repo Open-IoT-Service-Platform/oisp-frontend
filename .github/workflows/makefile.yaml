@@ -1,0 +1,81 @@
+name: End2End Test
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+      - '**-debugtest'
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      PLATFORMORG: Open-IoT-Service-Platform
+    steps:
+    - name: Setup main repo + subrepos
+      shell: bash
+      run: |
+        export TERM=vt100
+        sudo apt install jq
+        git clone https://github.com/${PLATFORMORG}/platform-launcher.git
+        cd platform-launcher
+        git submodule update --recursive --init
+        make update
+
+    - name: Checkout branch to test
+      working-directory: platform-launcher
+      shell: bash
+      run: |
+        export TERM=vt100
+        echo github repo: $GITHUB_REPOSITORY
+        REPO=${GITHUB_REPOSITORY##*/}
+        echo repo: $REPO
+        rm -rf ${REPO}
+        git clone https://github.com/${PLATFORMORG}/${REPO}.git
+        cd ${REPO}
+        git submodule update --recursive --init
+
+    - name: Prepare platform
+      shell: bash
+      working-directory: platform-launcher
+      run: |
+        export TERM=vt100
+        cd util && \
+        bash setup-ubuntu20.04.sh
+    - name: Build platform
+      working-directory: platform-launcher
+      shell: bash
+      run: |
+        set +o pipefail
+        export TERM=vt100
+        yes | DOCKER_TAG=test NODOCKERLOGIN=true DEBUG=true make build
+    - name: E2E Test
+      id: e2etest
+      working-directory: platform-launcher
+      shell: bash
+      run: |
+        set +e
+        export TERM=vt100
+        export PATH=$PATH:/snap/bin
+        make import-images DOCKER_TAG=test DEBUG=true
+        docker image prune -a -f
+        rm -rf oisp-*
+        npm install nodemailer
+        export NODOCKERLOGIN=true
+        retval=2
+        loops=0
+        export DOCKER_TAG=test
+        export USE_LOCAL_REGISTRY=true
+        until [ ${retval} -eq 0 ] || [ ${loops} -gt 3 ]; do
+          make undeploy-oisp
+          (for i in {1..20}; do sleep 60; echo .; done&) &&  make deploy-oisp-test
+          make test
+          retval=$?
+          loops=$((loops+1))
+        done
+        echo Test return value: ${retval}
+        exit ${retval}
+    - name: debug with upterm
+      if: failure()
+      uses: lhotari/action-upterm@v1
