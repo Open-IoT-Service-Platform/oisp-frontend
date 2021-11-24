@@ -208,6 +208,7 @@ var config = {
             uri: kafka_config.uri,
             topicsObservations: kafka_config.topicsObservations,
             topicsRuleEngine: kafka_config.topicsRuleEngine,
+            topicsActuations: kafka_config.topicsActuations,
             topicsHeartbeatName: kafka_config.topicsHeartbeatName,
             topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval,
             replication: kafka_config.replication,

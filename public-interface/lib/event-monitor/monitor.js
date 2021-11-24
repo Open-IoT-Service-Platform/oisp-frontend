@@ -23,9 +23,59 @@ var ExecutorFactory = require('./executor-factory'),
 
 var ACTUATOR_TYPE = 'actuation';
 
+function alertExecutorCb(err, executorCollection, currExecutor, remainingExecutors, actionType, data, cb) {
+    if (err) {
+        return cb(err);
+    }
+    logger.info("Executor: " + currExecutor);
+    if (executorCollection[currExecutor]) {
+        var instance = new executorCollection[currExecutor](config, logger);
+        instance.execute(data, function(err, result) {
+            logger.info("AlertProcessor - Action executed " + ((err !== "undefined") ? "successfully":"with errors"));
+            if(result) {
+                logger.info("AlertProcessor - Result: " + JSON.stringify(result));
+            }
+            if (remainingExecutors.length >= 1) {
+                var nextExecutor = remainingExecutors.pop();
+                alertExecutorCb(err, executorCollection, nextExecutor, remainingExecutors, actionType, data, cb);
+            } else {
+                cb(err);
+            }
+        });
+    } else {
+        logger.error("AlertProcessor - No executor knows how to execute actions of type [" + actionType +"]");
+        cb();
+    }
+}
+
+function messageExecutorCb(err, executorCollection, currExecutor, remainingExecutors, message, cb) {
+    if (err) {
+        return cb(err);
+    }
+    logger.info("Executor: " + currExecutor);
+    if (executorCollection[currExecutor]) {
+        var instance = new executorCollection[currExecutor](config, logger);
+        instance.execute(message, function(err, result) {
+            logger.info("MessageProcessor - message handled " + ((err !== "undefined") ? "successfully":"with errors"));
+            if(result) {
+                logger.info("MessageProcessor - Result: " + JSON.stringify(result));
+            }
+            if (remainingExecutors.length >= 1) {
+                var nextExecutor = remainingExecutors.pop();
+                messageExecutorCb(err, executorCollection, nextExecutor, remainingExecutors, message, cb);
+            } else if (cb) {
+                cb(err, result);
+            }
+        });
+    } else {
+        logger.error("MessageProcessor - No executor knows how to send message of type [" + message.transport +"]");
+        cb();
+    }
+}
+
 function getExecutor(transport) {
-    if ( transport === 'ws' || transport === 'auto' ) {
-        return 'redis';
+    if (transport === 'ws' || transport === 'mqtt' || transport === 'auto') {
+        return 'redis+kafka';
     }
     return transport;
 }
@@ -35,7 +85,15 @@ function AlertProcessor(executors) {
     function executeAlertAction(executors, data, actionType, resultCallback) {
         var _executorCollection = executors;
         var executor = getExecutor(actionType);
-        logger.info("Executor "+executor);
+        // Multiple executors selected
+        if (executor.includes('+')) {
+            var waitingExecutors = executor.split('+');
+            var firstExecutor = waitingExecutors.pop();
+            alertExecutorCb(null, _executorCollection, firstExecutor,
+                waitingExecutors, actionType, data, resultCallback);
+            return;
+        }
+        logger.info("Executor " + executor);
         if( _executorCollection[executor]) {
             var instance = new _executorCollection[executor](config, logger);
             instance.execute(data, function(err, result) {
@@ -72,7 +130,8 @@ function AlertProcessor(executors) {
             }
         }, function(err) {
             if (err) {
-                logger.error("AlertProcessor - An error ocurred while executing actions for rule " + data.rule.id + " account " + data.alert.domainId);
+                logger.error(err);
+                logger.error("AlertProcessor - An error ocurred while executing actions for rule " + data.rule.id + " account " + data.alert.accountId);
             }
         });
     }
@@ -90,9 +149,17 @@ function MessageProcessor(executors) {
     function processMessage(message, done){
         logger.info("Message Processor - message arrived: " + JSON.stringify(message, null, "\t"));
         var executor = getExecutor(message.transport);
+        // Multiple executors selected
+        if (executor.includes('+')) {
+            var waitingExecutors = executor.split('+');
+            var firstExecutor = waitingExecutors.pop();
+            messageExecutorCb(null, _executorCollection, firstExecutor,
+                waitingExecutors, message, done);
+            return;
+        }
+        logger.info("Executor " + executor);
         if( _executorCollection[executor]) {
             var instance = new _executorCollection[executor](config, logger);
-
             instance.execute(message, function(err, result) {
                 logger.info("MessageProcessor - message handled " + ((err !== "undefined") ? "successfully":"with errors"));
                 if(result) {
@@ -102,7 +169,6 @@ function MessageProcessor(executors) {
                     done(err,result);
                 }
             });
-
         } else {
             logger.info("MessageProcessor - No executor knows how to send message of type [" + message.transport +"]");
         }
