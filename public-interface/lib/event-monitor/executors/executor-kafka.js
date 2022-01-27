@@ -16,7 +16,7 @@
 
 'use strict';
 
-var { Kafka, logLevel } = require('kafkajs'),
+var { Kafka, logLevel, Partitioners } = require('kafkajs'),
     logger = require('../../../lib/logger').init(),
     config = require('../../../config'),
     kafkaProducer = null,
@@ -38,7 +38,7 @@ async function getKafkaProducer() {
         }
     });
     try {
-        kafkaProducer = kafka.producer();
+        kafkaProducer = kafka.producer({ createPartitioner: Partitioners.DefaultPartitioner });
         kafkaAdmin    = kafka.admin();
     } catch (exception) {
         logger.error("Exception occured creating Kafka Producer: " + exception);
@@ -94,4 +94,3 @@ module.exports = function kafkaExecutor() {
         }
     };
 };
-
