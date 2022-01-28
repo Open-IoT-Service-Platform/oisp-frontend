@@ -75,7 +75,7 @@ function messageExecutorCb(err, executorCollection, currExecutor, remainingExecu
 
 function getExecutor(transport) {
     if (transport === 'ws' || transport === 'mqtt' || transport === 'auto') {
-        return 'redis+kafka';
+        return 'kafka';
     }
     return transport;
 }
