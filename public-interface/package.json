@@ -57,12 +57,9 @@
     "sequelize-cli": "^5.5.1",
     "serve-favicon": "^2.3.0",
     "shimmer": "^1.2.0",
-    "socket.io": "*",
     "underscore": "^1.13.1",
     "uuid": "^8.3.2",
-    "websocket": "^1.0.34",
-    "winston": "^3.1.0",
-    "xtend": "*"
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "chai": "^4.3.4",

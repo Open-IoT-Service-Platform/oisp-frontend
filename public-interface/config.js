@@ -62,7 +62,6 @@ var postgres_config = getOISPConfig("postgresConfig"),
     backendHost_config = getOISPConfig("backendHostConfig"),
     smtp_config = getOISPConfig("smtpConfig"),
     mail_config = getOISPConfig("mailConfig"),
-    websocketUser_config = getOISPConfig("websocketUserConfig"),
     redis_config = getOISPConfig("redisConfig"),
     ruleEngine_config = getOISPConfig("ruleEngineConfig"),
     gateway_config = getOISPConfig("gatewayConfig"),
@@ -219,36 +218,6 @@ var config = {
         ingestion: 'Kafka',
         userScheme: null // default
     },
-    controlChannel: {
-        mqtt: {
-            host: "",
-            port: "",
-            qos: 1,
-            retain: false,
-            secure: false,
-            retries: 30,
-            topic: "device/{gatewayId}/control",
-            username: "",
-            password : ""
-        },
-        ws: {
-            retryTime: 3000,
-            retriesLimit: 5,
-            secure: true,
-            username: websocketUser_config.username,
-            password : websocketUser_config.password,
-            verifyCert: false
-        },
-        redis: {
-            host: redis_config.hostname,
-            port: redis_config.port,
-            username: websocketUser_config.username,
-            password : websocketUser_config.password,
-            enableOfflineQueue : true,
-            retryTime: 3000,
-            retriesLimit: 5
-        }
-    },
     logger: {
         level: 'info', //Default verbosity,
     	format: winston.format.combine(
@@ -303,7 +272,6 @@ if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local")
     config.logger.level = process.env.LOGLEVEL === undefined?'info':process.env.LOGLEVEL;
 }
 config.api.forceSSL = false;
-config.controlChannel.ws.secure = false;
 
 if (process.env.PGSSLMODE === "require") {
     config.postgres.options.dialectOptions.ssl = {
