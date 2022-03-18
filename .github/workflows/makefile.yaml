@@ -10,32 +10,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    env:
-      PLATFORMORG: Open-IoT-Service-Platform
     steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: Open-IoT-Service-Platform/platform-launcher.git
+        ref: 'develop'
+        path: platform-launcher
+        submodules: recursive
     - name: Setup main repo + subrepos
       shell: bash
       run: |
         export TERM=vt100
         sudo apt install jq
-        git clone https://github.com/${PLATFORMORG}/platform-launcher.git
         cd platform-launcher
-        git submodule update --recursive --init
         make update
-
-    - name: Checkout branch to test
-      working-directory: platform-launcher
-      shell: bash
-      run: |
-        export TERM=vt100
-        echo github repo: $GITHUB_REPOSITORY
-        REPO=${GITHUB_REPOSITORY##*/}
-        echo repo: $REPO
-        rm -rf ${REPO}
-        git clone https://github.com/${PLATFORMORG}/${REPO}.git
-        cd ${REPO}
-        git submodule update --recursive --init
-
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref }}
+        path: platform-launcher/oisp-frontend
     - name: Prepare platform
       shell: bash
       working-directory: platform-launcher

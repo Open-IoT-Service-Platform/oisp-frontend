@@ -19,8 +19,6 @@ var http = require('http'),
     express = require('./lib/express-jaeger').express,
     uuid = require('uuid'),
     AlertMonitor = require('./lib/event-monitor'),
-    commServer = require('./lib/comm-server'),
-    IotWsAuth = require('./lib/comm-server/plugins/iot-ws-auth'),
     iotRoutes =  require('./engine/routes'),
     uiRoutes = require('./dashboard/routes/ui.v1'),
     favicon = require('serve-favicon'),
@@ -154,7 +152,6 @@ keycloak.keycloakListener.listen(config.auth.keycloak.keycloakListenerPort, () =
 });
 
 monitor.start();
-commServer.init(httpServer, IotWsAuth);
 
 models.sequelize.authenticate().then(function() {
     console.log("Connected to " + config.postgres.database + " db in postgresql on: " + JSON.stringify(config.postgres.options));
