@@ -630,7 +630,7 @@
                 "methods":[
                     {
                         "method":"GET",
-                        "roles": ["account-user", "sysadmin", "system"]
+                        "roles": ["device", "sysadmin", "system"]
                     }
                 ]
             },
