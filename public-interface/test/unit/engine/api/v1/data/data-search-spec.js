@@ -102,7 +102,7 @@ describe('dataApi.search', function () {
                     "points": [
                         {
                             "ts": "1369881520000",
-                            "value": "17"
+                            "value": 17
                         }
                     ]
                 }
@@ -134,7 +134,7 @@ describe('dataApi.search', function () {
         expect(deviceMock.findByCriteria.calledOnce).to.equal(true);
         expect(proxyMock.dataInquiry.calledOnce).to.equal(true);
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.args[0].length).to.equal(2);
+        expect(callback.args[0].length).to.equal(3);
         expect(JSON.stringify(callback.args[0][1])).to.equal(JSON.stringify(callbackResponse));
 
         done();
@@ -165,7 +165,7 @@ describe('dataApi.search', function () {
         expect(deviceMock.findByCriteria.calledOnce).to.equal(true);
         expect(proxyMock.dataInquiry.calledOnce).to.equal(true);
         expect(callback.calledOnce).to.equal(true);
-        expect(callback.args[0].length).to.equal(2);
+        expect(callback.args[0].length).to.equal(3);
         expect(JSON.stringify(callback.args[0][1])).to.equal(JSON.stringify(callbackResponse));
         done();
     });

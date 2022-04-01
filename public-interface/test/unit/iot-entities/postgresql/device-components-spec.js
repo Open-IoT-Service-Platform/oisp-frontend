@@ -21,6 +21,8 @@ var expect = require('expect.js'),
     rewire = require('rewire'),
     uuid = require('uuid'),
     Q = require('q'),
+    Sequelize = require('sequelize'),
+    Op = Sequelize.Op,
     deviceComponentsMgr = rewire('../../../../iot-entities/postgresql/deviceComponents');
 
 describe('iot-entities.deviceComponents', function() {
@@ -40,7 +42,7 @@ describe('iot-entities.deviceComponents', function() {
                 // prepare
                 var components = [ { cid: uuid.v4() } ],
                     mock = {
-                        all: sinon.stub().returns(Q.resolve(components))
+                        findAll: sinon.stub().returns(Q.resolve(components))
                     },
                     accountId = uuid.v4();
                 deviceComponentsMgr.__set__('deviceComponents', mock);
@@ -48,10 +50,9 @@ describe('iot-entities.deviceComponents', function() {
                 Q.nfcall(deviceComponentsMgr.all, accountId)
                     .then(function (result) {
                         // attest
-                        expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
-                        expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-
+                        expect(mock.findAll.args[0][0].include[0].as).to.equal('componentType');
+                        expect(mock.findAll.args[0][0].include[1].attributes.length).to.equal(0);
+                        expect(mock.findAll.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
                         expect(result[0]).to.equal(components[0]);
                         done();
                     })
@@ -67,7 +68,7 @@ describe('iot-entities.deviceComponents', function() {
                 // prepare
                 var error = new Error(500),
                     mock = {
-                        all: sinon.stub().returns(Q.reject(error))
+                        findAll: sinon.stub().returns(Q.reject(error))
                     },
                     accountId = uuid.v4();
                 deviceComponentsMgr.__set__('deviceComponents', mock);
@@ -79,9 +80,9 @@ describe('iot-entities.deviceComponents', function() {
                     })
                     .catch(function (ex) {
                         // attest
-                        expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
-                        expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
+                        expect(mock.findAll.args[0][0].include[0].as).to.equal('componentType');
+                        expect(mock.findAll.args[0][0].include[1].attributes.length).to.equal(0);
+                        expect(mock.findAll.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
 
                         expect(ex).to.equal(error);
                         done();
@@ -110,8 +111,8 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].where.componentId.$in).to.equal(customFilter.componentIds);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].where.componentId[Op.in]).to.equal(customFilter.componentIds);
 
                         expect(result[0]).to.equal(components[0]);
 
@@ -137,8 +138,8 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].include[1].where.$and.id.$in).to.equal(customFilter.deviceIds);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].id[Op.in]).to.equal(customFilter.deviceIds);
 
                         expect(result[0]).to.equal(components[0]);
 
@@ -164,8 +165,8 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].include[1].where.$and.name.$in).to.equal(customFilter.deviceNames);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].name[Op.in]).to.equal(customFilter.deviceNames);
 
                         expect(result[0]).to.equal(components[0]);
 
@@ -191,9 +192,9 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].include[1].where.$and.id.$in).to.equal(customFilter.deviceIds);
-                        expect(mock.all.args[0][0].include[1].where.$and.name.$in).to.equal(customFilter.deviceNames);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].id[Op.in]).to.equal(customFilter.deviceIds);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].name[Op.in]).to.equal(customFilter.deviceNames);
 
                         expect(result[0]).to.equal(components[0]);
 
@@ -219,8 +220,8 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].include[1].where.$and.gatewayId.$in).to.equal(customFilter.gatewayIds);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].gatewayId[Op.in]).to.equal(customFilter.gatewayIds);
 
                         expect(result[0]).to.equal(components[0]);
 
@@ -246,9 +247,9 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
                         expect(mock.all.args[0][0].include[1].include[0].as).to.equal('tags');
-                        expect(mock.all.args[0][0].include[1].include[0].where.value.$in).to.equal(customFilter.deviceTags);
+                        expect(mock.all.args[0][0].include[1].include[0].where.value[Op.in]).to.equal(customFilter.deviceTags);
                         expect(mock.all.args[0][0].include[1].include[0].attributes.length).to.equal(0);
 
                         expect(result[0]).to.equal(components[0]);
@@ -278,8 +279,8 @@ describe('iot-entities.deviceComponents', function() {
                         // attest
                         expect(mock.all.args[0][0].include[0].as).to.equal('componentType');
                         expect(mock.all.args[0][0].include[1].attributes.length).to.equal(0);
-                        expect(mock.all.args[0][0].include[1].where.$and.accountId).to.equal(accountId);
-                        expect(mock.all.args[0][0].include[1].where.$and.id.$in).to.equal(customFilter.deviceIds);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].accountId).to.equal(accountId);
+                        expect(mock.all.args[0][0].include[1].where[Op.and].id[Op.in]).to.equal(customFilter.deviceIds);
 
                         expect(ex).to.equal(error);
                         done()

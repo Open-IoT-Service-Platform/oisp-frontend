@@ -58,7 +58,8 @@ describe('Data proxy', function() {
             var data = {},
                 res = {
                     statusCode: 200,
-                    body: JSON.stringify({report: "data"})
+                    body: JSON.stringify({report: "data"}),
+                    headers: {}
                 },
                 reqestMock = sinon.stub().callsArgWith(1, null, res),
                 callback = sinon.spy();
@@ -71,7 +72,7 @@ describe('Data proxy', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
-            expect(callback.args[0].length).to.equal(2);
+            expect(callback.args[0].length).to.equal(3);
             expect(callback.args[0][0]).to.equal(null);
             expect(JSON.stringify(callback.args[0][1])).to.equal(res.body);
 
@@ -279,78 +280,74 @@ describe('Data proxy', function() {
         var dataProxy,
             callback,
             data,
-            KafkaHLProducerMock,
-            KafkaClientMock,
+            KafkaMock,
             MetricMock;
 
         beforeEach(function() {
             config.ingestion = 'Kafka';
+            config.kafka.uri = 'uri';
             callback = sinon.spy();
-            data = {};
-            KafkaHLProducerMock = sinon.stub().returns(
-                {
-                    send: sinon.stub().callsArgWith(1, null, null)
-                }
-            );
-            KafkaClientMock = sinon.stub().returns({});
-            DataProxy.__set__('KafkaHLProducer', KafkaHLProducerMock);
-            DataProxy.__set__('KafkaClient', KafkaClientMock);
+            data = {
+                domainId: 'domainId',
+                systemOn: 0,
+                data: [{
+                    dataType: 'Number',
+                    value: 1,
+                    cid: 'cid',
+                    on: 0,
+                }]
+            };
+            KafkaMock = sinon.stub().returns({
+                producer: () => {
+                    return {
+                        send: sinon.stub().resolves(),
+                        connect: () => {},
+                        on: () => {},
+                        events: {
+                            CONNECT: 'CONNECT',
+                            DISCONNECT: 'DISCONNECT'
+                        }
+                    };
+                },
+                admin: () => {}
+            });
+            DataProxy.__set__('Kafka', KafkaMock);
             dataProxy = new DataProxy(config);
         });
 
-        it('should submit data if everything is ok', function (done) {
-
+        it('should submit data if everything is ok', async function() {
             // prepare
-            dataProxy.submitDataKafka(data, callback);
-
+            await dataProxy.submitDataKafka(data, callback);
             // attest
             expect(callback.calledOnce).to.equal(true);
             expect(callback.calledWith(null)).to.equal(true);
-
-            done();
         });
 
-        it('should not submit data and return error if exception thrown while message creation', function (done) {
-
-            // prepare
-            var error = errBuilder.build(errBuilder.Errors.Data.SubmissionError);
-        	var errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
-            MetricMock = {
-                prepareDataIngestionMsg: sinon.stub().throws(error)
-            };
-            DataProxy.__set__('Metric', MetricMock);
-
-
-            // execute
-            dataProxy.submitDataKafka(data, callback);
-
-            // attest
-            expect(callback.calledOnce).to.equal(true);
-            expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
-
-            done();
-        });
-
-        it('should not submit data and return error if kafka failed', function (done) {
+        it('should not submit data and return error if kafka failed', async function() {
             // prepare
             var error = errBuilder.build(errBuilder.Errors.Data.SubmissionError);
             var errorObj = { msg: error.msg, business: error.business, status: error.status, code: error.code };
-            KafkaHLProducerMock = sinon.stub().returns(
-                {
-                    send: sinon.stub().callsArgWith(1, error, null)
-                }
-            );
-            DataProxy.__set__('KafkaHLProducer', KafkaHLProducerMock);
+            KafkaMock = sinon.stub().returns({
+                producer: () => {
+                    return {
+                        send: sinon.stub().rejects(error),
+                        connect: () => {},
+                        on: () => {},
+                        events: {
+                            CONNECT: 'CONNECT',
+                            DISCONNECT: 'DISCONNECT'
+                        }
+                    };
+                },
+                admin: () => {}
+            });
+            DataProxy.__set__('Kafka', KafkaMock);
             dataProxy = new DataProxy(config);
-
             // execute
-            dataProxy.submitDataKafka(data, callback);
-
+            await dataProxy.submitDataKafka(data, callback);
             // attest
             expect(callback.calledOnce).to.equal(true);
             expect(callback.calledWith(sinon.match(errorObj))).to.equal(true);
-
-            done();
         });
     });
 
@@ -366,7 +363,8 @@ describe('Data proxy', function() {
                 callback = sinon.spy(),
                 res = {
                     statusCode: responses.Success.OK,
-                    body: JSON.stringify({data: {}})
+                    body: JSON.stringify({data: {}}),
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -392,7 +390,8 @@ describe('Data proxy', function() {
                 },
                 callback = sinon.spy(),
                 res = {
-                    statusCode: responses.Success.NoContent
+                    statusCode: responses.Success.NoContent,
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -419,7 +418,8 @@ describe('Data proxy', function() {
                 callback = sinon.spy(),
                 res = {
                     statusCode: responses.Errors.BadRequest,
-                    body: {errors: [{errorMessage: "BadResponse"}]}
+                    body: {errors: [{errorMessage: "BadResponse"}]},
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -444,7 +444,8 @@ describe('Data proxy', function() {
                 },
                 callback = sinon.spy(),
                 res = {
-                    statusCode: responses.Errors.EntityToLarge
+                    statusCode: responses.Errors.EntityToLarge,
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -477,7 +478,7 @@ describe('Data proxy', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
-            expect(JSON.stringify(callback.getCall(0).args[0])).to.equal(JSON.stringify({message: 'error receiving data'}));
+            expect(JSON.stringify(callback.getCall(0).args[0])).to.equal(JSON.stringify({message: 'Could not parse AA response'}));
 
             done();
         });
@@ -494,7 +495,8 @@ describe('Data proxy', function() {
                     statusCode: responses.Success.OK,
                     body: {
                         data: {}
-                    }
+                    },
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -521,7 +523,8 @@ describe('Data proxy', function() {
                 callback = sinon.spy(),
                 res = {
                     statusCode: responses.Success.OK,
-                    body: {data: {}}
+                    body: {data: {}},
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -546,7 +549,8 @@ describe('Data proxy', function() {
                 },
                 callback = sinon.spy(),
                 res = {
-                    statusCode: responses.Success.NoContent
+                    statusCode: responses.Success.NoContent,
+                    headers: {}
                 },
                 requestMock = sinon.stub().callsArgWith(1, null, res);
             DataProxy.__set__('request', requestMock);
@@ -572,7 +576,8 @@ describe('Data proxy', function() {
                 callback = sinon.spy(),
                 res = {
                     statusCode: responses.Errors.BadRequest,
-                    body: "error body"
+                    body: "error body",
+                    headers: {}
                 },
                 error = res,
                 requestMock = sinon.stub().callsArgWith(1, null, res);
@@ -584,6 +589,7 @@ describe('Data proxy', function() {
 
             // attest
             expect(callback.calledOnce).to.equal(true);
+            delete res.headers;
             expect(JSON.stringify(callback.getCall(0).args[0])).to.equal(JSON.stringify(error));
 
             done();
@@ -613,21 +619,22 @@ describe('Data proxy', function() {
     });
 
     describe('data-proxy-exports', function () {
-        it('should throw exception if kafka client or producer cannot be created', function (done) {
+        it('should throw exception if kafka producer cannot be created', function (done) {
             // prepare
-            var KafkaClientMock = sinon.stub().throws(),
-                KafkaHLProducerMock = sinon.stub().throws(),
+            var KafkaMock = sinon.stub().returns({
+                producer: sinon.stub().throws(),
+                admin: () => {}
+            }),
                 loggerMock = {
                     error: sinon.spy()
                 };
             DataProxy.__set__('logger', loggerMock);
-            DataProxy.__set__('KafkaClient', KafkaClientMock);
-            DataProxy.__set__('KafkaHLProducer', KafkaHLProducerMock);
+            DataProxy.__set__('Kafka', KafkaMock);
             // execute
             new DataProxy(config);
 
             // attest
-            expect(loggerMock.error.calledTwice).to.equal(true);
+            expect(loggerMock.error.calledOnce).to.equal(true);
 
             done();
         });

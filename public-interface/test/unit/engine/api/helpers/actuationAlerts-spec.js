@@ -36,7 +36,6 @@ describe("Actuation alerts", function () {
         websocketBindingStub,
         mqttBindingStub,
         actuationMock,
-        connectionBindingsMock,
         resolved,
         rejected,
         DEVICE_ID = 'deviceId',
@@ -150,11 +149,6 @@ describe("Actuation alerts", function () {
         actuationMock = {
             new: sinon.stub().callsArgWith(1, null)
         };
-
-        connectionBindingsMock = {
-            find: sinon.stub().returns(Q.resolve(websocketBindingStub)),
-            findLatestConnection: sinon.stub().returns(Q.resolve(httpBindingStub))
-        };
     }
 
     beforeEach (function () {
@@ -184,7 +178,6 @@ describe("Actuation alerts", function () {
             actuationAlerts.__set__('Actuations', actuationMock);
             actuationAlerts.__set__('ComplexCommand', complexCommandMock);
             actuationAlerts.__set__('Device', deviceMock);
-            actuationAlerts.__set__('connectionBindings', connectionBindingsMock);
 
             actuationAlerts.addCommandsToActuationActions(accountId1, ruleOnlyWithActuationStub)
                 .then(function success() {
@@ -224,32 +217,6 @@ describe("Actuation alerts", function () {
             })
         });
 
-        it('Should not add any command to action if there are no information about device connection status', function (done) {
-
-            complexCommandMock.findByAccountAndId = sinon.stub().yields(null, complexCommandStub);
-            deviceMock.findByAccountIdAndComponentId = sinon.stub().yields(null, deviceStub);
-            connectionBindingsMock.findLatestConnection = sinon.stub().returns(Q.resolve(null));
-
-            actuationAlerts.__set__('ComplexCommand', complexCommandMock);
-            actuationAlerts.__set__('Device', deviceMock);
-            actuationAlerts.__set__('connectionBindings', connectionBindingsMock);
-
-            actuationAlerts.addCommandsToActuationActions(accountId1, ruleOnlyWithActuationStub)
-                .then(function success() {
-                    resolved();
-                }, function error(err) {
-                    rejected();
-                })
-                .finally (function () {
-                    expect(resolved.calledOnce).to.be.equal(true);
-                    expect(rejected.notCalled).to.be.equal(true);
-                    for (var i = 0; i < ruleOnlyWithActuationStub.actions.length; i ++) {
-                        expect(ruleOnlyWithActuationStub.actions[i].messages.length).to.be.equal(0);
-                    }
-                    done();
-                })
-        });
-
         it('Should add command message to action', function (done) {
 
             var MESSAGE_TYPE_COMMAND = "command";
@@ -259,7 +226,6 @@ describe("Actuation alerts", function () {
 
             actuationAlerts.__set__('ComplexCommand', complexCommandMock);
             actuationAlerts.__set__('Device', deviceMock);
-            actuationAlerts.__set__('connectionBindings', connectionBindingsMock);
 
             actuationAlerts.addCommandsToActuationActions(accountId1, ruleOnlyWithActuationStub)
                 .then(function success() {

@@ -211,9 +211,9 @@ describe('commands handler', function(){
 
         var validateGetActuationsArgs = function () {
             expect(commandsApiMock.getActuations.calledOnce).to.equal(true);
-            expect(commandsApiMock.getActuations.args[0][0]).to.equal(device.deviceId);
-            expect(commandsApiMock.getActuations.args[0][1].from).to.equal(req.query.from);
-            expect(commandsApiMock.getActuations.args[0][1].to).to.equal(req.query.to);
+            expect(commandsApiMock.getActuations.args[0][1]).to.equal(device.deviceId);
+            expect(commandsApiMock.getActuations.args[0][2].from).to.equal(req.query.from);
+            expect(commandsApiMock.getActuations.args[0][2].to).to.equal(req.query.to);
         };
 
         var expectError = function (expectedError) {
@@ -327,17 +327,13 @@ describe('commands handler', function(){
             delete req.query.to;
             devicesMock.getDevice.yields(null, device);
             commandsApiMock.getActuations.returns(promiseReturningOutcome(actuations));
-
             // execute
-
             commandsHandler.getCommands(req, res, next).then(function() {
                 // attest
-
                 expect(commandsApiMock.getActuations.calledOnce).to.equal(true);
-                expect(commandsApiMock.getActuations.args[0][0]).to.equal(device.deviceId);
-                expect(commandsApiMock.getActuations.args[0][1].from).to.equal(0);
-                expect(commandsApiMock.getActuations.args[0][1].to).to.equal(undefined);
-
+                expect(commandsApiMock.getActuations.args[0][1]).to.equal(device.deviceId);
+                expect(commandsApiMock.getActuations.args[0][2].from).to.equal(0);
+                expect(commandsApiMock.getActuations.args[0][2].to).to.equal(undefined);
                 done();
             }).catch(function(err) {
                 done(err);
@@ -352,10 +348,8 @@ describe('commands handler', function(){
             // execute
             commandsHandler.getCommands(req, res, next).then(function() {
                 // attest
-
                 validateGetActuationsArgs();
                 validateSendReturnsObject(actuations);
-
                 done();
             }).catch(function(err) {
                 done(err);

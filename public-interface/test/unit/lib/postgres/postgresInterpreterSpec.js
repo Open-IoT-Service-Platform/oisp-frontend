@@ -32,6 +32,7 @@ describe('postgresInterpreter', function() {
     describe('deviceInterpreter', function(){
         beforeEach(function(){
             lookUpTable = {
+                uid: 'uid',
                 deviceId: 'id',
                 gatewayId: 'gatewayId',
                 domainId: 'accountId',
@@ -107,7 +108,8 @@ describe('postgresInterpreter', function() {
 
             //attest
             expect(result.domainId).to.equal(entity.dataValues.accountId);
-            expect(result.components[0].deviceId).to.equal(undefined);
+            expect(result.components[0].deviceId).to.equal(
+                entity.dataValues.deviceComponents[0].deviceId);
             expect(result.updated).to.equal(undefined);
             expect(result.contact).not.to.equal(undefined);
 
@@ -179,14 +181,8 @@ describe('postgresInterpreter', function() {
             lookUpTable = {
                 name: 'name',
                 public_id: 'id',
-                healthTimePeriod: 'healthTimePeriod',
                 created: 'created',
                 updated: 'updated',
-                exec_interval: 'exec_interval',
-                base_line_exec_interval: 'base_line_exec_interval',
-                cd_model_frequency: 'cd_model_frequency',
-                cd_execution_frequency: 'cd_execution_frequency',
-                data_retention: 'data_retention',
                 attributes: 'attrs',
                 settings: 'settings',
                 activation_code: 'activation_code',
@@ -295,11 +291,6 @@ describe('postgresInterpreter', function() {
                 accounts: 'accounts',
                 attributes: 'attrs',
                 email: 'email',
-                password: 'password',
-                salt: 'salt',
-                verified: 'verified',
-                provider: 'provider',
-                termsAndConditions: 'termsAndConditions',
                 created: 'created',
                 updated: 'updated'
             };

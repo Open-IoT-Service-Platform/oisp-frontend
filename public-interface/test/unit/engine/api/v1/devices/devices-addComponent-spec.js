@@ -120,9 +120,9 @@ describe('devicesApi.addComponents', function () {
         postgresProviderMock = {
             commit: sinon.stub().returns(Q.resolve()),
             startTransaction: sinon.stub().returns(Q.resolve()),
-            rollback: sinon.stub().returns({
+            rollback: sinon.stub().returns(Q.resolve({
                 done: sinon.stub().returns(Q.resolve())
-            })
+            }))
         };
 
         deviceManagerMock.setComponentTypeId.withArgs([component], existingComponentTypes).returns([component]);
@@ -194,11 +194,11 @@ describe('devicesApi.addComponents', function () {
         devicesManager.addComponents(existingDevice.deviceId, component, accountId)
             .then(function(){
                 // attest
+                done("Error: Component is not rejected");
+            })
+            .catch(function(){
                 assertPostgressTransactionFailed();
                 done();
-            })
-            .catch(function(error){
-                done(error);
             });
     });
 
@@ -255,6 +255,8 @@ describe('devicesApi.addComponents', function () {
         // execute
         devicesManager.addComponents(existingDevice.deviceId, componentsWithNewType, accountId)
             .then(function(){
+                done('Error: Component is not rejected')
+            }).catch(function(){
                 assertPostgressTransactionFailed();
                 done();
             });
@@ -268,12 +270,11 @@ describe('devicesApi.addComponents', function () {
         // execute
         devicesManager.addComponents(existingDevice.deviceId, component, accountId)
             .then(function(){
-                // attest
+                done("Error: Component is not rejected");
+            })
+            .catch(function(){
                 assertPostgressTransactionFailed();
                 done();
-            })
-            .catch(function(error){
-                done(error);
             });
     });
 });

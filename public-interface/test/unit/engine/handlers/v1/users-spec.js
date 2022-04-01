@@ -110,10 +110,6 @@ describe('users handler', function(){
                     role: "user"
                 }
             ];
-            var authMock = {
-                isAdminForAccountInUri: sinon.stub().callsArgWith(2, true, true, "12345")
-            };
-            usersHandler.__set__('auth', authMock);
             users.getUsers = sinon.stub().callsArgWith(2, null, usersList);
             usersHandler.getUsers(reqMock, resMock, nextMock);
             expect(resMock.send.calledWith(200, usersList));
@@ -124,10 +120,6 @@ describe('users handler', function(){
         });
         it('should return an empty list of users', function(done) {
             users.getUsers = sinon.stub().callsArgWith(2, null, []);
-            var authMock = {
-                isAdminForAccountInUri: sinon.stub().callsArgWith(2, true, true, "12345")
-            };
-            usersHandler.__set__('auth', authMock);
             usersHandler.getUsers(reqMock, resMock, nextMock);
             expect(resMock.send.calledWith(200, []));
             expect(resMock.send.calledOnce).to.be.equal(true);
@@ -137,10 +129,6 @@ describe('users handler', function(){
         });
         it('should return an error', function(done) {
             users.getUsers = sinon.stub().callsArgWith(2, {});
-            var authMock = {
-                isAdminForAccountInUri: sinon.stub().callsArgWith(2, true, true, "12345")
-            };
-            usersHandler.__set__('auth', authMock);
             usersHandler.getUsers(reqMock, resMock, nextMock);
             expect(resMock.send.notCalled).to.be.equal(true);
             expect(nextMock.calledOnce).to.be.equal(true);
@@ -153,14 +141,9 @@ describe('users handler', function(){
         it('should not change role of user - user who is not an admin tried change a role', function (done) {
             // prepare
             var accountId = '1',
-                authMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, false, false, accountId)
-                },
                 userApiMock = {
                     updateUser: sinon.stub().callsArgWith(2, null)
                 };
-
-            usersHandler.__set__('auth', authMock);
             usersHandler.__set__('users', userApiMock);
             var callback = sinon.spy(),
                 data = {
@@ -174,14 +157,9 @@ describe('users handler', function(){
         it('should change role of user - user who is an admin tried change a role', function (done) {
             // prepare
             var accountId = '1',
-                authMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, true, false, accountId)
-                },
                 userApiMock = {
                     updateUser: sinon.stub().returns(Q.resolve())
                 };
-
-            usersHandler.__set__('auth', authMock);
             usersHandler.__set__('users', userApiMock);
             var callback = sinon.spy(),
                 data = {
@@ -203,15 +181,11 @@ describe('users handler', function(){
     describe('user update attributes or Terms of conditions', function() {
         it('should not update user attributes - is not an admin and he is not an owner of account', function (done) {
             // prepare
-            var authMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, false, false)
-                },
-                userApiMock = {
-                    updateUser: sinon.stub().returns(Q.resolve())
-                };
+            var userApiMock = {
+                updateUser: sinon.stub().returns(Q.resolve())
+            };
             attributesValidationMock.checkLimitsForAttributes.callsArgWith(1, null);
 
-            usersHandler.__set__('auth', authMock);
             usersHandler.__set__('users', userApiMock);
             usersHandler.__set__('attributesValidation', attributesValidationMock);
 
@@ -226,13 +200,9 @@ describe('users handler', function(){
         });
         it('should not update user attributes - if they did not pass validation', function (done) {
             // prepare
-            var authMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, false, true)
-                },
-                attributesValidationErrors = [ 'Error'];
+            var attributesValidationErrors = [ 'Error'];
             attributesValidationMock.checkLimitsForAttributes.callsArgWith(1, attributesValidationErrors);
 
-            usersHandler.__set__('auth', authMock);
             usersHandler.__set__('attributesValidation', attributesValidationMock);
 
             //execute
@@ -245,19 +215,15 @@ describe('users handler', function(){
         });
         it('should update user attributes - user is admin of account', function (done) {
             // prepare
-            var authMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, true, false, reqMock.params.accountId)
-                },
-                userApiMock = {
-                    updateUser: sinon.stub().returns(Q.resolve())
-                };
+            var userApiMock = {
+                updateUser: sinon.stub().returns(Q.resolve())
+            };
             attributesValidationMock.checkLimitsForAttributes.callsArgWith(1, null);
 
             reqMock.body.id = reqMock.params.accountId;
             reqMock.params.userId = reqMock.params.accountId;
             reqMock.identity = reqMock.params.accountId;
 
-            usersHandler.__set__('auth', authMock);
             usersHandler.__set__('users', userApiMock);
             usersHandler.__set__('attributesValidation', attributesValidationMock);
 
@@ -400,13 +366,9 @@ describe('users handler', function(){
         it('should do nothing if user is not himself ', function (done) {
             // prepare
             var Q = {
-                    nfcall: sinon.spy()
-                },
-                authApiMock = {
-                    isAdminForAccountInUri: sinon.stub().callsArgWith(2, false, false)
-                };
+                nfcall: sinon.spy()
+            };
 
-            usersHandler.__set__('auth', authApiMock);
             usersHandler.__set__('Q', Q);
             reqMock.identity =  uuid.v4();
             // execute

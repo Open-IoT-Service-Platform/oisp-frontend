@@ -13,7 +13,7 @@ RUN apk del python3 g++
 
 ADD . /app
 ENV TERM xterm
-RUN node_modules/grunt-cli/bin/grunt build-api
+RUN node_modules/grunt-cli/bin/grunt default
 
 RUN adduser -D nodeuser
 USER nodeuser

@@ -30,6 +30,7 @@ describe('usersApi.addUser', function () {
         postgresProviderMock,
         configStub,
         mailerMock,
+        keycloakMock,
         userInteractionTokenMock;
 
     beforeEach(function () {
@@ -73,11 +74,19 @@ describe('usersApi.addUser', function () {
             send: sinon.spy()
         };
 
+        keycloakMock = {
+            serviceAccount: {
+                createUser: sinon.stub().returns(Q.resolve()),
+                findUserByParameters: sinon.stub().returns(Q.resolve({id: 'id'}))
+            }
+        };
+
         usersManager.__set__('userInteractionToken', userInteractionTokenMock);
         usersManager.__set__('mailer', mailerMock);
         usersManager.__set__('user', userMock);
         usersManager.__set__('postgresProvider', postgresProviderMock);
         usersManager.__set__('config', configStub);
+        usersManager.__set__('keycloak', keycloakMock);
     });
 
     it('should add a user if it does not exist', function (done) {

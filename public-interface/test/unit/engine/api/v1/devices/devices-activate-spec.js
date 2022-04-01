@@ -34,14 +34,18 @@ describe('deviceApi.registerDevice', function () {
             confirmActivation: sinon.stub().returns(Q.resolve({
                 activated: true,
                 accountId: 1
-            }))
+            })),
+            findByIdAndAccount: sinon.stub().returns(Q.resolve())
         };
         authMock = {
-            generateToken: sinon.stub().callsArgWith(4, null, "token")
+            generateToken: sinon.stub().returns(Q.resolve({
+                token: 'token',
+                refreshToken: 'refreshToken'
+            }))
         };
 
         devicesManager.__set__('Device', deviceMock);
-        devicesManager.__set__('auth', authMock);
+        devicesManager.__set__('generateToken', authMock.generateToken);
     });
 
     it('should activate a device if device exists', function (done) {
@@ -135,7 +139,8 @@ describe('deviceApi.registerDevice', function () {
                 confirmActivation: sinon.stub().returns(Q.resolve({
                     activated: false,
                     accountId: 1
-                }))
+                })),
+                findByIdAndAccount: sinon.stub().returns(Q.resolve())
             },
             deviceManagerMock = {
                 isDeviceRegisteredInAccount: sinon.stub().withArgs(device.deviceId, account).returns(Q.resolve(false))

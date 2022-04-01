@@ -18,20 +18,20 @@
 
 exports.logLevels = {
     levels: {
-        all: 5,
-	        debug: 4,
-	        info: 3,
-	        warn: 2,
-	        error: 1,
-	        critical: 0
+        all: 6,
+        debug: 5,
+        info: 4,
+        warn: 3,
+        error: 2,
+        critical: 1
     },
     colors: {
         all: 'magenta',
-		    debug: 'blue',
-		    info : 'green',
-		    warn : 'yellow',
-		    error: 'red',
-		    critical: 'red'
+        debug: 'blue',
+        info : 'green',
+        warn : 'yellow',
+        error: 'red',
+        critical: 'red'
     }
 };
 
