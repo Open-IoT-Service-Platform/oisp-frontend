@@ -78,9 +78,9 @@ describe('devicesApi.deleteComponent', function () {
         postgresProviderMock = {
             commit: sinon.spy(),
             startTransaction: sinon.stub().returns(Q.resolve()),
-            rollback: sinon.stub().returns({
+            rollback: sinon.stub().returns(Q.resolve({
                 done: sinon.stub().returns(Q.resolve())
-            })
+            }))
         };
 
         devicesManager.__set__('postgresProvider', postgresProviderMock);
@@ -96,7 +96,6 @@ describe('devicesApi.deleteComponent', function () {
             .then(function(){
                 // attest
                 assertPostgressTransactionSucceded();
-
                 done();
             }).catch(function(error){
                 done(error);
@@ -109,45 +108,36 @@ describe('devicesApi.deleteComponent', function () {
         // execute
         devicesManager.deleteComponent(existingDevice.deviceId, "no-cid", accountId)
             .then(function(){
-                // attest
+                done('Error: Non-existing component is deleted');
+            }).catch(function(){
                 assertPostgressTransactionFailed();
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 
     it('should not delete component if the devices has no components', function (done) {
         // prepare
-
         existingDevice.components = [];
         // execute
         devicesManager.deleteComponent(existingDevice.deviceId, "no-cid", accountId)
             .then(function(){
-                // attest
+                done('Error: Non-existing component is deleted');
+            }).catch(function(){
                 assertPostgressTransactionFailed();
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 
     it('should call callback with an error if something wrong happens when deleting a component', function (done) {
         // prepare
-
         deviceMock.deleteComponent.returns(Q.reject());
         // execute
         devicesManager.deleteComponent(existingDevice.deviceId, existingDevice.components[0].cid, accountId)
             .then(function(){
-                // attest
+                done('Error: No error is thrown');
+            }).catch(function(){
                 assertPostgressTransactionFailed();
-
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 
@@ -158,12 +148,10 @@ describe('devicesApi.deleteComponent', function () {
         // execute
         devicesManager.deleteComponent(existingDevice.deviceId, existingDevice.components[0].cid, accountId)
             .then(function(){
-                // attest
+                done('Error: No error is thrown');
+            }).catch(function(){
                 assertPostgressTransactionFailed();
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 });

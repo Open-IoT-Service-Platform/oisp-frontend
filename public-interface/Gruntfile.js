@@ -38,6 +38,7 @@ module.exports = function (grunt) {
                 "**/iot-entities/*","**/iot-entities/postgresql/*",
                 "**/iot-entities/redis/*",
                 "**/iot-entities/postgresql/models/*",
+                "**/lib/entropizer/**",
                 "**/lib/json-gate/**"]
         },
         jshint: {
@@ -69,63 +70,26 @@ module.exports = function (grunt) {
                 src: ['<%= dirs.jsfiles %>'],
             }
         },
-        mocha_istanbul: {
-            local: {
-                src: 'test/unit', // the folder, not the files,
+        nyc: {
+            cover: {
                 options: {
-                    ui: 'bdd',
-                    excludes: '<%= dirs.codeCoverageExclude %>',
-                    reporter: 'spec',
-                    mask: '**/**/**.js',
-                    mochaOptions: ["--check-leaks","--sort"],
-                    root: '.', // define where the cover task should consider the root of libraries that are covered by tests
-                    coverageFolder: '../coverage/partial/nodejs',
-                    reportFormats: ['lcov'],
-                    print: 'detail',
-                    coverage: true,
-                    check: {
-                        statements: 82,
-                        branches: 70.97,
-                        functions: 80,
-                        lines: 82
-                    }
-                }
-            },
-            local_without_coverage: {
-                src: 'test/unit', // the folder, not the files,
-                options: {
-                    ui: 'bdd',
-                    excludes: '<%= dirs.codeCoverageExclude %>',
-                    reporter: 'spec',
-                    mask: '**/**/**.js',
-                    mochaOptions: ["--check-leaks","--sort"],
-                    root: '.', // define where the cover task should consider the root of libraries that are covered by tests
-                    coverageFolder: 'coverage/partial/nodejs',
-                    reportFormats: ['lcov'],
-                    coverage: false,
-                    grep: testToRun
-                }
-            },
-            teamcity: {
-                src: 'test/unit/', // the folder, not the files
-                options: {
-                    ui: 'bdd',
-                    coverage: true,
-                    recursive: true,
-                    excludes: ["**/iot-entities/**", "**/lib/json-gate/**"],
-                    reporter: 'mocha-teamcity-reporter',
-                    mask: '**/**/**.js',
-                    mochaOptions: ["--check-leaks","--sort"],
-                    coverageFolder: '../coverage/partial/nodejs',
-                    reportFormats: ['lcov'],
-                    print: 'detail',
-                    check: {
-                        statements: 82,
-                        branches: 70.97,
-                        functions: 80,
-                        lines: 82
-                    }
-                }
+                    include: ['config.js', 'engine/**', 'lib/**'],
+                    exclude: '<%= dirs.codeCoverageExclude %>',
+                    reporter: ['lcov', 'text-summary'],
+                    all: true
+                },
+                cmd: false,
+                debug: false,
+                args: ['grunt', 'simplemocha:unit']
+            }
+        },
+        simplemocha: {
+            unit: {
+                ui: 'bdd',
+                src: ['./test/unit/**/*.js'],
+                bail: true,
+                fullTrace: true,
+                grep: testToRun
             }
         },
         compress: {
@@ -271,8 +235,8 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-filerev');
-
-    grunt.loadNpmTasks('grunt-mocha-istanbul');
+    grunt.loadNpmTasks('grunt-simple-nyc');
+    grunt.loadNpmTasks('grunt-simple-mocha');
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -290,7 +254,7 @@ module.exports = function (grunt) {
     grunt.registerTask('default', [
         'eslint:local',
         'jshint:local',
-        'mocha_istanbul:local',
+        'nyc:cover',
         'makeReport',
         'shell:build'
     ]);
@@ -301,14 +265,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('run_test', [
-        'mocha_istanbul:local_without_coverage',
+        'simplemocha:unit',
 	    'shell:test'
-    ]);
-
-    grunt.registerTask('teamcity_codevalidation', [
-        'jshint:teamcity',
-        'mocha_istanbul:teamcity',
-        'makeReport'
     ]);
 
     grunt.registerTask('packaging', [
@@ -347,8 +305,6 @@ module.exports = function (grunt) {
     grunt.registerTask('clean-api', ['shell:clean']);
 
     grunt.registerTask('build-api', [
-        'eslint:local',
-        'jshint:local',
         'shell:build'
     ]);
 };

@@ -103,10 +103,17 @@ describe('invites handler', function () {
     });
 
     var expectResponseCode = function (code, body) {
-        expect(callback.send.calledOnce).to.equal(true);
-        expect(responseCode).to.eql(code);
-        if (body) {
-            expect(callback.send.calledWith(body)).to.equal(true);
+        if (code >= 300) {
+            expect(nextCallback.calledOnce).to.equal(true);
+            if (body) {
+                expect(nextCallback.getCall(0).args[0].code).to.equal(code);
+            }
+        } else {
+            expect(callback.send.calledOnce).to.equal(true);
+            expect(responseCode).to.eql(code);
+            if (body) {
+                expect(callback.send.calledWith(body)).to.equal(true);
+            }
         }
     };
 
@@ -135,7 +142,7 @@ describe('invites handler', function () {
         it('should response with error if getInvites failed', function (done) {
             invitesMock.getUserInvites = sinon.stub().callsArgWith(1, error);
 
-            invitesHandler.getUserInvites(reqStub, callback);
+            invitesHandler.getUserInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Invite.NotFound.code, errBuilder.Errors.Invite.NotFound.message);
             done();
@@ -144,7 +151,7 @@ describe('invites handler', function () {
         it('should response with error if user was not found', function (done) {
             userMock.getUser = sinon.stub().callsArgWith(1, error);
 
-            invitesHandler.getUserInvites(reqStub, callback);
+            invitesHandler.getUserInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.User.NotFound.code, errBuilder.Errors.User.NotFound.message);
             done();
@@ -153,7 +160,7 @@ describe('invites handler', function () {
         it('should response with error if user email does not match email from param', function (done) {
             reqStub.params.email = 'wrongemail@example.com';
 
-            invitesHandler.getUserInvites(reqStub, callback);
+            invitesHandler.getUserInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.NotAuthorized.code, errBuilder.Errors.Generic.NotAuthorized.message);
             done();
@@ -162,7 +169,7 @@ describe('invites handler', function () {
         it('should response with error if request params are missing', function (done) {
             delete reqStub.params;
 
-            invitesHandler.getUserInvites(reqStub, callback);
+            invitesHandler.getUserInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
@@ -180,7 +187,7 @@ describe('invites handler', function () {
         it('should response with error if getInvites failed', function (done) {
             invitesMock.getInvites = sinon.stub().callsArgWith(1, error);
 
-            invitesHandler.getInvites(reqStub, callback);
+            invitesHandler.getInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Invite.NotFound.code, errBuilder.Errors.Invite.NotFound.message);
             done();
@@ -189,7 +196,7 @@ describe('invites handler', function () {
         it('should response with error if request params are missing', function (done) {
             delete reqStub.params;
 
-            invitesHandler.getInvites(reqStub, callback);
+            invitesHandler.getInvites(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
@@ -207,7 +214,7 @@ describe('invites handler', function () {
         it('should response with error if addInvite failed', function (done) {
             invitesMock.addInvite = sinon.stub().callsArgWith(3, error);
 
-            invitesHandler.addInvite(reqStub, callback);
+            invitesHandler.addInvite(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.InternalServerError.code, errBuilder.Errors.Generic.InternalServerError.message);
             done();
@@ -216,7 +223,7 @@ describe('invites handler', function () {
         it('should response with error if request body is missing', function (done) {
             delete reqStub.body;
 
-            invitesHandler.addInvite(reqStub, callback);
+            invitesHandler.addInvite(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
@@ -225,7 +232,7 @@ describe('invites handler', function () {
         it('should response with error if request params are missing', function (done) {
             delete reqStub.params;
 
-            invitesHandler.addInvite(reqStub, callback);
+            invitesHandler.addInvite(reqStub, callback, nextCallback);
 
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
@@ -233,58 +240,16 @@ describe('invites handler', function () {
     });
 
     describe('update invite status', function () {
-        it('should update invite status', function (done) {
-            invitesHandler.updateInviteStatus(reqStub, callback)
-                .done(function () {
-                    expectOkResponse();
-                    done();
-                });
-        });
-
-        it('should response with error if update invitation in DB failed', function (done) {
-            invitesMock.updateInviteStatus = sinon.stub().returns(Q.reject(errBuilder.Errors.Generic.InternalServerError));
-
-            invitesHandler.updateInviteStatus(reqStub, callback)
-                .done(function () {
-                    expectResponseCode(errBuilder.Errors.Generic.InternalServerError.code, errBuilder.Errors.Generic.InternalServerError.message);
-                    done();
-                });
-        });
-
-        it('should response with error if user was not found', function (done) {
-            invitesMock.updateInviteStatus = sinon.stub().returns(Q.reject(errBuilder.Errors.Generic.NotAuthorized));
-
-            invitesHandler.updateInviteStatus(reqStub, callback)
-                .done(function () {
-                    expectResponseCode(errBuilder.Errors.Generic.NotAuthorized.code, errBuilder.Errors.Generic.NotAuthorized.message);
-                    done();
-                });
-        });
-
-        it('should response with error if invite was not found', function (done) {
-            invitesMock.updateInviteStatus = sinon.stub().returns(Q.reject(errBuilder.Errors.Invite.NotFound));
-
-            invitesHandler.updateInviteStatus(reqStub, callback)
-                .done(function () {
-                    expectResponseCode(errBuilder.Errors.Invite.NotFound.code, errBuilder.Errors.Invite.NotFound.message);
-                    done();
-                });
-        });
-
         it('should response with error if request body is missing', function (done) {
             delete reqStub.body;
-
-            invitesHandler.updateInviteStatus(reqStub, callback);
-
+            invitesHandler.updateInviteStatus(reqStub, callback, nextCallback);
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
         });
 
         it('should response with error if request params are missing', function (done) {
             delete reqStub.params;
-
-            invitesHandler.updateInviteStatus(reqStub, callback);
-
+            invitesHandler.updateInviteStatus(reqStub, callback, nextCallback);
             expectResponseCode(errBuilder.Errors.Generic.InvalidRequest.code, errBuilder.Errors.Generic.InvalidRequest.message);
             done();
         });

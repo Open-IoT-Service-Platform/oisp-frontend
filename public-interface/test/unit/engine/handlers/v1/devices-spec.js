@@ -708,32 +708,6 @@ describe('devices handler', function(){
                 done();
             });
 
-            it('should add component if identity is not equal deviceId', function(done) {
-                // prepare
-                req.params.deviceId = 'myDevice';
-                var component = {
-                        cid: '01',
-                        name: 'n01',
-                        type: 't01'
-                    },
-                    schemaValidatorMock = {
-                        validateSchema: sinon.stub().returns(function (a, b, c) {
-                            c();
-                        })
-                    };
-                devicesHandler.__set__('schemaValidator', schemaValidatorMock);
-                req.body = component;
-                req.identity = uuid.v4();
-                req.headers = [{authorization : {}}];
-                // execute
-                devicesHandler.addComponents(req, res, next);
-                // attest
-                expect(next.calledOnce).to.equal(true);
-                expect(next.getCall(0).args[0].code).to.equal(errBuilder.Errors.Generic.NotAuthorized.code);
-
-                done();
-            });
-
             it('should not add a component if it does exist', function(done){
                 // prepare
                 var component = {
@@ -863,13 +837,9 @@ describe('devices handler', function(){
                     schemaValidatorMock = {
                         validateSchema: sinon.stub().returns(function(a,b,c){c();})
                     },
-                    authMock = {
-                        isAdminForAccountInUri: sinon.stub().yields(null, true, true, req.identity)
-                    },
                     id = uuid.v4();
                 devicesHandler.__set__('schemaValidator', schemaValidatorMock);
                 devicesHandler.__set__('devices', mock);
-                devicesHandler.__set__('auth', authMock);
                 req.body = components;
                 req.params = {accountId: uuid.v4(), deviceId: id};
                 req.identity = id;

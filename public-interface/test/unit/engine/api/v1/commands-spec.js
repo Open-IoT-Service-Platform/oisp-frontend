@@ -217,7 +217,7 @@ describe('commands api', function() {
         it('should successfully respond with empty list of commands when there are no actuations commands registered for device', function (done) {
             commandsManager.__set__("Actuations", actuationsMock);
 
-            commandsManager.getActuations(devices[0].deviceId, dateFilterStub)
+            commandsManager.getActuations(devices[0].deviceId, dateFilterStub, {})
                 .then (function success(actuations) {
                     actuationsList = actuations;
                     resolved();
@@ -240,7 +240,7 @@ describe('commands api', function() {
 
             commandsManager.__set__("Actuations", actuationsMock);
 
-            commandsManager.getActuations(devices[0].deviceId, dateFilterStub)
+            commandsManager.getActuations(devices[0].deviceId, dateFilterStub, {})
                 .then (function success(actuations) {
                     actuationsList = actuations;
                     resolved();
@@ -264,7 +264,7 @@ describe('commands api', function() {
 
             commandsManager.__set__("Actuations", actuationsMock);
 
-            commandsManager.getActuations(devices[0].deviceId, dateFilterStub)
+            commandsManager.getActuations(devices[0].deviceId, dateFilterStub, {})
                 .then (function success(actuations) {
                     actuationsList = actuations;
                     resolved();

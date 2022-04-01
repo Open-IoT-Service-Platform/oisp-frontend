@@ -32,14 +32,14 @@ describe("device model helper formatDeviceAttributes",function(){
                 attribute2:"value2",
                 attribute3:"value3"
             },
-                deviceId = 1;
+            deviceUID = 1;
             //act
-            var result = deviceModelHelper.formatDeviceAttributes(attributes, deviceId);
+            var result = deviceModelHelper.formatDeviceAttributes(attributes, deviceUID);
             //assert
             expect(result.length).to.be(3);
             expect(result[1].key).to.be("attribute2");
             expect(result[1].value).to.be("value2");
-            expect(result[1].deviceId).to.be(1);
+            expect(result[1].deviceUID).to.be(1);
             done();
         });
 });
@@ -48,13 +48,13 @@ describe("device model helper formatDeviceTags",function(){
     it("should return device tags object list for device", function(done){
         //prepare
         var tags = ["tag1", "tag2", "tag3"],
-            deviceId = 1;
+            deviceUID = 1;
         //act
-        var result = deviceModelHelper.formatDeviceTags(tags, deviceId);
+        var result = deviceModelHelper.formatDeviceTags(tags, deviceUID);
         //assert
         expect(result.length).to.be(3);
         expect(result[1].value).to.be("tag2");
-        expect(result[1].deviceId).to.be(1);
+        expect(result[1].deviceUID).to.be(1);
         done();
     });
 });
@@ -82,50 +82,6 @@ describe("device model helper formatDeviceComponents",function(){
         //assert
         expect(result.length).to.be(expectedResult.length);
         expect(result).to.be(expectedResult);
-        done();
-    });
-});
-
-
-describe("device model helper getIdsFromQueryResult",function(){
-    it("should return device id list from devices", function(done){
-        //prepare
-        var devices = [
-            {
-                name:"name1",
-                id:"dev1"
-            },
-            {
-                name:"name2",
-                id:"dev2"
-            }
-        ];
-        //act
-        var result = deviceModelHelper.getIdsFromQueryResult(devices);
-        //assert
-        expect(result.length).to.be(2);
-        expect(result[0]).to.be("dev1");
-        expect(result[1]).to.be("dev2");
-        done();
-    });
-
-    it("should return empty list from if devices is null", function(done){
-        //prepare
-        var devices = null;
-        //act
-        var result = deviceModelHelper.getIdsFromQueryResult(devices);
-        //assert
-        expect(result.length).to.be(0);
-        done();
-    });
-
-    it("should return empty list from if devices is object", function(done){
-        //prepare
-        var devices = {};
-        //act
-        var result = deviceModelHelper.getIdsFromQueryResult(devices);
-        //assert
-        expect(result.length).to.be(0);
         done();
     });
 });

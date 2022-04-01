@@ -46,7 +46,7 @@ describe('logger', function(){
                     file: {
                     }
                 },
-                "logLevel": "info"
+                level: "info"
             }
         };
 

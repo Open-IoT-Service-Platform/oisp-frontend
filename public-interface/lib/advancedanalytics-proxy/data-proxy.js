@@ -130,15 +130,13 @@ module.exports = function(config) {
             });
             kafkaProducer = kafka.producer();
             const { CONNECT, DISCONNECT } = kafkaProducer.events;
-
-            kafkaAdmin    = kafka.admin();
+            kafkaAdmin = kafka.admin();
             kafkaProducer.on(DISCONNECT, e => {
-                console.log(`Metric producer disconnected!: ${e.timestamp}`);
+                logger.info(`Metric producer disconnected!: ${e.timestamp}`);
                 kafkaProducer.connect();
             });
             kafkaProducer.on(CONNECT, e => logger.debug("Kafka metric producer connected: " + e));
             kafkaProducer.connect();
-
         } catch (exception) {
             logger.error("Exception occured creating Kafka Producer: " + exception);
         }
@@ -264,8 +262,7 @@ module.exports = function(config) {
                     return true;
                 } catch (e) {
                     logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(e.message));
-                    //kafkaProducer.disconnect();
-                    return false;
+                    throw errBuilder.build(errBuilder.Errors.Data.SubmissionError);
                 }
             };
 
@@ -281,11 +278,10 @@ module.exports = function(config) {
                         })
                         .catch((e) => {
                             logger.error("Error when forwarding observation to Kafka: " + JSON.stringify(e.message));
-                            return callback(errBuilder.build(errBuilder.Errors.Data.SubmissionError));
+                            throw errBuilder.build(errBuilder.Errors.Data.SubmissionError);
                         });
                 });
             };
-
             if (nonByteArrayList !== undefined && nonByteArrayList.length > 0) {
                 await trySendingArray(nonByteArrayList);
             }

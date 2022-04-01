@@ -112,6 +112,12 @@ describe('data handlers', function(){
                     }
                 ]
             };
+            reqMock.tokenInfo = {
+                payload: {
+                    type: 'device'
+                }
+            };
+            reqMock.identity = 'identity';
         });
 
         describe('collect data', function(){
@@ -120,7 +126,10 @@ describe('data handlers', function(){
                     deviceId: reqMock.params.deviceId,
                     data: reqMock.body,
                     forwarded: reqMock.headers['forwarded'],
-                    gatewayId: reqMock.identity
+                    type: 'device',
+                    isAdmin: false,
+                    hasBinary: false,
+                    identity: 'identity',
                 };
                 expect(dataAPIMock.collectData.calledOnce).to.equal(true);
                 expect(dataAPIMock.collectData.args[0].length).to.equal(2);
@@ -161,7 +170,9 @@ describe('data handlers', function(){
                     deviceId: reqMock.params.deviceId,
                     data: reqMock.body,
                     forwarded: reqMock.headers['forwarded'],
-                    gatewayId: reqMock.params.deviceId
+                    gatewayId: reqMock.params.deviceId,
+                    isAdmin: true,
+                    type: 'device'
                 };
                 expect(dataAPIMock.collectData.calledOnce).to.equal(true);
                 expect(dataAPIMock.collectData.args[0].length).to.equal(2);
@@ -340,7 +351,7 @@ describe('data handlers', function(){
                 expectResponseCodeAndMessage(httpStatuses.OK.code, csvResult);
                 done();
             });
-            
+
             it('should respond with Invalid Request Error Code and results', function(done) {
                 //prepare
                 dataAPIMock.exportToCsv.callsArgWith(2, badRequest, errorResult);

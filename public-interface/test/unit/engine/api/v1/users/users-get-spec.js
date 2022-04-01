@@ -36,8 +36,6 @@ describe('usersApi.getUser', function () {
 
         user = {
             userId: 1,
-            password: "some_pass_hash",
-            salt: "some_salt"
         };
         accId = uuid.v4();
         callback = sinon.spy();
@@ -57,8 +55,6 @@ describe('usersApi.getUser', function () {
 
         // attest
         expect(callback.calledWith(null, user)).to.equal(true);
-        expect(user.password).to.equal(undefined);
-        expect(user.salt).to.equal(undefined);
         expect(user.userId).to.equal(1);
         done();
     });
@@ -72,8 +68,6 @@ describe('usersApi.getUser', function () {
 
         // attest
         expect(callback.getCall(0).args[1].accounts).to.not.equal(null);
-        expect(user.password).to.equal(undefined);
-        expect(user.salt).to.equal(undefined);
         expect(user.userId).to.equal(1);
         done();
     });
@@ -157,7 +151,7 @@ describe('get users', function () {
         Q.longStackSupport = true;
 
         users = [
-            {userId: 1, password: 'pass', salt: 'salt'},
+            {userId: 1},
             {userId: 2}
         ];
         callback = sinon.spy();

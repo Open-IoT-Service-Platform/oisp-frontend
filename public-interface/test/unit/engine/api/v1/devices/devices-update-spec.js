@@ -92,9 +92,9 @@ describe('devicesApi.updateDevice', function () {
         postgresProviderMock = {
             commit: sinon.stub().returns(Q.resolve()),
             startTransaction: sinon.stub().returns(Q.resolve()),
-            rollback: sinon.stub().returns({
+            rollback: sinon.stub().returns(Q.resolve({
                 done: sinon.stub().returns(Q.resolve())
-            })
+            }))
         };
 
         devicesManager.__set__('postgresProvider', postgresProviderMock);
@@ -110,7 +110,6 @@ describe('devicesApi.updateDevice', function () {
             .then(function(){
                 // attest
                 assertPostgressTransactionSucceded();
-
                 done();
             }).catch(function(error){
                 done(error);
@@ -123,14 +122,12 @@ describe('devicesApi.updateDevice', function () {
         // execute
         devicesManager.updateDevice(deviceUpdated.deviceId, deviceUpdated, accountId)
             .then(function(){
+                done('Error: No error is thrown');
+            }).catch(function(){
                 // attest
                 assertPostgressTransactionFailed();
-
                 expect(deviceMock.updateByIdAndAccount.calledOnce).to.be(true);
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 
@@ -141,14 +138,12 @@ describe('devicesApi.updateDevice', function () {
         // execute
         devicesManager.updateDevice(deviceUpdated.deviceId, deviceUpdated, accountId)
             .then(function(){
+                done('Error: No error is thrown');
+            }).catch(function(){
                 // attest
                 assertPostgressTransactionFailed();
-
                 expect(deviceMock.updateByIdAndAccount.calledOnce).to.be(true);
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 
@@ -159,14 +154,12 @@ describe('devicesApi.updateDevice', function () {
         // execute
         devicesManager.updateDevice(deviceUpdated.deviceId, deviceUpdated, accountId)
             .then(function(){
+                done('Error: No error is thrown');
+            }).catch(function(){
                 // attest
                 assertPostgressTransactionFailed();
-
                 expect(deviceMock.updateByIdAndAccount.calledOnce).to.be(true);
-
                 done();
-            }).catch(function(error){
-                done(error);
             });
     });
 });
