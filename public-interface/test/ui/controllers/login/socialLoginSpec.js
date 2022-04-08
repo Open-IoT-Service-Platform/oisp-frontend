@@ -63,7 +63,10 @@ describe('socialLoginSpec', function(){
         sessionServiceMock = {
             getJwt: sinon.spy(),
             setJwt: sinon.spy(),
-            clearJwt: sinon.spy()
+            clearJwt: sinon.spy(),
+            setRefreshJwt: sinon.spy(),
+            getRefreshJwt: sinon.spy(),
+            clearRefreshJwt: sinon.spy(),
         };
         // mocking i18n resources
         rootScope.i18n = { };
@@ -88,7 +91,7 @@ describe('socialLoginSpec', function(){
             $rootScope: rootScope,
             $window: window,
             $routeParams: {
-                jwt: 'jwtToken'
+                jwt: 'jwtToken',
             },
             ngResourceBundle: {},
             accountsService: accountsServiceAPI,
@@ -98,7 +101,7 @@ describe('socialLoginSpec', function(){
         });
 
         expect(sessionServiceMock.setJwt.calledOnce).to.be.equal(true);
-        expect(window.location).to.equal("/ui/dashboard");
+        expect(window.location).to.equal("/ui/auth#/validate");
 
         expect(accountsServiceAPI.addAccount.notCalled).to.be.equal(true);
         expect(loginServiceAPI.login.notCalled).to.be.equal(true);

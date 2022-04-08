@@ -69,7 +69,10 @@ describe('localLoginSpec', function(){
         sessionServiceMock = {
             getJwt: sinon.spy(),
             setJwt: sinon.spy(),
-            clearJwt: sinon.spy()
+            clearJwt: sinon.spy(),
+            setRefreshJwt: sinon.spy(),
+            getRefreshJwt: sinon.spy(),
+            clearRefreshJwt: sinon.spy()
         };
     });
 
@@ -100,6 +103,7 @@ describe('localLoginSpec', function(){
             scope.login();
 
             expect(sessionServiceMock.setJwt.calledOnce).to.be.equal(true);
+            expect(sessionServiceMock.setRefreshJwt.calledOnce).to.be.equal(true);
             expect(scope.error).to.equal('Invalid username or password.');
         }
     });
@@ -132,6 +136,7 @@ describe('localLoginSpec', function(){
         scope.login();
 
         expect(sessionServiceMock.setJwt.calledOnce).to.be.equal(true);
+        expect(sessionServiceMock.setRefreshJwt.calledOnce).to.be.equal(true);
         expect(window.location).to.equal("/ui/dashboard");
     });
 
@@ -154,6 +159,7 @@ describe('localLoginSpec', function(){
 
         expect(scope.error).not.to.be.equal(undefined);
         expect(sessionServiceMock.setJwt.notCalled).to.be.equal(true);
+        expect(sessionServiceMock.setRefreshJwt.notCalled).to.be.equal(true);
         expect(window.location).to.equal(undefined);
     });
 
@@ -185,6 +191,7 @@ describe('localLoginSpec', function(){
         scope.login();
 
         expect(sessionServiceMock.setJwt.calledOnce).to.be.equal(true);
+        expect(sessionServiceMock.setRefreshJwt.calledOnce).to.be.equal(true);
         expect(window.location).to.equal("/ui/dashboard");
 
         controllerProvider('LogoutCtrl', {
@@ -194,6 +201,7 @@ describe('localLoginSpec', function(){
         });
 
         expect(sessionServiceMock.clearJwt.calledOnce).to.be.equal(true);
+        expect(sessionServiceMock.clearRefreshJwt.calledOnce).to.be.equal(true);
         expect(window.location).to.equal("/");
     });
 });

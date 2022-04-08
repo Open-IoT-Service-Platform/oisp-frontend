@@ -100,8 +100,6 @@ describe('ChartCtrl', function(){
         expect(scope.search.timePeriods[1].text).to.equal(rootScope.i18n.charts.pastHour);
         expect(scope.search.timePeriods[2].text).to.equal(rootScope.i18n.charts.pastDay);
         expect(scope.search.timePeriods[3].text).to.equal(rootScope.i18n.charts.pastWeek);
-        expect(scope.search.timePeriods[4].text).to.equal(rootScope.i18n.charts.pastMonth);
-        expect(scope.search.timePeriods[5].text).to.equal(rootScope.i18n.charts.pastYear);
-        expect(scope.search.timePeriods[6].text).to.equal(rootScope.i18n.charts.custom);
+        expect(scope.search.timePeriods[4].text).to.equal(rootScope.i18n.charts.custom);
     });
 });

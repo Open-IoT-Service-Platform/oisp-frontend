@@ -273,7 +273,7 @@ describe('alerts service', function(){
                 successCallback = sinon.spy(),
                 errorCallback = sinon.spy();
 
-            httpBackend.expectPUT('/accounts/'+accountId+'/alerts/' + alerts[0].alertId + '/status/' + options.newStatus).respond(200);
+            httpBackend.expectPUT('/accounts/' + accountId+'/alerts/' + alerts[0].alertId + '/status/' + options.newStatus + '?active=true').respond(200);
 
             // execute
             service.updateStatus(options, successCallback, errorCallback);
@@ -304,7 +304,7 @@ describe('alerts service', function(){
                 successCallback = sinon.spy(),
                 errorCallback = sinon.spy();
 
-            httpBackend.expectPUT('/accounts/'+accountId+'/alerts/' + alerts[0].alertId + '/status/' + options.newStatus).respond(500);
+            httpBackend.expectPUT('/accounts/' + accountId + '/alerts/' + alerts[0].alertId + '/status/' + options.newStatus + '?active=true').respond(500);
 
             // execute
             service.updateStatus(options, successCallback, errorCallback);
