@@ -110,19 +110,6 @@ module.exports = function (grunt) {
                 ]
             }
         },
-        makeReport: {
-            src: '../coverage/partial/**/**.json',
-            options: {
-                reporters: {
-                    'lcov': {
-                        'dir': '../coverage/report/'
-                    }
-                },
-                type: 'teamcity',
-                dir: '../coverage/report',
-                print: 'detail'
-            }
-        },
         copy: {
             /* dashboard/public/js is copied by uglify */
             /* dashboard/public/css/ is copied by cssmin */
@@ -226,6 +213,12 @@ module.exports = function (grunt) {
             test: {
                 command: 'make -C doc/api test'
             }
+        },
+
+        karma: {
+            unit: {
+                configFile: 'test/test.ui.conf.js'
+            }
         }
     });
     grunt.event.on('coverage', function (lcovFileContents, done) {
@@ -237,6 +230,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-filerev');
     grunt.loadNpmTasks('grunt-simple-nyc');
     grunt.loadNpmTasks('grunt-simple-mocha');
+    grunt.loadNpmTasks('grunt-karma');
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -246,7 +240,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-istanbul');
     grunt.loadNpmTasks('grunt-bumpup');
     grunt.loadNpmTasks('grunt-shell');
 
@@ -255,7 +248,7 @@ module.exports = function (grunt) {
         'eslint:local',
         'jshint:local',
         'nyc:cover',
-        'makeReport',
+        'karma:unit',
         'shell:build'
     ]);
 
@@ -266,6 +259,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('run_test', [
         'simplemocha:unit',
+        'karma:unit',
 	    'shell:test'
     ]);
 
