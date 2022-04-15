@@ -23,7 +23,7 @@ var jwt_decode = require('jwt-decode'),
     logger = require('./../logger').init(),
     tokenTypes;
 
-var generateToken = function(deviceUID, deviceId, activationcode, type, callback, email, expire) {
+var generateToken = function(deviceUID, deviceId, activationcode, type, gatewayId, callback, email, expire) {
     if ((!deviceUID || !activationcode) && !email) {
         callback("Can't create token, not enough information.");
     }
@@ -41,13 +41,16 @@ var generateToken = function(deviceUID, deviceId, activationcode, type, callback
                     });
                 });
         } else {
+            var scopeParam = "gateway";
             if (type === tokenTypes.device) {
                 headers["X-Access-Type"] = type;
                 headers["X-DeviceID"] = deviceId;
                 headers["X-Activation-Code"] = activationcode;
                 headers["X-DeviceUID"] = deviceUID;
+                headers["X-GatewayID"] = gatewayId ? gatewayId : deviceId;
+                scopeParam = "gateway";
             }
-            keycloak.customGrants.impersonateUser(grant.access_token.token, keycloak.placeholdermail, headers)
+            keycloak.customGrants.impersonateUser(grant.access_token.token, keycloak.placeholdermail, headers, scopeParam)
                 .then(grant => {
                     callback(null, {
                         token: grant.access_token,

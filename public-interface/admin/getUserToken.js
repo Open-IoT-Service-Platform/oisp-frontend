@@ -18,7 +18,7 @@ module.exports = function() {
     var email = arguments[0],
         expiresAfterInMinutes = arguments[1],
         expire = expiresAfterInMinutes * 60;
-    generateToken(null, null, null, null,
+    generateToken(null, null, null, null, null,
         function(err, token) {
             if (err) {
                 console.error(err);
