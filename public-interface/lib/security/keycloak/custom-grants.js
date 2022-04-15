@@ -38,8 +38,11 @@ module.exports = function getCustomGrants(clientId, secret, realmUrl, clientPubl
             username: username,
             password: password,
             grant_type: 'password',
-            scope: scopeParam || 'openid'
+            scope: 'openid'
         };
+        if (scopeParam) {
+            params.scope = params.scope + ' ' + scopeParam;
+        }
         const options = postOptions();
         Object.keys(headers).forEach(header => {
             options.headers[header] = headers[header];
@@ -65,7 +68,7 @@ module.exports = function getCustomGrants(clientId, secret, realmUrl, clientPubl
         return rp(options).then(res => JSON.parse(res));
     }
 
-    function impersonateUser(accessToken, user, headers) {
+    function impersonateUser(accessToken, user, headers, scopeParam) {
         const params = {
             client_id: clientId,
             client_secret: secret,
@@ -73,8 +76,12 @@ module.exports = function getCustomGrants(clientId, secret, realmUrl, clientPubl
             subject_token: accessToken,
             requested_subject: user,
             requested_token_type: 'urn:ietf:params:oauth:token-type:refresh_token',
-            audience: clientId
+            audience: clientId,
+            scope: 'openid'
         };
+        if (scopeParam) {
+            params.scope = params.scope + ' ' + scopeParam;
+        }
         const options = postOptions(null, false);
         Object.keys(headers).forEach(header => {
             options.headers[header] = headers[header];
