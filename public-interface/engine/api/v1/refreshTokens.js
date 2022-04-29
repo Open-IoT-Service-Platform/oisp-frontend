@@ -23,12 +23,13 @@ var postgresProvider = require('../../../iot-entities/postgresql'),
     errBuilder  = require("../../../lib/errorHandler/index").errBuilder,
     keycloak = require('../../../lib/security/keycloak');
 
-var refreshJWTToken = function(oldToken, refreshToken, deviceUID) {
+var refreshJWTToken = function(oldToken, refreshToken, deviceUID, gatewayID) {
     var headers = {
         'X-Access-Type': oldToken.type
     };
     if (oldToken.type === tokenTypes.device) {
         headers['X-DeviceID'] = oldToken.sub;
+        headers["X-GatewayID"] = gatewayID;
         headers['X-DeviceUID'] = deviceUID;
         headers['X-Activation-Code'] = keycloak.placeholder;
     }
@@ -48,7 +49,7 @@ exports.refresh = function(refreshToken, oldToken) {
             if (!result) {
                 throw errBuilder.build(errBuilder.Errors.Device.NotFound);
             }
-            return refreshJWTToken(oldToken, refreshToken, result.uid).then(grant => {
+            return refreshJWTToken(oldToken, refreshToken, result.uid, result.gatewayId).then(grant => {
                 tokens.jwt = grant.access_token;
                 tokens.refreshToken = grant.refresh_token;
                 return tokens;
