@@ -9,20 +9,24 @@ on:
       - '**-debugtest'
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    env:
+      SELF_HOSTED_RUNNER: true
+    runs-on: private
     steps:
     - uses: actions/checkout@v3
       with:
         repository: Open-IoT-Service-Platform/platform-launcher.git
         ref: 'develop'
         path: platform-launcher
-        submodules: recursive
     - name: Setup main repo + subrepos
       shell: bash
       run: |
         export TERM=vt100
-        sudo apt install jq
+        if [ -z "${SELF_HOSTED_RUNNER}" ]; then
+          sudo apt install jq
+        fi
         cd platform-launcher
+        git submodule update --init --recursive
         make update
     - uses: actions/checkout@v3
       with:
@@ -33,8 +37,12 @@ jobs:
       working-directory: platform-launcher
       run: |
         export TERM=vt100
-        cd util && \
-        bash setup-ubuntu20.04.sh
+        if [ -z "${SELF_HOSTED_RUNNER}" ]; then
+          cd util && \
+          bash setup-ubuntu20.04.sh
+        else
+          make restart-cluster
+        fi
     - name: Build platform
       working-directory: platform-launcher
       shell: bash
@@ -68,6 +76,3 @@ jobs:
         done
         echo Test return value: ${retval}
         exit ${retval}
-    - name: debug with upterm
-      if: failure()
-      uses: lhotari/action-upterm@v1
