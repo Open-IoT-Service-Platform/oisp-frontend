@@ -54,7 +54,7 @@ exports.all = function (accountId, detailed, resultCallback) {
                 }
             ]
         },
-        order: ['dimension', 'version']
+        order: ['dimension', 'version', 'created']
     };
     if (!detailed) {
         query.attributes = ['componentTypeId', 'dimension', 'version', 'type'];
@@ -81,7 +81,10 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
                 }
             ]
         },
-        transaction: t
+        transaction: t,
+        order: [
+            ['created', 'ASC']
+        ]
     };
 
     return componentTypes.findAll(query)
@@ -101,21 +104,24 @@ exports.findByIdAndAccount = function (compId, accountId, t) {
 
 exports.findByDimensionAndAccount = function (dimension, accountId, t) {
     var query = {
-	        where: {
-	            [Op.or]: [
-	                {
-	                    accountId: accountId,
-	                    dimension: dimension
-	                },
-	                {
-	                    accountId: null,
-	                    dimension: dimension,
-	                    default: true
-	                }
-	            ]
-	        },
-	        transaction: t
-	    };
+        where: {
+            [Op.or]: [
+                {
+                    accountId: accountId,
+                    dimension: dimension
+                },
+                {
+                    accountId: null,
+                    dimension: dimension,
+                    default: true
+                }
+            ]
+        },
+        transaction: t,
+        order: [
+            ['created', 'ASC']
+        ]
+    };
     return componentTypes.findAll(query)
         .then(function (component) {
             return Q.resolve(interpreterHelper.mapAppResults(component, interpreter));

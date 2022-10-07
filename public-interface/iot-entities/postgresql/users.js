@@ -92,12 +92,16 @@ exports.all = function (accountId, resultCallback) {
                 model: accounts,
                 where: {id: accountId}
             }
-        ]})
-        .then(function (users) {
-            return interpreterHelper.mapAppResults(users, interpreter, resultCallback);
-        }).catch(function (err) {
-            return resultCallback(err);
-        });
+        ],
+        order: [
+            ['created', 'ASC'],
+            [accounts, 'created', 'ASC']
+        ]
+    }).then(function (users) {
+        return interpreterHelper.mapAppResults(users, interpreter, resultCallback);
+    }).catch(function (err) {
+        return resultCallback(err);
+    });
 };
 
 var getUsersWithAllAccounts = function(users) {
@@ -145,7 +149,10 @@ exports.getUsersNotInSet = function(idSet, emailSet) {
             email: {
                 [Op.notIn]: emailSet ? emailSet : []
             }
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
     return users.findAll(filters);
 };

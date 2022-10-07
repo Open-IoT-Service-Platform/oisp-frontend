@@ -24,7 +24,11 @@ exports.all = function (accountId, resultCallback) {
         where: {
             accountId: accountId
         },
-        include: [{ model: deviceAttributes, as: 'attributes'}]
+        include: [{ model: deviceAttributes, as: 'attributes'}],
+        order: [
+            ['created', 'ASC'],
+            [{ model: deviceAttributes, as: 'attributes'}, 'created', 'ASC']
+        ]
     };
 
     devices.findAll(filters)

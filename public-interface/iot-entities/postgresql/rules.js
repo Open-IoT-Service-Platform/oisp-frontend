@@ -180,7 +180,10 @@ exports.allDrafted = function (accountId) {
         where: {
             accountId: accountId,
             status: ruleStatus.draft
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
     filter.attributes = ['id', 'externalId', 'name', 'description', 'owner', 'created', 'updated', 'priority', 'status',
         'deviceNames', 'deviceTags', 'devices', 'deviceAttributes'];
@@ -199,9 +202,14 @@ exports.allByStatus = function (status) {
         where: {
             status: status
         },
-        attributes: ['id', 'externalId', 'name', 'description', 'owner', 'created',
+        attributes: [
+            'id', 'externalId', 'name', 'description', 'owner', 'created',
             'updated', 'priority', 'status', 'deviceNames', 'deviceTags',
-            'devices', 'deviceAttributes', 'naturalLanguage', 'synchronizationStatus']
+            'devices', 'deviceAttributes', 'naturalLanguage', 'synchronizationStatus'
+        ],
+        order: [
+            ['created', 'ASC']
+        ]
     };
 
     return rules.findAll(filter)
@@ -220,7 +228,10 @@ exports.all = function (accountId) {
     var filter = {
         where: {
             accountId: accountId
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
     filter.attributes = ['id', 'externalId', 'name', 'description', 'owner', 'created', 'updated', 'priority', 'status',
         'deviceNames', 'deviceTags', 'devices', 'deviceAttributes', 'naturalLanguage', 'synchronizationStatus'];
@@ -238,7 +249,10 @@ exports.findByStatus = function(status) {
     var filter = {
         where: {
             status: status
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
     return rules.findAll(filter).then(function(allRules) {
         return interpreterHelper.mapAppResults(allRules, ruleInterpreter);
@@ -249,7 +263,10 @@ exports.findBySynchronizationStatus = function(status, synchronizationStatus) {
     var filter = {
         where: {
             status: status
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
     if (synchronizationStatus) {
         filter.where.synchronizationStatus = synchronizationStatus;
@@ -263,9 +280,13 @@ exports.findAccountWithRule = function (accountId, externalId) {
     var filter = {
         where : { 'id' : accountId},
         include : [
-            { model: rules,
+            {
+                model: rules,
                 where: {'externalId' : externalId}
             }
+        ],
+        order: [
+            [rules, 'created', 'ASC']
         ]
     };
 
@@ -293,7 +314,11 @@ exports.findUserWithAccountAndRule = function (userId, accountId, ruleId) {
         include : [{
             model: accounts, where: {'id': accountId},
             include: [{model: rules, where: {'externalId': ruleId}}]
-        }]
+        }],
+        order: [
+            [accounts, 'created', 'ASC'],
+            [accounts, rules, 'created', 'ASC']
+        ]
     };
 
     return users.findOne(filter)

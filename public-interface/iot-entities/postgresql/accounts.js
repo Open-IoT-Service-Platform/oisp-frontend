@@ -64,6 +64,10 @@ exports.new = function (accountData, userId, transaction) {
                 where: { id: userId },
                 include: [{ model: account }],
                 transaction: transaction,
+                order: [
+                    ['created', 'ASC'],
+                    [account, 'created', 'ASC']
+                ]
             });
         })
         .then(user => {
@@ -119,6 +123,9 @@ exports.findWithDevices = function (id, resultCallback) {
         },
         include: [
             devices
+        ],
+        order: [
+            [devices, 'created', 'ASC']
         ]
     };
 

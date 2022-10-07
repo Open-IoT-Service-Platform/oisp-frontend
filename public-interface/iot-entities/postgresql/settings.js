@@ -51,7 +51,10 @@ exports.findByCategory = function (userId, accountId, type, resultCallback) {
                 {userId: userId, public: false},
                 {public: true}
             ]
-        }
+        },
+        order: [
+            ['created', 'ASC']
+        ]
     };
 
     settings.findAll(filter)

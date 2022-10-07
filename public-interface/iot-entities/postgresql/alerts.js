@@ -58,7 +58,7 @@ exports.findByStatus = function (accountId, status, isActive, maxAlerts, callbac
         where: {
             accountId: accountId
         },
-        order: [ ['created', 'DESC'] ]
+        order: [ ['created', 'ASC'] ]
     };
 
     if (status) {

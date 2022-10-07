@@ -23,19 +23,24 @@ var invites = require('./models').invites,
     interpreter = require('../../lib/interpreter/postgresInterpreter').invites();
 
 exports.all = function (accountId, resultCallback) {
-    invites.findAll({where: {accountId: accountId}})
-        .then(function (invites) {
-            if (invites) {
-                resultCallback(null, invites.map(function(invite) {
-                    return invite.email;
-                }));
-            } else {
-                resultCallback(null);
-            }
-        })
-        .catch(function (err) {
-            resultCallback(err);
-        });
+    invites.findAll({
+        where: {
+            accountId: accountId
+        },
+        order: [
+            ['created', 'ASC']
+        ]
+    }).then(function (invites) {
+        if (invites) {
+            resultCallback(null, invites.map(function(invite) {
+                return invite.email;
+            }));
+        } else {
+            resultCallback(null);
+        }
+    }).catch(function (err) {
+        resultCallback(err);
+    });
 };
 
 exports.findByEmail = function (email, resultCallback) {
@@ -43,7 +48,11 @@ exports.findByEmail = function (email, resultCallback) {
         where: {
             email: email
         },
-        include: [accounts]
+        include: [accounts],
+        order: [
+            ['created', 'ASC'],
+            [accounts, 'created', 'ASC']
+        ]
     };
 
     invites.findAll(filter)

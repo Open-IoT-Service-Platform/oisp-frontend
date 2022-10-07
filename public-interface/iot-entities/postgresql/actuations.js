@@ -39,7 +39,11 @@ exports.findById = function (id, resultCallback) {
         include: getActuationRelations(),
         where: {
             id: id
-        }
+        },
+        order: [
+            [deviceComponents, 'created', 'ASC'],
+            [deviceComponents, devices, 'created', 'ASC']
+        ]
     };
 
     return actuations.findOne(filter)
@@ -52,7 +56,11 @@ exports.findById = function (id, resultCallback) {
 exports.findByDeviceId = function (accountId, deviceId, limit, dateFilter, resultCallback) {
     var filter = {
         include: getActuationRelations(),
-        order:[['created','DESC']]
+        order: [
+            ['created','ASC'],
+            [deviceComponents, 'created', 'ASC'],
+            [deviceComponents, devices, 'created', 'ASC']
+        ]
     };
     filter.include[0]["required"] = true;
     filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
@@ -64,7 +72,6 @@ exports.findByDeviceId = function (accountId, deviceId, limit, dateFilter, resul
             }
         };
         filter["limit"] = limit;
-
     }
 
     return actuations.findAll(filter)
@@ -81,12 +88,16 @@ exports.new = function (data, resultCallback) {
     return actuations.create(actuationModel)
         .then(function (actuation) {
             return actuations.findOne({
-                where: {id: actuation.id},
-                include: getActuationRelations()})
-                .then(function (actuation) {
-                    actuation = interpreter.toApp(actuation);
-                    return resultCallback(null, actuation);
-                });
+                where: { id: actuation.id },
+                include: getActuationRelations(),
+                order: [
+                    [deviceComponents, 'created', 'ASC'],
+                    [deviceComponents, devices, 'created', 'ASC']
+                ]
+            }).then(function (actuation) {
+                actuation = interpreter.toApp(actuation);
+                return resultCallback(null, actuation);
+            });
         })
         .catch(function (err) {
             resultCallback(err);
@@ -96,7 +107,6 @@ exports.new = function (data, resultCallback) {
 exports.deleteByDeviceId = function (accountId, deviceId, resultCallback) {
     var filter = {
         include: getActuationRelations(),
-
     };
     filter.include[0]["required"] = true;
     filter.include[0].include["where"] = {id: deviceId, accountId: accountId};
