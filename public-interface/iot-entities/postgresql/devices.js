@@ -68,6 +68,16 @@ var getDeviceRelations = function () {
     ];
 };
 
+var getDeviceOrdering = function() {
+    return [
+        ['created', 'ASC'],
+        [{ model: deviceAttributes, as: 'attributes' }, 'created', 'ASC'],
+        [{ model: deviceTags, as: 'tags' }, 'created', 'ASC'],
+        [{ model: deviceComponents, as: 'deviceComponents' }, 'created', 'ASC'],
+        [{ model: deviceComponents, as: 'deviceComponents' }, { model: componentTypes, as: 'componentType' }, 'created', 'ASC']
+    ];
+};
+
 var getIntersection = function (arr1, arr2) {
     return arr2.filter(entry => arr2.indexOf(entry) !== -1);
 };
@@ -102,7 +112,8 @@ exports.all = function (accountId, resultCallback) {
         where: {
             accountId: accountId
         },
-        include: getDeviceRelations()
+        include: getDeviceRelations(),
+        order: getDeviceOrdering()
     };
 
     devices.findAll(filter)

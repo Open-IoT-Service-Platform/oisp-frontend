@@ -25,22 +25,35 @@ var complexCommands = require('./models').complexCommands,
     interpreter = require('../../lib/interpreter/postgresInterpreter').complexCommands();
 
 exports.findByAccountAndId = function (accountId, id, resultCallback) {
-    return complexCommands.findOne({where: {accountId: accountId, name: id}, include: [commands]})
-        .then(function (foundComplexCommand) {
-            return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
-        })
-        .nodeify(resultCallback);
+    return complexCommands.findOne({
+        where: {
+            accountId: accountId,
+            name: id
+        },
+        include: [commands],
+        order: [
+            [commands, 'created', 'ASC']
+        ]
+    }).then(function (foundComplexCommand) {
+        return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
+    }).nodeify(resultCallback);
 };
 
 exports.findAllByAccount = function (accountId, resultCallback) {
-    return complexCommands.findAll({where: {accountId: accountId}, include: [commands]})
-        .then(function (foundComplexCommand) {
-            return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
-        })
-        .catch(function (err) {
-            throw err;
-        })
-        .nodeify(resultCallback);
+    return complexCommands.findAll({
+        where: {
+            accountId: accountId
+        },
+        include: [commands],
+        order: [
+            ['created', 'ASC'],
+            [commands, 'created', 'ASC'],
+        ],
+    }).then(function (foundComplexCommand) {
+        return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
+    }).catch(function (err) {
+        throw err;
+    }).nodeify(resultCallback);
 };
 
 exports.update = function (data, resultCallback) {

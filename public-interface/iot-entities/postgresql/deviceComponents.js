@@ -41,6 +41,11 @@ var filterByAccountId = function(accountId) {
                 },
                 attributes: []
             }
+        ],
+        order: [
+            ['created', 'ASC'],
+            [{ model: componentTypes, as: 'componentType'}, 'created', 'ASC'],
+            [devices, 'created', 'ASC']
         ]
     };
 };
@@ -146,10 +151,13 @@ exports.findComponentsAndTypesForDevice = function(accountId, deviceId, resultCa
             where: {
                 deviceUID: device.uid
             },
-            include: [
-                {
-                    model: componentTypes, as: 'componentType'
-                }]
+            include: [{
+                model: componentTypes, as: 'componentType'
+            }],
+            order: [
+                ['created', 'ASC'],
+                [{ model: componentTypes, as: 'componentType' }, 'created', 'ASC']
+            ]
         };
         return deviceComponents.findAll(filter);
     }).then(function(result) {
