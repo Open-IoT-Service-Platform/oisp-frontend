@@ -466,105 +466,6 @@ var accountsInterpreter = function (lookUpTable, inverseLookUpTable) {
     };
 };
 
-var rulesInterpreter = function (lookUpTable, inverseLookUpTable) {
-    var parsePupulations = function (entity) {
-        if (entity.devices || entity.deviceTags || entity.deviceAttributes) {
-            entity.population = {};
-
-            entity.population.ids = entity.devices;
-            delete entity.devices;
-
-            entity.population.tags = entity.deviceTags;
-            delete entity.deviceTags;
-
-            entity.population.attributes = entity.deviceAttributes;
-            delete entity.deviceAttributes;
-        }
-    };
-
-    var createRelations = function(entity) {
-        if (entity.population) {
-            if (entity.population.name) {
-                entity.deviceNames = [entity.population.name];
-            }
-            if (entity.population.ids && entity.population.ids.length > 0) {
-                entity.devices = entity.population.ids;
-            }
-            if (entity.population.tags && entity.population.tags.length > 0) {
-                entity.deviceTags = entity.population.tags;
-            }
-            if (entity.population.attributes) {
-                entity.deviceAttributes = entity.population.attributes;
-            }
-        }
-    };
-
-    return {
-        toApp: function (entity) {
-            var values = null;
-            if (entity) {
-                values = entity.dataValues;
-                convertDatesToTimestamps(values);
-            }
-            return helper.translate(inverseLookUpTable, values,  function (entity) {
-                if (entity) {
-                    parsePupulations(entity);
-                    removesEmptyFields(entity);
-                }
-                return entity;
-            });
-        },
-        toDb: function (entity) {
-            if (entity) {
-                createRelations(entity);
-            }
-            return helper.translate(lookUpTable, entity, helper.removeDbId);
-        },
-        lookUp: function () {
-            return lookUpTable;
-        }
-    };
-};
-
-var alertsInterpreter = function (lookUpTable, inverseLookUpTable) {
-    var parseComments = function(entity) {
-        var comments = entity.Comments;
-        if(comments && Array.isArray(comments)) {
-            var i = 0;
-            for (i = 0; i < comments.length; i++ ) {
-                comments[i] = {text: comments[i].text, timestamp: comments[i].created, user: comments[i].user};
-            }
-        }
-    };
-    return {
-        toApp: function (entity) {
-            var values = null;
-            if (entity) {
-                values = entity.dataValues;
-                convertDatesToTimestamps(values);
-                parseComments(entity);
-            }
-            return helper.translate(inverseLookUpTable, values,  function (entity) {
-                if (entity) {
-                    removesEmptyFields(entity);
-                    entity.triggered = new Date(entity.triggered).getTime();
-                    entity.dashboardAlertReceivedOn = new Date(entity.dashboardAlertReceivedOn).getTime();
-                    entity.dashboardObservationReceivedOn = new Date(entity.dashboardObservationReceivedOn).getTime();
-                }
-                return entity;
-            });
-        },
-        toDb: function (entity) {
-            var result = helper.translate(lookUpTable, entity, helper.removeDbId);
-            result.externalId = entity.externalId;
-            return result;
-        },
-        lookUp: function () {
-            return lookUpTable;
-        }
-    };
-};
-
 var actuationsInterpreter = function (lookUpTable, inverseLookUpTable) {
     return {
         toApp: function (entity) {
@@ -684,50 +585,6 @@ var invites = function () {
     return invitesInterpreter(lookUpTable, helper.inverse(lookUpTable));
 };
 
-var rules = function () {
-    var lookUpTable = {
-        id: 'id',
-        externalId: 'externalId',
-        domainId: 'accountId',
-        actions: 'actions',
-        status: 'status',
-        name: 'name',
-        owner: 'owner',
-        conditions: 'conditions',
-        resetType: 'resetType',
-        priority: 'priority',
-        creationDate: 'created',
-        lastUpdateDate: 'updated',
-        naturalLanguage: 'naturalLanguage'
-    };
-
-    return rulesInterpreter(lookUpTable, helper.inverse(lookUpTable));
-};
-
-var alerts = function () {
-    var lookUpTable = {
-        alertId: 'id',
-        ruleId: 'externalId',
-        accountId: 'accountId',
-        deviceUID: 'deviceUID',
-        reset: 'reset',
-
-        // rule_engine received timestamp value
-        triggered: 'triggered',
-        dashboardAlertReceivedOn: 'dashboardAlertReceivedOn',
-        dashboardObservationReceivedOn: 'dashboardObservationReceivedOn',
-
-        status: 'status',
-        ruleName: 'ruleName',
-        priority: 'priority',
-        naturalLangAlert: 'naturalLangAlert',
-        conditions: 'conditions',
-        comments: 'Comments'
-    };
-
-    return alertsInterpreter(lookUpTable, helper.inverse(lookUpTable));
-};
-
 var actuations = function () {
     var lookUpTable = {
         id: 'id',
@@ -776,8 +633,6 @@ module.exports = {
     devices: devices,
     deviceComponents: deviceComponents,
     invites: invites,
-    rules: rules,
-    alerts: alerts,
     complexCommands: complexCommands,
     userInteractionTokens: userInteractionTokens,
     actuations: actuations,

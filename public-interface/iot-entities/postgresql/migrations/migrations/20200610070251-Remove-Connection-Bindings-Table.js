@@ -38,6 +38,10 @@ module.exports = {
                 allowNull: false,
                 unique: 'connectionBindings_deviceUID_type_unique'
             }
+        }, {
+            createdAt: 'created',
+            updatedAt: 'updated',
+            schema: 'dashboard'
         });
     }
 };

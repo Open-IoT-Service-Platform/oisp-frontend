@@ -18,7 +18,6 @@
 var { Kafka, logLevel } = require('kafkajs'),
     config = require('../config'),
     logger = require('./logger').init(),
-    rulesUpdateNotifier = require('../engine/api/helpers/rules-update-notifier'),
     heartBeatInterval = null;
 var kafkaProducer = null;
 var kafkaAdmin = null;
@@ -68,7 +67,6 @@ exports.start = function () {
         heartBeatInterval = setInterval( function (producer, partition, topic) {
             heartbeat(producer, partition, topic);
         }, interval, kafkaProducer, partition, topic );
-        rulesUpdateNotifier.notify();
     };
 
     run().catch(e => console.error("Kafka runtime error " + e));

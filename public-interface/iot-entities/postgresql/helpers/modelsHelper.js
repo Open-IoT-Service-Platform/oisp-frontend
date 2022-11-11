@@ -22,17 +22,13 @@ var Accounts = require('./../models/accounts'),
     ComponentTypes = require('./../models/componentTypes'),
     ComplexCommands = require('./../models/complexCommands'),
     Commands = require('./../models/commands'),
-    Rules = require('./../models/rules'),
     Invites = require('./../models/invites'),
     Devices = require('./../models/devices'),
     DeviceTags = require('./../models/deviceTags'),
     DeviceAttributes = require('./../models/deviceAttributes'),
     DeviceComponents = require('./../models/deviceComponents'),
     UserInteractionTokens = require('./../models/userInteractionTokens'),
-    Alerts = require('./../models/alerts'),
-    AlertsBase = require('./../migrations/models/alerts'),
     Actuations = require('./../models/actuations'),
-    AlertComments = require('./../models/alertComments'),
     PurchasedLimits = require('./../models/purchasedLimits');
 
 const DESC = "DESC",
@@ -66,7 +62,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         settings = new Settings(sequelize, DataTypes),
         userAccounts = new UserAccounts(sequelize, DataTypes),
         componentTypes = new ComponentTypes(sequelize, DataTypes),
-        rules = new Rules(sequelize, DataTypes),
         complexCommands = new ComplexCommands(sequelize, DataTypes),
         commands = new Commands(sequelize, DataTypes),
         devices = new Devices(sequelize, DataTypes),
@@ -75,15 +70,11 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         invites = new Invites(sequelize, DataTypes),
         deviceComponents = new DeviceComponents(sequelize, DataTypes),
         userInteractionTokens = new UserInteractionTokens(sequelize, DataTypes),
-        purchasedLimits = new PurchasedLimits(sequelize, DataTypes),
-        alertComments = new AlertComments(sequelize, DataTypes),
-        alerts = null;
+        purchasedLimits = new PurchasedLimits(sequelize, DataTypes);
 
     if (!baseModels) {
-        alerts = new Alerts(sequelize, DataTypes);
         users = new Users(sequelize, DataTypes);
     } else {
-        alerts = new AlertsBase(sequelize, DataTypes);
         users = new UsersBase(sequelize, DataTypes);
     }
 
@@ -135,14 +126,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         }
     });
 
-    accounts.hasMany(rules, {
-        onDelete: 'CASCADE',
-        foreignKey: {
-            name: 'accountId',
-            allowNull: false
-        }
-    });
-
     accounts.hasMany(commands, {
         onDelete: 'CASCADE',
         foreignKey: {
@@ -174,14 +157,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         }
     });
 
-    accounts.hasMany(alerts, {
-        onDelete: 'CASCADE',
-        foreignKey: {
-            name: 'accountId',
-            allowNull: false
-        }
-    });
-
     complexCommands.hasMany(commands, {
         onDelete: 'CASCADE',
         foreignKey: {
@@ -199,14 +174,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
 
     devices.hasMany(deviceComponents, {
         as: 'deviceComponents',
-        onDelete: 'CASCADE',
-        foreignKey: {
-            name: 'deviceUID',
-            allowNull: false
-        }
-    });
-
-    devices.hasMany(alerts, {
         onDelete: 'CASCADE',
         foreignKey: {
             name: 'deviceUID',
@@ -257,43 +224,11 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         }
     });
 
-    rules.hasMany(alerts, {
-        onDelete: 'CASCADE',
-        foreignKey: {
-            name: 'externalId',
-            allowNull: false,
-        },
-        sourceKey: 'externalId'
-    });
-
-
-    alerts.belongsTo(accounts, {
-        foreignKey: {
-            name: 'accountId',
-            allowNull: false
-        }
-    });
-
-    alerts.belongsTo(devices, {
-        foreignKey: {
-            name: 'deviceUID',
-            allowNull: false
-        }
-    });
-
     deviceTags.belongsTo(devices, {
         foreignKey: {
             name: 'deviceUID',
             allowNull: false
         }
-    });
-
-    alerts.belongsTo(rules, {
-        foreignKey: {
-            name: 'externalId',
-            allowNull: false,
-        },
-        targetKey: 'externalId'
     });
 
     actuations.belongsTo(deviceComponents, {
@@ -305,7 +240,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
 
     accounts.belongsToMany(users, {through: 'user_accounts'});
     users.belongsToMany(accounts, {through: 'user_accounts'});
-    alerts.hasMany(alertComments, {as: 'Comments'});
 
     return {
         accounts: accounts,
@@ -313,7 +247,6 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         settings: settings,
         userAccounts: userAccounts,
         componentTypes: componentTypes,
-        rules: rules,
         complexCommands: complexCommands,
         commands: commands,
         devices: devices,
@@ -322,10 +255,8 @@ module.exports.fillModels = function (sequelize, DataTypes, baseModels = false) 
         invites: invites,
         deviceComponents: deviceComponents,
         userInteractionTokens: userInteractionTokens,
-        alerts: alerts,
         actuations: actuations,
-        purchasedLimits: purchasedLimits,
-        alertComments: alertComments
+        purchasedLimits: purchasedLimits
     };
 };
 

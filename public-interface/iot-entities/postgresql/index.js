@@ -29,13 +29,11 @@ var DAOs = [
     'invites',
     'settings',
     'users',
-    'rules',
     'devices',
     'deviceTags',
     'deviceAttributes',
     'deviceComponents',
     'userInteractionTokens',
-    'alerts',
     'actuations',
     'purchasedLimits'
 ];

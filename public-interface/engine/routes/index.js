@@ -16,11 +16,8 @@
 
 var cors = require('./header/cors').cors,
     devices = require('./devices.v1'),
-    rules = require('./rules.v1'),
     users = require('./users.v1'),
     accounts = require('./accounts.v1'),
-    alerts = require('./alerts.v1'),
-    resets = require('./resets.v1'),
     health = require('./health/health.v1'),
     data = require("./data.v1"),
     invites = require("./invites.v1"),
@@ -31,11 +28,8 @@ var cors = require('./header/cors').cors,
 
 var routes =  {
     devices: devices,
-    rules: rules,
     users: users,
     accounts: accounts,
-    alerts: alerts,
-    resets: resets,
     health: health,
     data: data,
     invites: invites,
