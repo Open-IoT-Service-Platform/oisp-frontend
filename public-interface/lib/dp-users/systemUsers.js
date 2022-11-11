@@ -21,7 +21,6 @@ var postgresProvider = require('../../iot-entities/postgresql'),
     errBuilder = require('../errorHandler').errBuilder,
     entropy = require('../entropizer'),
     gatewayUser = require('../../config').auth.gatewayUser,
-    ruleEngineUser = require('../../config').auth.ruleEngineUser,
     placeholderUser = require('../../config').auth.placeholderUser,
     Q = require('q'),
     keycloak = require('../security/keycloak');
@@ -49,10 +48,6 @@ exports.create = function(){
         {
             password: gatewayUser.password,
             email: gatewayUser.email
-        },
-        {
-            password: ruleEngineUser.password,
-            email: ruleEngineUser.email
         },
         {
             email: placeholderUser.email,

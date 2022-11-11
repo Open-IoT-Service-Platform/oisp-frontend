@@ -17,71 +17,14 @@
 'use strict';
 
 var ExecutorFactory = require('./executor-factory'),
-    async = require('async'),
     logger = require('../../lib/logger').init(),
     config = require('../../config');
-
-var ACTUATOR_TYPE = 'actuation';
 
 function getExecutor(transport) {
     if (transport === 'ws' || transport === 'mqtt' || transport === 'auto') {
         return 'kafka';
     }
     return transport;
-}
-
-function AlertProcessor(executors) {
-
-    function executeAlertAction(executors, data, actionType, resultCallback) {
-        var _executorCollection = executors;
-        var executor = getExecutor(actionType);
-        logger.info("Executor " + executor);
-        if( _executorCollection[executor]) {
-            var instance = new _executorCollection[executor](config, logger);
-            instance.execute(data, function(err, result) {
-                logger.info("AlertProcessor - Action executed " + ((err !== "undefined") ? "successfully":"with errors"));
-                if(result) {
-                    logger.info("AlertProcessor - Result: " + JSON.stringify(result));
-                }
-                resultCallback(err);
-            });
-        } else {
-            resultCallback("AlertProcessor - No executor knows how to execute actions of type [" + actionType +"]");
-        }
-    }
-
-    function processAlert(data){
-        logger.info("AlertProcessor - Alert arrived: " + JSON.stringify(data));
-        async.each(data.rule.actions, function(action, done){
-            if (action.type === ACTUATOR_TYPE) {
-                async.each(action.messages, function (message, parallelCallback) {
-                    executeAlertAction(executors, message, message.transport, function (err) {
-                        parallelCallback(err);
-                    });
-                }, function (err) {
-                    if (done) {
-                        done(err);
-                    }
-                });
-            } else {
-                executeAlertAction(executors, {action: action, data: data.alert}, action.type, function (err) {
-                    if (done) {
-                        done(err);
-                    }
-                });
-            }
-        }, function(err) {
-            if (err) {
-                logger.error(err);
-                logger.error("AlertProcessor - An error ocurred while executing actions for rule " + data.rule.id + " account " + data.alert.accountId);
-            }
-        });
-    }
-
-    this.listen = function(event){
-        process.on(event, processAlert);
-        logger.info("Alert Event Processor started.");
-    };
 }
 
 function MessageProcessor(executors) {
@@ -124,8 +67,6 @@ function start() {
         if (executors) {
             var messageProcessor = new MessageProcessor(executors);
             messageProcessor.listen("incoming_message");
-            var alertProcessor = new AlertProcessor(executors);
-            alertProcessor.listen("incoming_alert");
         } else {
             logger.error("No Executors available. Message processor won't do anything");
         }

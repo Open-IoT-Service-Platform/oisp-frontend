@@ -16,8 +16,7 @@
 
 
 'use strict';
-var
-    postgresProvider = require('../../../iot-entities/postgresql'),
+var postgresProvider = require('../../../iot-entities/postgresql'),
     Actuations = postgresProvider.actuations,
     Device = postgresProvider.devices,
     complexCommand = postgresProvider.complexCommands,

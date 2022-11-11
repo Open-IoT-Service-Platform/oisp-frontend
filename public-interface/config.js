@@ -63,7 +63,6 @@ var postgres_config = getOISPConfig("postgresConfig"),
     smtp_config = getOISPConfig("smtpConfig"),
     mail_config = getOISPConfig("mailConfig"),
     redis_config = getOISPConfig("redisConfig"),
-    ruleEngine_config = getOISPConfig("ruleEngineConfig"),
     gateway_config = getOISPConfig("gatewayConfig"),
     dashboardSecurity_config = getOISPConfig("frontendSecurityConfig"),
     kafka_config = getOISPConfig("kafkaConfig"),
@@ -123,10 +122,6 @@ var config = {
         gatewayUser: {
             email: gateway_config.username,
             password: gateway_config.password
-        },
-        ruleEngineUser: {
-            email: ruleEngine_config.username,
-            password: ruleEngine_config.password
         },
         placeholderUser: {
             email: 'placeholder@placeholder.org',
