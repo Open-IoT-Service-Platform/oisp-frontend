@@ -1,3 +1,4 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FOpen-IoT-Service-Platform%2Foisp-frontend.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FOpen-IoT-Service-Platform%2Foisp-frontend?ref=badge_shield)
 
 # OISP Frontend and Dashboard
 
