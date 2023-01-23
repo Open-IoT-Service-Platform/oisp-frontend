@@ -32,6 +32,11 @@ const SUGGESTION_PATH = '/metricnames',
 
 app.use(cookieParser());
 
+function isDefaultNamespace(metric) {
+    const splitted = metric.split('\\');
+    return splitted[0] === "default" && splitted.length === 3;
+}
+
 function verifyResponse(req, res, cb) {
     var token = req.cookies.jwt || secUtils.getBearerToken(req.headers.authorization);
     return tokenInfo(token, null, function(result) {
@@ -46,7 +51,8 @@ function getAccountMatcher(accountId) {
 function verifySuggestion(res, accounts) {
     for (var i = 0; i < res.results.length; i++) {
         var splitted = res.results[i].split(".");
-        var isAllowed = accounts.some(getAccountMatcher(splitted[0]));
+        var isAllowed = isDefaultNamespace(res.results[i]) ||
+            accounts.some(getAccountMatcher(splitted[0]));
         if (!isAllowed) {
             res.results.splice(i, 1);
             i--;
@@ -59,7 +65,8 @@ function verifyQuery(res, accounts) {
     var isAllowed = res.queries.every(query => {
         return query.results.every(result => {
             var splitted = result.name.split('.');
-            return accounts.some(getAccountMatcher(splitted[0]));
+            return isDefaultNamespace(result.name) ||
+                accounts.some(getAccountMatcher(splitted[0]));
         });
     });
     if (isAllowed) {

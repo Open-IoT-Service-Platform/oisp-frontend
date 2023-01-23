@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-const OPENTSDB = 'opentsdb',
-    KAIROSDB = 'kairosdb',
-    grafanaConf = require('./../config').grafana,
-    getViewerToken = require('./viewer-token'),
-    reverseProxyGrafana = require('./reverse-proxy-grafana');
-
-var reverseProxyDataSource;
-
-switch (grafanaConf.dataSource) {
-case KAIROSDB:
+const getViewerToken = require('./viewer-token'),
+    reverseProxyGrafana = require('./reverse-proxy-grafana'),
     reverseProxyDataSource = require('./reverse-proxy-kairosdb');
-    break;
-case OPENTSDB:
-default:
-    reverseProxyDataSource = require('./reverse-proxy-opentsdb');
-}
 
 module.exports = {
     reverseProxyGrafana: reverseProxyGrafana,
