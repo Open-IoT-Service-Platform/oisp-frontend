@@ -88,7 +88,7 @@ exports.update = function (accountData, transaction) {
         where: {
             id: accountModel.id
         },
-        returning: true,
+        returning: ["*"],
         transaction: transaction
     };
 
@@ -151,7 +151,7 @@ exports.refreshActivationCode = function (id, resultCallback) {
         where: {
             id: id
         },
-        returning: true
+        returning: ["*"]
     };
 
     var data = {

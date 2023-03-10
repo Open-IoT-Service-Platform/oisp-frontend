@@ -32,7 +32,7 @@ exports.getUserInvites = function (email, resultCallback) {
 
 exports.getInvite = function (inviteId, resultCallback) {
     return invites.findById(inviteId, null)
-        .nodeify(resultCallback);
+        .then(result => resultCallback(null, result));
 };
 
 exports.addInvite = function (accountId, host, email, resultCallback) {
@@ -155,7 +155,7 @@ exports.updateInviteStatus = function (inviteId, accept, userId, resultCallback)
                 .catch(function (err) {
                     logger.error('invites.updateInviteStatus error: ' + JSON.stringify(err));
                     return postgresProvider.rollback(transaction)
-                        .done(function() {
+                        .finally(function() {
                             var errMsg = errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
                             if (err && err.code) {
                                 errMsg = errBuilder.build(err);

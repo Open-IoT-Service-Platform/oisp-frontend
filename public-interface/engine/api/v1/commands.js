@@ -191,18 +191,16 @@ var command = function (accountId, commands, complexCommands, resultCallback) {
     );
 };
 
-var getComplexCommands = function (accountId, cb) {
-    return complexCommand.findAllByAccount(accountId)
-        .nodeify(cb);
+var getComplexCommands = function (accountId, resultCallback) {
+    return complexCommand.findAllByAccount(accountId, resultCallback);
 };
 
 var deleteComplexCommand = function (accountId, name, resultCallback) {
-    return complexCommand.delete(accountId, name)
-        .nodeify(resultCallback);
+    return complexCommand.delete(accountId, name, resultCallback);
 };
 
 var addComplexCommand = function (accountId, name, commands, resultCallback) {
-    return complexCommand.insert({ accountId: accountId, id: name, commands: commands})
+    return complexCommand.insert({ accountId: accountId, id: name, commands: commands}, resultCallback)
         .catch(function (err) {
             if (err && err.code) {
                 throw err;
@@ -210,8 +208,7 @@ var addComplexCommand = function (accountId, name, commands, resultCallback) {
             else {
                 throw errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
             }
-        })
-        .nodeify(resultCallback);
+        });
 };
 
 var updateComplexCommand = function (accountId, name, commands, resultCallback) {
@@ -221,16 +218,13 @@ var updateComplexCommand = function (accountId, name, commands, resultCallback) 
         accountId: accountId,
         id: name,
         commands: commands
-    })
-        .catch(function (err) {
-            if (err && err.code) {
-                throw err;
-            }
-            else {
-                throw errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
-            }
-        })
-        .nodeify(resultCallback);
+    }, resultCallback).catch(function (err) {
+        if (err && err.code) {
+            throw err;
+        } else {
+            throw errBuilder.build(errBuilder.Errors.Generic.InternalServerError);
+        }
+    });
 };
 
 var parseDatesFromRequest = function (dateFilterParams) {

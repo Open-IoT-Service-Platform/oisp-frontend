@@ -254,7 +254,7 @@ exports.confirmActivation = function (deviceId, activationCode) {
             }
             accountId = account.id;
             filter = {
-                returning: true,
+                returning: ["*"],
                 where: {
                     id: deviceId,
                     accountId: accountId
