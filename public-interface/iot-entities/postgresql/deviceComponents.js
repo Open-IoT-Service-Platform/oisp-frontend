@@ -23,8 +23,7 @@ var errBuilder = require("./../../lib/errorHandler").errBuilder,
     devices = require('./models').devices,
     interpreterHelper = require('../../lib/interpreter/helper'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').deviceComponents(),
-    Sequelize = require('sequelize'),
-    Q = require('q');
+    Sequelize = require('sequelize');
 
 const Op = Sequelize.Op;
 
@@ -173,7 +172,7 @@ exports.updateLastObservationTS = function (componentId, date, resultCallback) {
             componentId: componentId
         }
     };
-    deviceComponents.findOne(filter).then(function (comp) {
+    return deviceComponents.findOne(filter).then(function (comp) {
         filter.where.last_observation_time = {
             [Op.lt]: new Date(date)
         };
@@ -182,15 +181,13 @@ exports.updateLastObservationTS = function (componentId, date, resultCallback) {
             comp.last_observation_time = date;
             deviceComponents.update(comp, filter)
                 .then(function () {
-                    return Q.resolve();
+                    resultCallback();
                 })
                 .catch(function (err) {
                     throw err;
-                }).nodeify(resultCallback);
+                });
         } else {
-            Q.resolve();
+            resultCallback();
         }
-    }).catch(function (err) {
-        throw err;
-    }).nodeify(resultCallback);
+    });
 };

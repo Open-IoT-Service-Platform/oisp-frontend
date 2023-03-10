@@ -92,7 +92,7 @@ exports.update = function (settingId, data, resultCallback) {
         where: {
             id: settingId
         },
-        returning: true
+        returning: ["*"]
     };
 
     var settingModel = interpreter.toDb(data);
@@ -182,7 +182,7 @@ exports.updateDefault = function (userId, accountId, type, settingId, resultCall
             type: type,
             default: true
         },
-        returning: true
+        returning: ["*"]
     };
 
     settings.update({default: false}, filter)

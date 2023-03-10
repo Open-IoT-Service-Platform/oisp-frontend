@@ -21,7 +21,6 @@ var complexCommands = require('./models').complexCommands,
     sequelize = require('./models').sequelize,
     interpreterHelper = require('../../lib/interpreter/helper'),
     errBuilder = require("../../lib/errorHandler/index").errBuilder,
-    Q = require('q'),
     interpreter = require('../../lib/interpreter/postgresInterpreter').complexCommands();
 
 exports.findByAccountAndId = function (accountId, id, resultCallback) {
@@ -35,8 +34,8 @@ exports.findByAccountAndId = function (accountId, id, resultCallback) {
             [commands, 'created', 'ASC']
         ]
     }).then(function (foundComplexCommand) {
-        return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
-    }).nodeify(resultCallback);
+        resultCallback(null, interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
+    });
 };
 
 exports.findAllByAccount = function (accountId, resultCallback) {
@@ -50,10 +49,10 @@ exports.findAllByAccount = function (accountId, resultCallback) {
             [commands, 'created', 'ASC'],
         ],
     }).then(function (foundComplexCommand) {
-        return Q.resolve(interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
+        resultCallback(null, interpreterHelper.mapAppResults(foundComplexCommand, interpreter));
     }).catch(function (err) {
         throw err;
-    }).nodeify(resultCallback);
+    });
 };
 
 exports.update = function (data, resultCallback) {
@@ -64,7 +63,7 @@ exports.update = function (data, resultCallback) {
     var componentModel = interpreter.toDb(data);
     return sequelize.transaction()
         .then(function (t) {
-            return complexCommands.update(componentModel, {where: {accountId: componentModel.accountId, name: componentModel.name }, returning: true }, {transaction: t})
+            return complexCommands.update(componentModel, {where: {accountId: componentModel.accountId, name: componentModel.name }, returning: ["*"] }, {transaction: t})
                 .then(function (foundComplexCommand) {
                     if (foundComplexCommand && foundComplexCommand[1][0]) {
                         return commands.destroy({where: {complexCommandId: foundComplexCommand[1][0].dataValues.id}}, {transaction: t})
@@ -75,7 +74,7 @@ exports.update = function (data, resultCallback) {
                                 return commands.bulkCreate(data.commands, {transaction: t})
                                     .then(function () {
                                         t.commit();
-                                    });
+                                    }).then(() => resultCallback());
                             });
                     }
                     else {
@@ -86,8 +85,7 @@ exports.update = function (data, resultCallback) {
                     t.rollback();
                     throw err;
                 });
-        })
-        .nodeify(resultCallback);
+        });
 };
 
 exports.insert = function (data, resultCallback) {
@@ -106,7 +104,7 @@ exports.insert = function (data, resultCallback) {
                     return commands.bulkCreate(data.commands, {transaction: t})
                         .then(function () {
                             t.commit();
-                        });
+                        }).then(() => resultCallback());
                 }).
                 catch(function (err) {
                     t.rollback();
@@ -117,28 +115,25 @@ exports.insert = function (data, resultCallback) {
                         throw err;
                     }
                 });
-        })
-        .nodeify(resultCallback);
+        });
 };
 
 exports.delete = function (accountId, id, resultCallback) {
     return complexCommands.destroy({where: {accountId: accountId, name: id}})
         .then(function (res) {
-            return res;
+            resultCallback(null, res);
         })
         .catch(function (err) {
             throw err;
-        })
-        .nodeify(resultCallback);
+        });
 };
 
 exports.deleteAllByAccount = function (accountId, resultCallback) {
     return complexCommands.destroy({where: {accountId: accountId}})
         .then(function (res) {
-            return res;
+            resultCallback(null, res);
         })
         .catch(function (err) {
             throw err;
-        })
-        .nodeify(resultCallback);
+        });
 };

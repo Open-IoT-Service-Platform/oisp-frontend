@@ -46,7 +46,8 @@ describe('usersApi.updateUser', function () {
         postgresProviderMock = {
             startTransaction: sinon.stub().returns(Q.resolve()),
             rollback: sinon.stub().returns({
-                done: rollbackDone
+                done: rollbackDone,
+                finally: rollbackDone
             }),
             commit: sinon.stub().returns(Q.resolve())
         };

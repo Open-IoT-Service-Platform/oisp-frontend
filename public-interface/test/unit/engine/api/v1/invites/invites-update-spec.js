@@ -81,7 +81,8 @@ describe('invitesApi.updateInviteStatus', function () {
             commit: sinon.stub().returns(Q.resolve()),
             startTransaction: sinon.stub().returns(Q.resolve()),
             rollback: sinon.stub().returns({
-                done: sinon.stub().returns(Q.resolve())
+                done: sinon.stub().returns(Q.resolve()),
+                finally: sinon.stub().returns(Q.resolve())
             })
         };
 

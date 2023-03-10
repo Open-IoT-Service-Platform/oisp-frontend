@@ -186,7 +186,7 @@ exports.updateUser = function (data, accountId) {
                 .catch (function(err) {
                     logger.warn("users.update - unable to update user, error: " + JSON.stringify(err));
                     return postgresProvider.rollback(transaction)
-                        .done(function() {
+                        .finally(function() {
                             if (err && err.code) {
                                 throw errBuilder.build(err);
                             } else {
@@ -255,7 +255,7 @@ exports.deleteUser = function (userId) {
     }).then(() => {
         return keycloak.serviceAccount.deleteUser(userId);
     }).catch (function (err) {
-        return postgresProvider.rollback(transaction).done(function() {
+        return postgresProvider.rollback(transaction).finally(function() {
             if (err && err.code) {
                 logger.error("Could not delete user: " + userId);
                 throw err;
@@ -291,7 +291,7 @@ exports.deleteUserFromAccount = function (email, accountId, isSelf) {
                             })
                             .catch(function () {
                                 return postgresProvider.rollback(transaction)
-                                    .done(function(err) {
+                                    .finally(function(err) {
                                         throw err;
                                     });
                             });
