@@ -15,12 +15,8 @@
  */
 
 'use strict';
-var authentication = require('./authentication'),
-    authorization = require('./authorization'),
-    limit = require('./limit.js');
+var authorization = require('./authorization');
 
 module.exports = {
-    authentication: authentication,
-    authorization: authorization,
-    rateLimiter: limit
+    authorization: authorization
 };
