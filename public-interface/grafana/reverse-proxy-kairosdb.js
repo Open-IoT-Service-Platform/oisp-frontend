@@ -37,10 +37,17 @@ function isDefaultNamespace(metric) {
     return splitted[0] === "default" && splitted.length === 3;
 }
 
+function isRealmNamespace(metric, realm) {
+    const splitted = metric.split('\\');
+    return splitted[0] === realm && splitted.length === 3;
+}
+
 function verifyResponse(req, res, cb) {
     var token = req.cookies.jwt || secUtils.getBearerToken(req.headers.authorization);
     return tokenInfo(token, null, function(result) {
-        return cb(res, result.payload.accounts);
+        const parts = result.payload.iss.split("/");
+        const realm = parts[parts.length - 1];
+        return cb(res, result.payload.accounts, realm);
     });
 }
 
@@ -48,10 +55,11 @@ function getAccountMatcher(accountId) {
     return account => account.id === accountId;
 }
 
-function verifySuggestion(res, accounts) {
+function verifySuggestion(res, accounts, realm) {
     for (var i = 0; i < res.results.length; i++) {
         var splitted = res.results[i].split(".");
         var isAllowed = isDefaultNamespace(res.results[i]) ||
+            isRealmNamespace(res.results[i], realm) ||
             accounts.some(getAccountMatcher(splitted[0]));
         if (!isAllowed) {
             res.results.splice(i, 1);
@@ -61,11 +69,12 @@ function verifySuggestion(res, accounts) {
     return Promise.resolve(res);
 }
 
-function verifyQuery(res, accounts) {
+function verifyQuery(res, accounts, realm) {
     var isAllowed = res.queries.every(query => {
         return query.results.every(result => {
             var splitted = result.name.split('.');
             return isDefaultNamespace(result.name) ||
+                isRealmNamespace(result.name, realm) ||
                 accounts.some(getAccountMatcher(splitted[0]));
         });
     });

@@ -58,74 +58,11 @@ var getOISPConfig = (function () {
     };
 })();
 
-var postgres_config = getOISPConfig("postgresConfig"),
-    backendHost_config = getOISPConfig("backendHostConfig"),
-    smtp_config = getOISPConfig("smtpConfig"),
-    mail_config = getOISPConfig("mailConfig"),
-    redis_config = getOISPConfig("redisConfig"),
-    gateway_config = getOISPConfig("gatewayConfig"),
-    dashboardSecurity_config = getOISPConfig("frontendSecurityConfig"),
-    kafka_config = getOISPConfig("kafkaConfig"),
-    jaeger_enabled = getOISPConfig("jaegerTracing"),
-    grafana_config = getOISPConfig("grafanaConfig"),
-    winston = require('winston'),
+var grafana_config = getOISPConfig("grafanaConfig"),
     keycloak_config = getOISPConfig("keycloakConfig");
 
-// Get replica information from the postgres config,
-// Done this way to avoid compatibility problems with other services
-var postgresReadReplicas = [],
-    postgresWriteConf = {};
-
-if (postgres_config.readReplicas) {
-    postgresReadReplicas = postgres_config.readReplicas;
-} else if (postgres_config.readHostname) {
-    postgresReadReplicas.push({
-        host: postgres_config.readHostname,
-        port: postgres_config.readPort
-    });
-} else {
-    // Use default db config as read
-    postgresReadReplicas.push({});
-}
-
-if (postgres_config.writeHostname) {
-    postgresWriteConf = {
-        host: postgres_config.writeHostname,
-        port: postgres_config.writePort
-    };
-}
-
-var smtp_tls;
-if (smtp_config.host === "debugger") {
-    smtp_tls = {rejectUnauthorized: false};
-} else {
-    smtp_tls = {secureProtocol: "TLSv1_method"};
-}
-
 var config = {
-    api: {
-        forceSSL: true,
-        port: process.env.PORT || 4001,
-        socket: 1024,
-        bodySizeLimit: '2560kb'
-    },
-    biz: {
-        domain: {
-            defaultHealthTimePeriod: 86400, // 1 day in secs
-            defaultPasswordTokenExpiration: 60, // in minutes
-            defaultActivateTokenExpiration: 60, // in minutes
-            defaultPasswordResetPath: '/ui/auth#/resetPassword?token=',
-            defaultActivatePath: '/ui/auth#/activate?token='
-        }
-    },
     auth: {
-        gatewayUser: {
-            email: gateway_config.username,
-            password: gateway_config.password
-        },
-        placeholderUser: {
-            email: 'placeholder@placeholder.org',
-        },
         keycloak: {
             keycloakListenerPort: keycloak_config.listenerPort,
             realm: keycloak_config.realm,
@@ -137,147 +74,12 @@ var config = {
             "ssl-required": keycloak_config["ssl-required"]
         }
     },
-    verifyUserEmail: true,
-    accountsPerUserLimit: 30,
-    redis:{
-        host: redis_config.hostname,
-        password: redis_config.password,
-        port: redis_config.port
-    },
-    postgres: {
-        database: postgres_config.dbname,
-        su_username: postgres_config.su_username,
-        su_password: postgres_config.su_password,
-        username: postgres_config.username,
-        password: postgres_config.password,
-        options: {
-            host: postgres_config.hostname,
-            port: postgres_config.port,
-            dialect: 'postgres',
-            dialectOptions: {},
-            databaseVersion: '9.4.21',
-            replication: {
-                read: postgresReadReplicas,
-                write: postgresWriteConf
-            },
-            pool: {
-                max: 12,
-                min: 0,
-                idle: 10000
-            }
-        }
-    },
-    mail:{
-        from: 'OISP <' + mail_config.sender + '>',
-        smtp: {
-            transport: "SMTP",
-            host: smtp_config.host,
-            secureConnection: (smtp_config.protocol === 'smtps'),
-            port: smtp_config.port,
-            requiresAuth: true,
-            auth: {
-                user: smtp_config.username,
-                pass: smtp_config.password
-            },
-            tls: smtp_tls
-        },
-        footer:"",
-        blockedDomains: [ "@example.com", "@test.com" ]
-    },
-    drsProxy: {
-        url: backendHost_config.host,
-        dataUrl: backendHost_config.host,
-        strictSsl: false,
-        mqtt: {
-            host: '',
-            port: 8883,
-            qos: 1,
-            retain: false,
-            secure: true,
-            retries: 30,
-            username: "",
-            password : ""
-        },
-        kafka: {
-            uri: kafka_config.uri,
-            topicsObservations: kafka_config.topicsObservations,
-            topicsRuleEngine: kafka_config.topicsRuleEngine,
-            topicsActuations: kafka_config.topicsActuations,
-            topicsHeartbeatName: kafka_config.topicsHeartbeatName,
-            topicsHeartbeatInterval: kafka_config.topicsHeartbeatInterval,
-            replication: kafka_config.replication,
-            requestTimeout: kafka_config.requestTimeout,
-            maxRetryTime: kafka_config.maxRetryTime,
-            retries: kafka_config.retries
-        },
-        ingestion: 'Kafka',
-        userScheme: null // default
-    },
-    logger: {
-        level: 'info', //Default verbosity,
-    	format: winston.format.combine(
-    	        winston.format.colorize(),
-    	        winston.format.timestamp(),
-    	        winston.format.printf(info => { return `${info.timestamp}-${info.level}: ${info.message}`; })
-    	     ),
-        frontendTransports: [new winston.transports.Console({ handleExceptions: true })],
-        httpTransports: [new winston.transports.Console({ handleExceptions: true })],
-        exitOnError: false,
-        maxLines: 30
-    },
-    login : {
-        maxUnsuccessfulAttempts: 10,
-        lockIntervalLength: 30, //In seconds
-        lockLivePeriod : 86400 //In seconds - 24h
-    },
-    rateLimit: 25000, // Limit of requests to API per route and method per hour
-    actuation : {
-        TTL: 86400, //In seconds - 24h
-        limitPerRequest: 1000 //max number of actuations which can be returned by rest api
-    },
-    interactionTokenGenerator: {
-        permissionKey: dashboardSecurity_config.interaction_token_permision_key
-    },
-    jaeger : {
-        serviceName: 'frontend',
-        agentHost: process.env.DASHBOARD_SERVICE_HOST ? 'localhost' : 'jaeger',
-        agentPort: 6832,
-        logSpans: true,
-        samplerType: 'probabilistic',
-        samplerParam: 0.1,
-        tracing: jaeger_enabled
-    },
     grafana : {
-        host: 'grafana',
-        port: grafana_config.port,
-        adminUser: grafana_config.adminUser,
-        adminPassword: grafana_config.adminPassword,
         dataSource: grafana_config.dataSource,
         dataSourceHost: grafana_config.dataSourceHost,
         dataSourcePort: grafana_config.dataSourcePort,
-        proxyPort: grafana_config.proxyPort || 4002,
         dataSourceProxyPort: grafana_config.dataSourceProxyPort || 4003
     }
 };
-
-/* override for local development if NODE_ENV is defined to local */
-if (process.env.NODE_ENV && (process.env.NODE_ENV.toLowerCase().indexOf("local") !== -1)) {
-    console.log("NODE_ENV = local selected.");
-    config.rateLimit = 'limitless';
-    config.logger.level = process.env.LOGLEVEL === undefined?'info':process.env.LOGLEVEL;
-}
-config.api.forceSSL = false;
-
-if (process.env.PGSSLMODE === "require") {
-    config.postgres.options.dialectOptions.ssl = {
-        rejectUnauthorized: false
-    };
-}
-
-/* override for testing if rateLimit wants to be disabled */
-if (process.argv && (process.argv.indexOf("--disable-rate-limits") !== -1)) {
-    config.rateLimit = 'limitless';
-}
-
 
 module.exports = config;

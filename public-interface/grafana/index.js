@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-const getViewerToken = require('./viewer-token'),
-    reverseProxyGrafana = require('./reverse-proxy-grafana'),
-    reverseProxyDataSource = require('./reverse-proxy-kairosdb');
+const reverseProxyDataSource = require('./reverse-proxy-kairosdb');
 
 module.exports = {
-    reverseProxyGrafana: reverseProxyGrafana,
-    reverseProxyDataSource: reverseProxyDataSource,
-    getViewerToken: getViewerToken
+    reverseProxyDataSource: reverseProxyDataSource
 };

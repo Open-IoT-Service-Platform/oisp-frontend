@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "fs": "0.0.1-security",
-    "json2yaml": "^1.1.0",
-    "path": "^0.12.7",
-    "raml2html": "^6.4.1"
-  }
-}

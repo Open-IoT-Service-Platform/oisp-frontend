@@ -16,34 +16,12 @@
 
 'use strict';
 const Keycloak = require('keycloak-connect'),
-    keycloakListener = require('./listener'),
-    KeycloakServiceAccount = require('./service-account'),
-    getCustomGrants = require('./custom-grants'),
-    registerEnforcer = require('./enforcer').register,
-    authConfig = require('./../../../config').auth,
-    errors = require('./../../../engine/res/errors').Errors,
     config = require('./config').getKeycloakConfig();
 
-const keycloakAdapter = new Keycloak({}, config),
-    serviceAdapter = new Keycloak({}, config),
-    serviceAccount = new KeycloakServiceAccount(serviceAdapter),
-    customGrants = getCustomGrants(keycloakAdapter.grantManager.clientId,
-        keycloakAdapter.grantManager.secret, keycloakAdapter.grantManager.realmUrl,
-        keycloakAdapter.grantManager.public);
-
-keycloakAdapter.redirectToLogin = () => false;
-keycloakAdapter.accessDenied = (req, res) => {
-    res.status(errors.Generic.NotAuthorized.status).send(errors.Generic.NotAuthorized);
-};
-
+const keycloakAdapter = new Keycloak({}, config);
 
 module.exports = {
-    keycloakListener: keycloakListener,
-    serviceAccount: serviceAccount,
     adapter: keycloakAdapter,
-    customGrants: customGrants,
     placeholder: config.placeholder,
-    placeholdermail: authConfig.placeholderUser.email,
-    registerEnforcer: registerEnforcer,
     config: config
 };
