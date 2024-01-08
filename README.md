@@ -1,7 +1,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FOpen-IoT-Service-Platform%2Foisp-frontend.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FOpen-IoT-Service-Platform%2Foisp-frontend?ref=badge_shield)
 
 # OISP Frontend and Dashboard
-
+# NOTE: This project reached end of support and is no longer maintained. Parts of the project are continued in https://github.com/IndustryFusion/DigitalTwin.
 This repository consists of 2 distinct components. A browser-based dashboard written using AngularJS and also a Node application that provides all the public APIs.
 
 ## Dashboard
